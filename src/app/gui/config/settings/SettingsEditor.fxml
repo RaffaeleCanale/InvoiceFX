@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+<Stage title="%settings.title" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+       fx:controller="app.gui.config.settings.SettingsController">
+    <scene>
+        <Scene>
+            <BorderPane prefHeight="750.0" prefWidth="800.0">
+                <center>
+                    <ScrollPane>
+                        <GridPane hgap="10.0" vgap="10.0" BorderPane.alignment="CENTER">
+                            <padding>
+                                <Insets bottom="50.0" left="50.0" right="50.0" top="0.0"/>
+                            </padding>
+                            <columnConstraints>
+                                <ColumnConstraints halignment="RIGHT" hgrow="NEVER"/>
+                                <ColumnConstraints hgrow="SOMETIMES"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints prefHeight="30.0" vgrow="NEVER"/>
+                                <RowConstraints prefHeight="30.0" vgrow="NEVER"/>
+                                <RowConstraints valignment="TOP" vgrow="NEVER"/>
+                                <RowConstraints prefHeight="30.0" vgrow="NEVER"/>
+                                <RowConstraints prefHeight="30.0" vgrow="NEVER"/>
+                                <RowConstraints valignment="TOP" vgrow="SOMETIMES"/>
+                                <RowConstraints prefHeight="30.0" vgrow="NEVER"/>
+                            </rowConstraints>
+
+                            <Label text="%settings.language" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <ChoiceBox fx:id="languageBox" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="%settings.invoice_dir" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                                <Label fx:id="invoiceDirLabel"/>
+                                <Button onAction="#chooseInvoiceDir" text="%settings.choose_file"/>
+                            </HBox>
+
+                            <Label text="%settings.euro_currency" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <FlowPane GridPane.rowIndex="2" GridPane.columnIndex="1">
+                                <fx:include fx:id="currencyPanel" source="../currency/CurrencyPanel.fxml"/>
+                            </FlowPane>
+
+                            <Label text="%settings.ignore_count" GridPane.rowIndex="3" GridPane.columnIndex="0">
+                                <tooltip>
+                                    <Tooltip text="%settings.ignore_count.more"/>
+                                </tooltip>
+                            </Label>
+                            <CheckBox fx:id="showCountBox" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                            <Label text="%settings.round_vat" GridPane.rowIndex="4" GridPane.columnIndex="0">
+                                <tooltip>
+                                    <Tooltip text="%settings.round_vat.more"/>
+                                </tooltip>
+                            </Label>
+                            <CheckBox fx:id="roundVatCheckbox" GridPane.rowIndex="4"
+                                      GridPane.columnIndex="1"/>
+
+                            <Label text="%settings.drive" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                            <FlowPane GridPane.rowIndex="5" GridPane.columnIndex="1">
+                                <fx:include source="../../google/GoogleProfilePanel.fxml"/>
+                            </FlowPane>
+
+                            <Label text="%settings.version" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                            <FlowPane GridPane.rowIndex="6" GridPane.columnIndex="1" hgap="10" alignment="CENTER_LEFT">
+                                <Label fx:id="versionLabel" text="%settings.version.getting"/>
+                                <StackPane>
+                                    <ProgressIndicator fx:id="versionProgress" prefWidth="25" prefHeight="25"
+                                                       id="customProgressIndicator" visible="false"/>
+                                    <Button fx:id="versionActionButton" onAction="#versionAction" text="%settings.update"
+                                            visible="false"/>
+                                    <ProgressBar fx:id="versionUpdateProgress" visible="false" />
+                                </StackPane>
+                            </FlowPane>
+
+                        </GridPane>
+                    </ScrollPane>
+                </center>
+                <bottom>
+                    <HBox BorderPane.alignment="CENTER">
+                        <Button onAction="#showAdvanced" text="%settings.advanced"/>
+                        <FlowPane alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                            <Button cancelButton="true" defaultButton="true" onAction="#close" text="%settings.close"/>
+                        </FlowPane>
+                    </HBox>
+                </bottom>
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                </padding>
+            </BorderPane>
+        </Scene>
+    </scene>
+</Stage>

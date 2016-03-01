@@ -1,0 +1,119 @@
+\setLang{EN}
+
+
+\def\destination{VALUE}
+\def\date{VALUE}
+\def\id{VALUE}
+\def\totalChf{VALUE}
+\def\totalEuro{VALUE}
+
+\renewcommand{\thefootnote}{[\arabic{footnote}]}
+\usepackage{eurosym}
+
+\def\leftPage{0.5\linewidth}
+\def\rightPage{0.2\linewidth}
+
+\newcommand{\client}[1]{
+% \vspace*{0.9cm}
+\\\\
+#1 & & \\
+\\
+}
+
+\newcommand{\clientItem}[2] {
+#1 \hspace*{1cm} & Sfr. & #2 \\
+}
+
+\newcommand{\fromDate}[1] {
+Vom #1 & &\\
+}
+
+\newcommand{\toDate}[1] {
+Bis #1 & &\\	
+}
+
+\def\itemSep{\\}
+
+\newcommand{\vat}[3] {
+	#1\%\footnote{\vatText{#3}} MWST Inkl. #2\\
+}
+
+\newcommand{\vatText}[1] {
+	\ifthenelse{\equal{#1}{0}}
+		{Hotel Rechnung}
+		{\ifthenelse{\equal{#1}{1}}
+			{Restaurant Rechnung}
+			{}
+		}
+}
+
+\begin{document}
+\setlength{\parindent}{0cm}
+
+\section*{Hotel Restaurant Klösterli}
+
+%\vspace*{1cm}
+
+\begin{minipage}{0.7\linewidth}
+	% \setstretch{1}
+	\textbf{R \& C Gastronomie GmbH}\\	
+	\textbf{Bahnhofstrasse 1}\\
+	\textbf{2542 Pieterlen}\\
+	\hspace*{-0.3cm}
+	\begin{tabular}{ll}	
+	\textbf{TEL} & \textbf{: ++41 32 377 33 33}\\
+	\textbf{FAX} & \textbf{: ++41 32 377 33 63}\\
+	\textbf{MAIL} & \textbf{: rc.gastronomie@besonet.ch}\\
+	\textbf{Internet} & \textbf{: www.kloesterli-pieterlen.com}
+	\end{tabular}	
+
+	\vspace*{0.8cm}
+\end{minipage}
+\hfill
+\begin{minipage}{0.3\linewidth}
+	% \setstretch{0.9}
+	\vspace*{3cm}
+	\textbf{\raggedright \destination}
+
+	\vspace*{0.7cm}
+\end{minipage}
+% \setstretch{1}
+
+Pieterlen, \date
+\vspace*{0.5cm}
+
+\subsection*{\underline{Faktura/Quittung/\id}}
+
+\begin{longtable}[l]{lrr}
+
+% clients
+
+% \client{Raffaele Canale}
+% \clientItem{1 Chambre simple}{9.00}
+% \fromDate{13/08/2015}
+% \toDate{14/08/2015}
+% \itemSep
+
+% \client{Raffaele Canale}
+% \clientItem{1 Chambre simple}{19.00}
+% \fromDate{13/08/2015}
+% \toDate{14/08/2015}
+% \itemSep
+
+\\
+\multicolumn{1}{r}{Tot.}   & Sfr. & \totalChf\\
+						   & \euro & \totalEuro
+\\
+\\
+\end{longtable}
+
+% vat
+% \vat{3.8}{2.2 CHF}{1}
+% \vat{8}{2.2 CHF}{2}
+MWST-Nr. CHE-112.151.681\\
+
+Für Ihren Besuch und das Vertrauen, danken wir bestens.
+
+\end{document}
+
+

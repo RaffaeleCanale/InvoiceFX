@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.stage.Stage?>
+<?import javafx.scene.Scene?>
+<Stage title="%properties_editor.title" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+       fx:controller="app.gui.config.properties.PropertiesViewerController">
+    <scene>
+        <Scene>
+            <BorderPane prefHeight="600.0" prefWidth="700.0">
+                <center>
+                    <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+                        <Tab text="%properties_editor.shared">
+                            <BorderPane>
+                                <center>
+                                    <fx:include fx:id="sharedTable" source="PropertiesTable.fxml"
+                                                BorderPane.alignment="CENTER"/>
+                                </center>
+                            </BorderPane>
+                        </Tab>
+                        <Tab text="%properties_editor.local">
+                            <BorderPane>
+                                <center>
+                                    <fx:include fx:id="localTable" source="PropertiesTable.fxml"
+                                                BorderPane.alignment="CENTER"/>
+                                </center>
+                            </BorderPane>
+                        </Tab>
+                        <Tab text="%properties_editor.drive">
+                            <BorderPane>
+                                <center>
+                                    <fx:include fx:id="driveTable" source="PropertiesTable.fxml"
+                                                BorderPane.alignment="CENTER"/>
+                                </center>
+                            </BorderPane>
+                        </Tab>
+                        <Tab fx:id="filesTab" text="%properties_editor.drive_files">
+                            <BorderPane>
+                                <center>
+                                    <fx:include fx:id="filesTable" source="PropertiesTable.fxml"
+                                                BorderPane.alignment="CENTER"/>
+                                </center>
+                                <bottom>
+                                    <HBox>
+                                        <Label fx:id="driveInfoLabel"/>
+                                        <padding>
+                                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                        </padding>
+                                    </HBox>
+                                </bottom>
+                            </BorderPane>
+                        </Tab>
+                        <Tab text="%properties_editor.backup">
+                            <BorderPane>
+                                <center>
+                                    <fx:include fx:id="backUp" source="PropertiesTable.fxml"
+                                                BorderPane.alignment="CENTER"/>
+                                </center>
+                            </BorderPane>
+                        </Tab>
+                    </TabPane>
+                </center>
+                <bottom>
+                    <FlowPane>
+                        <fx:include source="../../google/StatusPane.fxml"/>
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </padding>
+                    </FlowPane>
+                </bottom>
+            </BorderPane>
+        </Scene>
+    </scene>
+</Stage>
