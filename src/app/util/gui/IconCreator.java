@@ -3,18 +3,16 @@ package app.util.gui;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Path2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 /**
+ * Specific code that generates a background for the App icon.
+ * <p>
  * Created on 20/07/2015
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
- * @version 0.1
  */
 public class IconCreator  {
 
@@ -26,23 +24,23 @@ public class IconCreator  {
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
 
-        GradientPaint grad = new GradientPaint(100, 0, new Color(255, 255, 255), 300, 300, new Color(255, 255, 255));
+        GradientPaint grad = new GradientPaint(100, 0, new Color(240, 240, 240), 300, 300, new Color(180, 180, 180));
         g.setPaint(grad);
-        g.fillOval(0, 0, 300, 300);
+        g.fillOval(20, 20, 260, 260);
 
         ImageIcon icon = new ImageIcon(IconCreator.class.getResource("/icons/icon_alt.png"));
 
 
-        Shape rect = new Rectangle2D.Double(0, 0, 300, 150);
-        Shape circle = new Ellipse2D.Double(0, 0, 300, 300);
-        Path2D.Double p = new Path2D.Double();
-        p.append(circle, false);
-        p.append(rect, false);
+//        Shape rect = new Rectangle2D.Double(0, 0, 300, 150);
+//        Shape circle = new Ellipse2D.Double(0, 0, 300, 300);
+//        Path2D.Double p = new Path2D.Double();
+//        p.append(circle, false);
+//        p.append(rect, false);
 
-        g.clip(p);
-        g.drawImage(icon.getImage(), 0, 0, null, null);
+//        g.clip(p);
+        g.drawImage(icon.getImage(), 5, 20, null, null);
 
-        ImageIO.write(image, "png", new File("/home/canale/Temporary/InvoiceFX/test.png"));
+        ImageIO.write(image, "png", new File("resources/icons/icon.png"));
     }
 
 
