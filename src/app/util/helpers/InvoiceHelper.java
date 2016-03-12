@@ -38,35 +38,6 @@ import static com.wx.fx.transfer.TransferTask.Action.MOVE;
 public class InvoiceHelper {
 
     /**
-     * Opens a dialog that will move all given pdf to a given directory.
-     *
-     * @param pdfFiles     Files to move
-     * @param newDirectory Destination directory
-     */
-    public static void moveFiles(File[] pdfFiles, File newDirectory) {
-        if (pdfFiles.length == 0) {
-            return;
-        }
-
-        StageManager.show(TransferController.STAGE_INFO,
-                new TransferTask.Builder()
-                        .action(MOVE, pdfFiles, newDirectory)
-                        .build(),
-                new SimpleCallback() {
-                    @Override
-                    public void success(Object[] args) {
-                    }
-
-                    @Override
-                    public void failure(Throwable ex) {
-                        AlertBuilder.error(ex)
-                                .key("errors.copy_failed")
-                                .show();
-                    }
-                });
-    }
-
-    /**
      * Create an invoice initialized with default values.
      *
      * @return An invoice with default values
@@ -184,7 +155,7 @@ public class InvoiceHelper {
         return true;
     }
 
-    public static boolean containsWord(InvoiceModel invoice, String word) {
+    private static boolean containsWord(InvoiceModel invoice, String word) {
         return contains(invoice.addressProperty().getValueSafe(), word)
                 || contains(dateConverter().toString(invoice.getDate()), word)
                 || contains(idFormat().format(invoice.getId()), word)

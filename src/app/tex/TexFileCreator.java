@@ -7,7 +7,6 @@ import app.model.DateEnabled;
 import app.model.invoice.InvoiceModel;
 import app.model.item.ClientItem;
 import app.model.item.ItemModel;
-import app.util.gui.DesktopOpen;
 import app.util.helpers.Common;
 import app.util.helpers.PdfNameHelper;
 import com.wx.io.Accessor;
@@ -64,7 +63,7 @@ public class TexFileCreator {
         }
         LOG.info("PDF generated at:" + newPdf.getAbsolutePath());
 
-        DesktopOpen.open(newPdf);
+        Common.open(newPdf);
 
         return newPdf.getName();
     }

@@ -2,8 +2,7 @@ package app.config.manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import app.util.interfaces.ListWrapper;
-import javafx.collections.transformation.SortedList;
+import app.model.ListContainer;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -16,7 +15,7 @@ import java.io.IOException;
  * A simple {@link ModelManager} that uses a single file to store the models. <br> The {@code JAXB} libraries are used
  * to store and load models to the file.
  * <p>
- * Due to some {@code JAXB} limitations, a class that wraps a list of model must be provided (see {@link ListWrapper}).
+ * Due to some {@code JAXB} limitations, a class that wraps a list of model must be provided (see {@link ListContainer}).
  * <p>
  * <p>
  * <p>
@@ -25,7 +24,7 @@ import java.io.IOException;
  * @author Raffaele Canale (raffaelecanale@gmail.com)
  * @version 1.0
  */
-public class DefaultModelManager<E, L extends ListWrapper<E>> implements ModelManager<E> {
+public class DefaultModelManager<E, L extends ListContainer<E>> implements ModelManager<E> {
 
     static Marshaller getMarshaller(Class... modelClass) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(modelClass);
@@ -48,9 +47,9 @@ public class DefaultModelManager<E, L extends ListWrapper<E>> implements ModelMa
     /**
      * Creates a new instance of the {@code DefaultModelManager}.
      * <p>
-     * A class that wraps a list of models must be provided (see {@link ListWrapper}.
+     * A class that wraps a list of models must be provided (see {@link ListContainer}.
      *
-     * @param listClass The list wrapper class (must implement {@link ListWrapper})
+     * @param listClass The list wrapper class (must implement {@link ListContainer})
      * @param file      The file that will contain the models
      */
     public DefaultModelManager(Class<L> listClass, File file) {

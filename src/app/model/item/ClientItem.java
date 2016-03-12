@@ -2,7 +2,7 @@ package app.model.item;
 
 import app.model.DateEnabled;
 import app.util.adapter.LocalDateAdapter;
-import app.util.interfaces.ValidationModel;
+import app.model.ValidationModel;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;

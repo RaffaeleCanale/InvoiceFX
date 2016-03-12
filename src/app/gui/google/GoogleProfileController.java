@@ -187,10 +187,10 @@ public class GoogleProfileController {
                 if (App.loadConfigSafe()) {
                     LOG.info("Merging managers");
                     if (addTo(Config.invoicesManager().get(), invoicesBackup, InvoiceModel::getId)) {
-                        App.saveSafe(Config.invoicesManager());
+                        Config.saveSafe(Config.invoicesManager());
                     }
                     if (addTo(Config.itemsManager().get(), itemsBackup, ItemModel::getItemName)) {
-                        App.saveSafe(Config.itemsManager());
+                        Config.saveSafe(Config.itemsManager());
                     }
 
                     StageManager.close(Stages.SETTINGS);

@@ -197,7 +197,7 @@ public class OverviewController implements StageController {
                 false);
 
         if (changed) {
-            App.saveSafe(Config.itemsManager());
+            Config.saveSafe(Config.itemsManager());
         }
 
         setArguments(savedInvoice); // TODO: 11/4/15 A bit overkill

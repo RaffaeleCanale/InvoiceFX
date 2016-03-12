@@ -1,6 +1,6 @@
 package app.model.invoice;
 
-import app.util.interfaces.ListWrapper;
+import app.model.ListContainer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -13,7 +13,7 @@ import java.util.List;
  * @version 0.1
  */
 @XmlRootElement
-public class InvoiceList implements ListWrapper<InvoiceModel> {
+public class InvoiceList implements ListContainer<InvoiceModel> {
 
     private List<InvoiceModel> invoices;
 

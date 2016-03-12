@@ -2,7 +2,7 @@ package app.model.invoice;
 
 import app.model.item.ClientItem;
 import app.util.adapter.LocalDateAdapter;
-import app.util.interfaces.ValidationModel;
+import app.model.ValidationModel;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
@@ -15,9 +15,7 @@ import javafx.collections.ObservableList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 

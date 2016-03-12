@@ -1,14 +1,16 @@
-package app.util.interfaces;
+package app.model;
 
 import java.util.List;
 
 /**
+ * Simple interface for a list container.
+ * <p>
  * Created on 09/07/2015
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
  * @version 1.0
  */
-public interface ListWrapper<E> {
+public interface ListContainer<E> {
 
     List<E> getElements();
 

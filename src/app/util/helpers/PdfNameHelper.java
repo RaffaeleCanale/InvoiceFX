@@ -6,13 +6,22 @@ import app.model.item.ClientItem;
 import java.util.List;
 
 /**
+ * Simple utility class that suggests a file name for a given invoice according to some format.
+ * <p>
  * Created on 11/07/2015
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
- * @version 0.1
  */
 public class PdfNameHelper {
 
+    /**
+     * Suggest a relevant file name for the given invoice. The name will be characterized by the invoice id and will be
+     * unique amongst all invoices.
+     *
+     * @param invoice Invoice whose file name to get
+     *
+     * @return A relevant file name for this invoice
+     */
     public static String suggestFileName(InvoiceModel invoice) {
         String clientName = findFirstClientName(invoice.getItems());
         if (clientName == null) {
@@ -33,6 +42,9 @@ public class PdfNameHelper {
         return null;
     }
 
+    /*
+        The file format used to be dynamically determined by a SharedProperty but has been simplified since for a unique format.
+     */
 
 //        String fileNamePattern = Config.sharedPreferences().getProperty(SharedProperty.PDF_FILE_NAME);
 //

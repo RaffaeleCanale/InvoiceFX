@@ -53,7 +53,7 @@ public class TexCreatorHelper {
                     String pdfName = texFileCreator.create();
 
                     invoice.setPdfFileName(pdfName);
-                    App.saveSafe(Config.invoicesManager());
+                    Config.saveSafe(Config.invoicesManager());
                 } catch (IOException e) {
                     AlertBuilder.error(e)
                             .key("errors.tex")

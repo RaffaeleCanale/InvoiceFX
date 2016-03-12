@@ -1,6 +1,6 @@
 package app.model.item;
 
-import app.util.interfaces.ListWrapper;
+import app.model.ListContainer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -13,7 +13,7 @@ import java.util.List;
  * @version 0.1
  */
 @XmlRootElement
-public class ItemsList implements ListWrapper<ItemModel> {
+public class ItemsList implements ListContainer<ItemModel> {
 
     private List<ItemModel> item;
 

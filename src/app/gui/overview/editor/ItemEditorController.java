@@ -98,7 +98,7 @@ public class ItemEditorController implements StageController {
 
 
             itemsManager.get().setAll(distinct(copies));
-            App.saveSafe(itemsManager);
+            Config.saveSafe(itemsManager);
 
             StageManager.close(Stages.ITEM_EDITOR);
         }

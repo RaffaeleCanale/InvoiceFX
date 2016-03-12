@@ -17,22 +17,47 @@ import static app.util.helpers.KeyWordHelper.keyPattern;
 import static app.util.helpers.KeyWordHelper.keyWordsIn;
 
 /**
+ * Utility class that "pretty prints" an invoice using HTML tags.
+ * <p>
  * Created on 10/07/2015
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
- * @version 0.1
  */
 public class InvoiceHtmlPrinter {
 
+    /*
+    Here the 'models' refer to the HTML format models.
+    More specifically, theses models are specified in the resources.
+     */
     private static String invoiceModel;
     private static String clientModel;
     private static String itemModel;
 
+    /**
+     * Print an invoice using the HTML format.
+     *
+     * @param invoice Invoice to print
+     *
+     * @return A formatted view of the invoice in HTML code
+     */
+    public static String print(InvoiceModel invoice) {
+        if (invoiceModel == null) {
+            invoiceModel = loadModel("/html_model/InvoiceHtmlModel.html");
+        }
+        if (clientModel == null) {
+            clientModel = loadModel("/html_model/ClientHtmlModel.html");
+        }
+        if (itemModel == null) {
+            itemModel = loadModel("/html_model/ItemHtmlModel.html");
+        }
+
+        return generateInvoice(invoice);
+    }
 
     private static String loadModel(String name) {
         PropertiesManager lang = App.getLang();
 
-        try(TextAccessor accessor = new TextAccessor().setIn(InvoiceHtmlPrinter.class.getResourceAsStream(name))) {
+        try (TextAccessor accessor = new TextAccessor().setIn(InvoiceHtmlPrinter.class.getResourceAsStream(name))) {
 
             String model = accessor.readText();
 
@@ -56,19 +81,6 @@ public class InvoiceHtmlPrinter {
         }
     }
 
-    public static String print(InvoiceModel invoice) {
-        if (invoiceModel == null) {
-            invoiceModel = loadModel("/html_model/InvoiceHtmlModel.html");
-        }
-        if (clientModel == null) {
-            clientModel = loadModel("/html_model/ClientHtmlModel.html");
-        }
-        if (itemModel == null) {
-            itemModel = loadModel("/html_model/ItemHtmlModel.html");
-        }
-
-        return generateInvoice(invoice);
-    }
 
     private static String generateInvoice(InvoiceModel invoice) {
         String clients = invoice.getItems().stream()

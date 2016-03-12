@@ -11,7 +11,8 @@ import app.model.invoice.InvoiceModel;
 import app.model.item.ItemModel;
 import app.model.item.ItemsList;
 import app.util.ExceptionLogger;
-import app.util.interfaces.ValidationModel;
+import app.util.gui.AlertBuilder;
+import app.model.ValidationModel;
 import com.wx.io.AccessorUtil;
 import com.wx.io.file.FileUtil;
 import com.wx.util.log.LogHelper;
@@ -190,6 +191,32 @@ public class Config {
      */
     public static UserPreferences<SharedProperty> sharedPreferences() {
         return sharedPreferences;
+    }
+
+    /**
+     * Save the given manager. Any exception is dealt locally.
+     * <p>
+     * More specifically, in case of exception, a dialog is started with the user to determine whether to retry or
+     * ignore the error.
+     *
+     * @param manager Manager to save
+     */
+    public static void saveSafe(ModelManager<?> manager) {
+        try {
+            LOG.info("Saving manager");
+            manager.save();
+        } catch (IOException ex) {
+            ExceptionLogger.logException(ex);
+            int choice = AlertBuilder.error(ex)
+                    .key("errors.saving_failed")
+                    .button("dialog.retry")
+                    .button("dialog.ignore")
+                    .show();
+
+            if (choice == 0) {
+                saveSafe(manager);
+            }
+        }
     }
 
     /**

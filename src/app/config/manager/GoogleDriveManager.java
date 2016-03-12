@@ -3,7 +3,7 @@ package app.config.manager;
 import app.google.DriveConfigHelper;
 import app.util.ExceptionLogger;
 import app.util.backup.BackUpManager;
-import app.util.interfaces.ListWrapper;
+import app.model.ListContainer;
 
 import java.io.IOException;
 
@@ -21,7 +21,7 @@ import java.io.IOException;
  * @author Raffaele Canale (raffaelecanale@gmail.com)
  * @version 0.1
  */
-public class GoogleDriveManager<E, L extends ListWrapper<E>> extends DefaultModelManager<E, L> {
+public class GoogleDriveManager<E, L extends ListContainer<E>> extends DefaultModelManager<E, L> {
 
     public GoogleDriveManager(Class<L> listClass, java.io.File file) {
         super(listClass, file);

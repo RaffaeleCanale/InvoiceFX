@@ -3,10 +3,11 @@ package app;
 import com.wx.fx.gui.window.StageInfo;
 
 /**
+ * Enumeration of all the stages of this app
+ *
  * Created on 18/07/2015
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
- * @version 0.1
  */
 public enum Stages implements StageInfo {
     OVERVIEW("/app/gui/overview/Overview.fxml", false, 0),

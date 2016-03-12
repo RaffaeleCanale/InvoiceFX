@@ -30,7 +30,7 @@ public class ECBRetriever implements CurrentRateRetriever {
     private static final long VALIDITY_PERIOD = 43200000; // 12h
     private static ECBRetriever singleton;
 
-    public static void initialize(File cacheDirectory) throws IOException {
+    public static void initialize(File cacheDirectory) {
         if (singleton != null) {
             throw new IllegalArgumentException("Already initialized");
         }

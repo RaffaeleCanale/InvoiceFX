@@ -44,8 +44,6 @@ public class SettingsController implements StageController {
 
     @FXML
     private ProgressIndicator versionProgress;
-    @FXML
-    private ProgressBar versionUpdateProgress;
 
     @FXML
     private Label versionLabel;
@@ -106,10 +104,6 @@ public class SettingsController implements StageController {
 
 
         // VERSION
-        UpdateHelper.progressPropertyProperty().addListener((observable, oldValue, newValue) -> {
-            double p = newValue.doubleValue();
-            Platform.runLater(() -> versionUpdateProgress.setProgress(p == 0.0 ? -1 : p));
-        });
         UpdateHelper.stateProperty().addListener((observable, oldValue, newValue) -> {
             Platform.runLater(() -> showUpdaterState(newValue));
         });
@@ -128,18 +122,12 @@ public class SettingsController implements StageController {
         versionLabel.setId("");
         versionActionButton.setVisible(false);
         versionProgress.setVisible(false);
-        versionUpdateProgress.setVisible(false);
 
         switch (state) {
             case UNINITIALIZED:
             case LOADING_INDEX:
                 versionLabel.setText(lang.getString("settings.version.getting"));
                 versionProgress.setVisible(true);
-                break;
-
-            case DOWNLOADING:
-                versionLabel.setText(lang.getString("settings.version.downloading"));
-                versionUpdateProgress.setVisible(true);
                 break;
 
             case UP_TO_DATE:
@@ -200,8 +188,7 @@ public class SettingsController implements StageController {
             FileUtil.autoCreateDirectory(result);
         } catch (IOException e) {
             AlertBuilder.error()
-                    .key("settings.file_chooser.error")
-                    .plainContent(result.getAbsolutePath())
+                    .key("settings.file_chooser.error", result.getAbsolutePath())
                     .show();
             return;
         }
@@ -215,7 +202,7 @@ public class SettingsController implements StageController {
                     .key("settings.file_chooser.migrate", pdfFiles.length)
                     .show();
             if (choice == 0) { // Migrate
-                InvoiceHelper.moveFiles(pdfFiles, result);
+                Common.moveFiles(pdfFiles, result);
             }
         }
 

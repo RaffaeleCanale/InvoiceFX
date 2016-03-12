@@ -3,18 +3,14 @@ package app.gui.archives;
 import app.App;
 import app.Stages;
 import app.config.Config;
-import app.util.helpers.InvoiceHelper;
+import app.util.helpers.*;
 import app.config.manager.ModelManager;
 import app.config.preferences.properties.LocalProperty;
 import app.config.preferences.properties.SharedProperty;
 import app.model.invoice.InvoiceModel;
 import app.model.item.ClientItem;
 import app.util.gui.AlertBuilder;
-import app.util.gui.DesktopOpen;
 import app.util.gui.cell.FormatFactory;
-import app.util.helpers.InvoiceHtmlPrinter;
-import app.util.helpers.InvoiceViewer;
-import app.util.helpers.TexCreatorHelper;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
 import com.wx.properties.PropertiesManager;
@@ -250,7 +246,7 @@ public class InvoicesArchiveController implements StageController {
         File pdf = getFile(selectedInvoice);
 
         if (pdf != null && pdf.exists()) {
-            DesktopOpen.open(pdf);
+            Common.open(pdf);
         } else {
             LOG.warning("Missing PDF at " + pdf + ", regenerating...");
             TexCreatorHelper.createAsync(selectedInvoice, openButton);
@@ -284,11 +280,11 @@ public class InvoicesArchiveController implements StageController {
         }
 
         manager.get().removeAll(invoices);
-        App.saveSafe(manager);
+        Config.saveSafe(manager);
     }
 
     public void openDirectory() {
-        DesktopOpen.open(getInvoiceDirectory());
+        Common.open(getInvoiceDirectory());
     }
 
     private File getInvoiceDirectory() {

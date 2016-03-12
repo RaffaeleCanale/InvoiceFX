@@ -72,7 +72,6 @@
                                                        id="customProgressIndicator" visible="false"/>
                                     <Button fx:id="versionActionButton" onAction="#versionAction" text="%settings.update"
                                             visible="false"/>
-                                    <ProgressBar fx:id="versionUpdateProgress" visible="false" />
                                 </StackPane>
                             </FlowPane>
 

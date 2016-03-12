@@ -3,7 +3,7 @@ package app.model.item;
 import app.model.DateEnabled;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
-import app.util.interfaces.ValidationModel;
+import app.model.ValidationModel;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.logging.Logger;

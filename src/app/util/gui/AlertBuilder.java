@@ -1,6 +1,7 @@
 package app.util.gui;
 
 import app.App;
+import app.util.ExceptionLogger;
 import com.sun.javafx.tk.Toolkit;
 import com.wx.fx.gui.window.StageManager;
 import com.wx.properties.PropertiesManager;
@@ -16,22 +17,41 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
+ * Quickly create alert dialogs.
+ * <p>
  * Created on 09/07/2015
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
- * @version 0.1
  */
 public class AlertBuilder {
 
+    /**
+     * Show an error dialog. Because the content is directly specified, this dialog does not require to access the
+     * language resources.
+     * <p>
+     * This method is intended to be used for fatal errors before the language resources are loaded.
+     *
+     * @param header  Header of the alert
+     * @param content Content of the alert
+     */
     public static void showFatalError(String header, String content) {
         showFatalError(header, content, null);
     }
 
+    /**
+     * Show an error dialog. Because the content is directly specified, this dialog does not require to access the
+     * language resources.
+     * <p>
+     * This method is intended to be used for fatal errors before the language resources are loaded.
+     *
+     * @param header  Header of the alert
+     * @param content Content of the alert
+     * @param ex      Exception that caused the error
+     */
     public static void showFatalError(String header, String content, Throwable ex) {
 
         AlertBuilder alert = error().button(ButtonType.OK);
@@ -53,19 +73,49 @@ public class AlertBuilder {
         alert.show();
     }
 
+    /**
+     * Start building a new info dialog.
+     *
+     * @return A builder for an info dialog
+     */
     public static AlertBuilder info() {
         return new AlertBuilder();
     }
 
+    /**
+     * Start building a new error dialog.
+     *
+     * @return A builder for an error dialog
+     */
     public static AlertBuilder error() {
         return new AlertBuilder().alertType(Alert.AlertType.ERROR);
     }
+
+    /**
+     * Start building a new error dialog.
+     *
+     * @param ex Exception that will be shown as details for the error
+     *
+     * @return A builder for an error dialog
+     */
     public static AlertBuilder error(Throwable ex) {
-        return error().exception(ex);
+        return error().expandableContent(ex);
     }
+
+    /**
+     * Start building a new confirmation dialog.
+     *
+     * @return A builder for an confirmation dialog
+     */
     public static AlertBuilder confirmation() {
         return new AlertBuilder().alertType(Alert.AlertType.CONFIRMATION);
     }
+
+    /**
+     * Start building a new warning dialog.
+     *
+     * @return A builder for an warning dialog
+     */
     public static AlertBuilder warning() {
         return new AlertBuilder().alertType(Alert.AlertType.WARNING);
     }
@@ -79,30 +129,39 @@ public class AlertBuilder {
     private String content;
     private Node expandableContent;
 
-    public AlertBuilder() {}
+    /**
+     * Initialize an new alert builder
+     */
+    public AlertBuilder() {
+    }
 
+    /**
+     * Set the type of the dialog.
+     *
+     * @param type Type of the dialog
+     *
+     * @return {@code this} (for chained calls)
+     *
+     * @see javafx.scene.control.Alert.AlertType
+     */
     public AlertBuilder alertType(Alert.AlertType type) {
         this.alertType = type;
 
         return this;
     }
 
-//    public AlertBuilder title(String key, Object... params) {
-//        alert.setTitle(Lang.get(key, params));
-//
-//        return this;
-//    }
-//    public AlertBuilder header(String key, Object... params) {
-//        alert.setHeaderText(Lang.get(key, params));
-//
-//        return this;
-//    }
-//    public AlertBuilder content(String key, Object... params) {
-//        alert.setContentText(Lang.get(key, params));
-//
-//        return this;
-//    }
-
+    /**
+     * Set the content key. This key will be used to fetch the content to display in the language resources.
+     * <p>
+     * More specifically, it will load the following properties from the language resources:
+     * <p>
+     * <lu> <li>{key}.title</li> <li>{key}.header</li> <li>{key}.content</li> </lu>
+     *
+     * @param key    Key associated with the dialog message in the language resources
+     * @param params Substitution parameters to use in the resources
+     *
+     * @return {@code this} (for chained calls)
+     */
     public AlertBuilder key(String key, Object... params) {
         title = lang.getString(key + ".title", params);
         header = lang.getString(key + ".header", params);
@@ -111,40 +170,68 @@ public class AlertBuilder {
         return this;
     }
 
-    public AlertBuilder plainContent(String value) {
-        content = value;
-
-        return this;
-    }
-
+    /**
+     * Add a button key. The button text will be set to the property in the language resources associated with the given
+     * key.
+     *
+     * @param key    Key (of the language resource) whose value to set for the button text
+     * @param params Substitution parameters to use in the resources
+     *
+     * @return {@code this} (for chained calls)
+     */
     public AlertBuilder button(String key, Object... params) {
         buttons.add(new ButtonType(lang.getString(key, params)));
 
         return this;
     }
 
+    /**
+     * Add buttons.
+     *
+     * @param types Type of the buttons
+     *
+     * @return {@code this} (for chained calls)
+     */
     public AlertBuilder button(ButtonType... types) {
         Collections.addAll(buttons, types);
 
         return this;
     }
 
+    /**
+     * Add a component as an expandable content.
+     *
+     * @param content Component to add
+     *
+     * @return {@code this} (for chained calls)
+     */
     public AlertBuilder expandableContent(Node content) {
         expandableContent = content;
 
         return this;
     }
 
-    public AlertBuilder exception(Throwable ex) {
+    /**
+     * Add an exception description as an expandable content.
+     *
+     * @param ex Exception to show
+     *
+     * @return {@code this} (for chained calls)
+     */
+    public AlertBuilder expandableContent(Throwable ex) {
         Label label = new Label("[" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
         label.setId("error");
         return expandableContent(label);
     }
 
-    public boolean showYesNo() {
-        return show() == 0;
-    }
-
+    /**
+     * Show the dialog. This blocking operation waits until the dialog is closed (even not called from the FX-User
+     * thread).
+     * <p>
+     * The returned index is set according to the order in which button have been added.
+     *
+     * @return The index of the pressed button or -1 if the user closed the dialog
+     */
     public int show() {
         if (buttons.isEmpty()) {
             setDefaultButtons();
@@ -153,16 +240,17 @@ public class AlertBuilder {
             setDefaultTitle();
         }
 
-        BlockingQueue<Integer> result = new ArrayBlockingQueue<>(1);
-
         if (Toolkit.getToolkit().isFxUserThread()) {
             return createAlertAndShow();
         }
 
         try {
+            BlockingQueue<Integer> result = new ArrayBlockingQueue<>(1);
             Platform.runLater(() -> result.add(createAlertAndShow()));
             return result.take();
         } catch (InterruptedException e) {
+            // Should not happen....
+            ExceptionLogger.logException(e);
             return -1;
         }
     }
@@ -184,12 +272,9 @@ public class AlertBuilder {
             alert.getDialogPane().setExpandableContent(expandableContent);
         }
 
-        ButtonType button = alert.showAndWait().orElse(null);
-        if (button == null) {
-            return -1;
-        } else {
-            return alert.getButtonTypes().indexOf(button);
-        }
+        return alert.showAndWait()
+                .map(i -> buttons.indexOf(i))
+                .orElse(-1);
     }
 
     private void setDefaultTitle() {
