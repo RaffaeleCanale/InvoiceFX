@@ -1,15 +1,12 @@
 package app.config;
 
-import app.config.manager.GoogleDriveManager;
 import app.config.manager.ModelManager;
 import app.config.preferences.UserPreferences;
 import app.config.preferences.properties.LocalProperty;
 import app.config.preferences.properties.SharedProperty;
 import app.google.DriveConfigHelper;
-import app.model.invoice.InvoiceList;
 import app.model.invoice.InvoiceModel;
 import app.model.item.ItemModel;
-import app.model.item.ItemsList;
 import app.util.ExceptionLogger;
 import app.util.gui.AlertBuilder;
 import app.model.ValidationModel;
@@ -37,7 +34,7 @@ import static app.google.DriveConfigHelper.Action.UPDATE;
 /**
  * This is the main configuration manager. This class manages the {@link ModelManager}s and the user properties.
  * <p>
- * To use the configuration, it must first be initialized ({@link #initConfig()}), then, the managers and preferences
+ * To use the configuration, it must first be initialized ({@link #initConfig(ModelManagerFactory.Impl)}), then, the managers and preferences
  * can be loaded ({@link #loadManagers()}, {@link #loadPreferences()}).
  * <p>
  * <p>
@@ -50,6 +47,7 @@ public class Config {
 
     private static final Logger LOG = LogHelper.getLogger(Config.class);
     private static final String CONFIG_DIR_NAME = "Config";
+    // TODO: 3/15/16 Add all Config-related constants here! (eg. update, managers locations, etc...)
 
     private static File configDir;
     private static final UserPreferences<LocalProperty> localPreferences =
@@ -66,13 +64,15 @@ public class Config {
      * Initialize this manager, this must be the first method called.
      *
      * @throws IOException If the config directory is not found or cannot be created
+     * @param modelManagerImplementation
      */
-    public static void initConfig() throws IOException {
+    public static void initConfig(ModelManagerFactory.Impl modelManagerImplementation) throws IOException {
         configDir = loadConfigDirectory(CONFIG_DIR_NAME);
         LOG.info("Configuration directory located: " + configDir.getAbsolutePath());
 
-        itemsManager = new GoogleDriveManager<>(ItemsList.class, localPreferences.getPathProperty(STORED_ITEMS_PATH));
-        invoicesManager = new GoogleDriveManager<>(InvoiceList.class, localPreferences.getPathProperty(STORED_INVOICES_PATH));
+        ModelManagerFactory.setImplementation(modelManagerImplementation);
+        itemsManager = ModelManagerFactory.createItemsManager();
+        invoicesManager = ModelManagerFactory.createInvoiceManager();
     }
 
     /**

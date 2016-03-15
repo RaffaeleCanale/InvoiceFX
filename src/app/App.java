@@ -1,6 +1,7 @@
 package app;
 
 import app.config.Config;
+import app.config.ModelManagerFactory;
 import app.currency.ECBRetriever;
 import app.gui.Splash;
 import app.util.ExceptionLogger;
@@ -137,7 +138,7 @@ public class App extends Application {
     private static boolean initConfig() {
         LOG.info("Initialize CONFIG");
         try {
-            Config.initConfig();
+            Config.initConfig(ModelManagerFactory.Impl.DRIVE);
         } catch (IOException e) {
             // ExceptionLogger needs Config to be used, thus it cannot be used if initConfig fails
             // Also, cannot use Lang yet since it must first be loaded according to the Config preferences
