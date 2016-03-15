@@ -7,25 +7,17 @@ import app.model.invoice.InvoiceModel;
 import app.model.item.ClientItem;
 import app.model.item.ItemModel;
 import app.util.adapter.DateConverter;
-import app.util.gui.AlertBuilder;
-import com.wx.fx.gui.window.StageManager;
-import com.wx.fx.transfer.TransferController;
-import com.wx.fx.transfer.TransferTask;
-import com.wx.fx.util.callback.SimpleCallback;
 import javafx.beans.binding.NumberExpression;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.ObservableList;
 import javafx.util.StringConverter;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Normalizer;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
-
-import static com.wx.fx.transfer.TransferTask.Action.MOVE;
 
 /**
  * Utility methods for various actions related to invoices.
@@ -39,6 +31,8 @@ public class InvoiceHelper {
 
     /**
      * Create an invoice initialized with default values.
+     * <p>
+     * Requires the {@link Config} to be loaded (in order to select a unique id).
      *
      * @return An invoice with default values
      */
