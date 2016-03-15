@@ -120,15 +120,20 @@ public class Common {
 
     /**
      * Convert a CHF sum into a Euro sum using the rate stored in the user preferences.
+     * <p>
+     * The result is rounded to the cent.
      *
      * @param chf_sum Sum to convert
      *
      * @return Same sum represented in Euro
+     *
+     * @see SharedProperty#EURO_TO_CHF_CURRENCY
      */
     public static double computeEuro(double chf_sum) {
         double euro_to_chf = Config.sharedPreferences().getDoubleProperty(SharedProperty.EURO_TO_CHF_CURRENCY);
 
-        return chf_sum / euro_to_chf;
+        double euro_sum = chf_sum / euro_to_chf;
+        return Math.round(euro_sum * 100.0) / 100.0;
     }
 
     /**
@@ -140,6 +145,8 @@ public class Common {
      * @param sum Sum whose share to compute fromF
      *
      * @return Absolute share of the VAT in the given sum
+     *
+     * @see SharedProperty#VAT_ROUND
      */
     public static double computeVatShare(double vat, double sum) {
         /*
