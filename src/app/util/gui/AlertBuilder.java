@@ -1,10 +1,9 @@
 package app.util.gui;
 
-import app.App;
 import app.util.ExceptionLogger;
 import com.sun.javafx.tk.Toolkit;
+import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageManager;
-import com.wx.properties.PropertiesManager;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -120,8 +119,6 @@ public class AlertBuilder {
         return new AlertBuilder().alertType(Alert.AlertType.WARNING);
     }
 
-    private final PropertiesManager lang = App.getLang();
-
     private Alert.AlertType alertType;
     private List<ButtonType> buttons = new LinkedList<>();
     private String title;
@@ -163,9 +160,9 @@ public class AlertBuilder {
      * @return {@code this} (for chained calls)
      */
     public AlertBuilder key(String key, Object... params) {
-        title = lang.getString(key + ".title", params);
-        header = lang.getString(key + ".header", params);
-        content = lang.getString(key + ".content", params);
+        title = Lang.getOptionalString(key + ".title", params).orElse(null);
+        header = Lang.getString(key + ".header", params);
+        content = Lang.getOptionalString(key + ".content", params).orElse(null);
 
         return this;
     }
@@ -180,7 +177,7 @@ public class AlertBuilder {
      * @return {@code this} (for chained calls)
      */
     public AlertBuilder button(String key, Object... params) {
-        buttons.add(new ButtonType(lang.getString(key, params)));
+        buttons.add(new ButtonType(Lang.getString(key, params)));
 
         return this;
     }
@@ -256,15 +253,18 @@ public class AlertBuilder {
     }
 
     private int createAlertAndShow() {
+        if (header == null) {
+            throw new IllegalArgumentException("No header set");
+        }
+
         Alert alert = new Alert(alertType);
         alert.setResizable(true);
         alert.getDialogPane().getStylesheets().add(StageManager.getStyleSheet());
         alert.getButtonTypes().setAll(buttons);
 
         alert.setTitle(title);
-        if (header != null) {
-            alert.setHeaderText(header);
-        }
+        alert.setHeaderText(header);
+
         if (content != null) {
             alert.setContentText(content);
         }
@@ -278,7 +278,7 @@ public class AlertBuilder {
     }
 
     private void setDefaultTitle() {
-        title = lang.getString("dialog." + alertType.name().toLowerCase() + "_title");
+        title = Lang.getString("dialog." + alertType.name().toLowerCase() + "_title");
     }
 
     private void setDefaultButtons() {
@@ -291,4 +291,5 @@ public class AlertBuilder {
                 break;
         }
     }
+
 }

@@ -1,9 +1,7 @@
 package app.gui.overview;
 
-import app.App;
 import app.Stages;
 import app.config.Config;
-import app.util.helpers.InvoiceHelper;
 import app.config.manager.ModelManager;
 import app.config.preferences.properties.SharedProperty;
 import app.model.invoice.InvoiceModel;
@@ -15,11 +13,12 @@ import app.util.bindings.GenericListContentBinding;
 import app.util.gui.AlertBuilder;
 import app.util.gui.components.AlternateColorPanel;
 import app.util.gui.components.NumberTextField;
+import app.util.helpers.InvoiceHelper;
 import app.util.helpers.InvoiceViewer;
 import app.util.helpers.TexCreatorHelper;
+import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
-import com.wx.util.pair.Pair;
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,11 +30,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -99,10 +98,11 @@ public class OverviewController implements StageController {
     }
 
     private Pane createItemPane(ClientItem item) {
-        FXMLLoader loader = StageManager.getLoader("/app/gui/overview/ItemPanel.fxml");
+        FXMLLoader loader = new FXMLLoader(
+                OverviewController.class.getResource("/app/gui/overview/ItemPanel.fxml"),
+                Lang.getBundle());
 
         try {
-            loader.setResources(ResourceBundle.getBundle("text"));
             VBox itemPanel = loader.load();
             HBox.setHgrow(itemPanel, Priority.ALWAYS);
 
@@ -116,7 +116,6 @@ public class OverviewController implements StageController {
                 forms.removeAll(itemForms);
                 invoice.getItems().remove(item);
             });
-
 
 
             return itemPanel;
@@ -136,12 +135,11 @@ public class OverviewController implements StageController {
     }
 
     private Button createVatButton(double vat) {
-        Button button = new Button(App.getLang().getString("overview.add_item", vat));
+        Button button = new Button(Lang.getString("overview.add_item", vat));
         button.setOnAction(e -> invoice.getItems().add(InvoiceHelper.createDefaultClientItem(vat)));
 
         return button;
     }
-
 
 
     public void createInvoice() {

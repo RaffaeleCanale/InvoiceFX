@@ -1,15 +1,15 @@
 package app.gui.overview.editor;
 
-import app.App;
 import app.Stages;
 import app.config.Config;
-import app.util.helpers.InvoiceHelper;
 import app.config.manager.ModelManager;
 import app.config.preferences.properties.SharedProperty;
 import app.model.item.ItemModel;
 import app.util.bindings.AddedRemovedListener;
 import app.util.bindings.FormElement;
 import app.util.gui.components.AlternateColorPanel;
+import app.util.helpers.InvoiceHelper;
+import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
 import com.wx.util.pair.Pair;
@@ -22,7 +22,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -66,8 +68,9 @@ public class ItemEditorController implements StageController {
     }
 
     private void addTypeToPanel(ItemModel item) {
-        FXMLLoader loader = StageManager.getLoader("/app/gui/overview/editor/ItemEditorPanel.fxml");
-        loader.setResources(ResourceBundle.getBundle("text"));
+        FXMLLoader loader = new FXMLLoader(
+                ItemEditorController.class.getResource("/app/gui/overview/editor/ItemEditorPanel.fxml"),
+                Lang.getBundle());
         try {
             Pane pane = loader.load();
             ItemSubPanelController controller = loader.getController();

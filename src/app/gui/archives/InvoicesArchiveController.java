@@ -11,6 +11,7 @@ import app.model.invoice.InvoiceModel;
 import app.model.item.ClientItem;
 import app.util.gui.AlertBuilder;
 import app.util.gui.cell.FormatFactory;
+import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
 import com.wx.properties.PropertiesManager;
@@ -76,13 +77,8 @@ public class InvoicesArchiveController implements StageController {
 
     private Runnable defaultAction;
 
-    private PropertiesManager lang;
-
-
     @Override
-    public void setContext(Stage stage, PropertiesManager bundle) {
-        this.lang = bundle;
-
+    public void setContext(Stage stage) {
         // DEFAULT ACTION
         defaultActionGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             int index = defaultActionGroup.getToggles().indexOf(newValue);
@@ -142,7 +138,7 @@ public class InvoicesArchiveController implements StageController {
         invoicesTable.getSelectionModel().selectionModeProperty().setValue(SelectionMode.MULTIPLE);
         invoicesTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             String body = newValue == null ?
-                    lang.getString("archives.no_selection") :
+                    Lang.getString("archives.no_selection") :
                     InvoiceHtmlPrinter.print(newValue);
             invoiceView.getEngine().loadContent(getHtmlContent(body));
         });
@@ -187,7 +183,7 @@ public class InvoicesArchiveController implements StageController {
 
         // INVOICE VIEWER
         InvoiceViewer.initViewer(invoiceView);
-        invoiceView.getEngine().loadContent(getHtmlContent(lang.getString("archives.no_selection")));
+        invoiceView.getEngine().loadContent(getHtmlContent(Lang.getString("archives.no_selection")));
 
         // BUTTONS
         IntegerBinding selectionSize = Bindings.size(invoicesTable.getSelectionModel().getSelectedCells());

@@ -7,8 +7,6 @@ import app.util.ExceptionLogger;
 import app.util.gui.AlertBuilder;
 import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageManager;
-import com.wx.fx.util.BundleWrapper;
-import com.wx.properties.PropertiesManager;
 import com.wx.util.log.LogHelper;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -18,7 +16,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,15 +43,6 @@ public class App extends Application {
     private static Logger initMainLog() {
         LogHelper.setupLogger(LogHelper.consoleHandlerShort(Level.ALL));
         return LogHelper.getLogger(App.class);
-    }
-
-    /**
-     * Get the language resource bundle as read-only {@link PropertiesManager}.
-     *
-     * @return The language resource bundle of this app
-     */
-    public static PropertiesManager getLang() {
-        return new PropertiesManager(new BundleWrapper(ResourceBundle.getBundle("text")));
     }
 
     /**
@@ -130,7 +118,7 @@ public class App extends Application {
             if (!initConfig()) return;
             ECBRetriever.initialize(Config.getConfigFile("Cache"));
 
-            loadUserLocale();
+            initLanguageResources();
 
             if (!loadConfigSafe()) return;  // Loads content (invoices, items, ...)
 
@@ -152,6 +140,7 @@ public class App extends Application {
             Config.initConfig();
         } catch (IOException e) {
             // ExceptionLogger needs Config to be used, thus it cannot be used if initConfig fails
+            // Also, cannot use Lang yet since it must first be loaded according to the Config preferences
 
             LOG.severe("Failed: " + e.getMessage());
             AlertBuilder.showFatalError(
@@ -163,9 +152,11 @@ public class App extends Application {
         return true;
     }
 
-    private static void loadUserLocale() {
+    private static void initLanguageResources() {
         String tag = Config.sharedPreferences().getProperty(LANGUAGE);
+
         Lang.setLocale(tag, SUPPORTED_LANGUAGES);
+        Lang.initLanguageResource("text");
     }
 
 }

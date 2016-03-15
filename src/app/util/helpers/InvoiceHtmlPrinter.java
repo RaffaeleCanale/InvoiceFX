@@ -1,12 +1,11 @@
 package app.util.helpers;
 
-import app.App;
 import app.model.DateEnabled;
 import app.model.invoice.InvoiceModel;
 import app.model.item.ClientItem;
 import app.util.ExceptionLogger;
+import com.wx.fx.Lang;
 import com.wx.io.TextAccessor;
-import com.wx.properties.PropertiesManager;
 
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -55,7 +54,6 @@ public class InvoiceHtmlPrinter {
     }
 
     private static String loadModel(String name) {
-        PropertiesManager lang = App.getLang();
 
         try (TextAccessor accessor = new TextAccessor().setIn(InvoiceHtmlPrinter.class.getResourceAsStream(name))) {
 
@@ -66,7 +64,7 @@ public class InvoiceHtmlPrinter {
                 if (keyWord.startsWith("/")) {
                     value = InvoiceHtmlPrinter.class.getResource(keyWord).toString();
                 } else if (keyWord.contains(".")) {
-                    value = lang.getString(keyWord);
+                    value = Lang.getString(keyWord);
                 }
 
                 if (value != null) {

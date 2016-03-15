@@ -8,6 +8,7 @@ import app.gui.config.currency.CurrencyPanelController;
 import app.util.gui.AlertBuilder;
 import app.util.helpers.Common;
 import app.util.helpers.UpdateHelper;
+import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
 import com.wx.io.file.FileUtil;
@@ -63,8 +64,6 @@ public class SettingsController implements StageController {
     @FXML
     private CheckBox roundVatCheckbox;
 
-    private PropertiesManager lang;
-
     public void initialize() {
         // INVOICE DIR
         StringProperty dirName = Config.localPreferences().stringProperty(INVOICE_DIRECTORY);
@@ -111,9 +110,7 @@ public class SettingsController implements StageController {
     }
 
     @Override
-    public void setContext(Stage stage, PropertiesManager bundle) {
-        this.lang = bundle;
-
+    public void setContext(Stage stage) {
         currencyPanelController.setContext(stage);
         showUpdaterState(UpdateHelper.stateProperty().get());
     }
@@ -126,32 +123,32 @@ public class SettingsController implements StageController {
         switch (state) {
             case UNINITIALIZED:
             case LOADING_INDEX:
-                versionLabel.setText(lang.getString("settings.version.getting"));
+                versionLabel.setText(Lang.getString("settings.version.getting"));
                 versionProgress.setVisible(true);
                 break;
 
             case UP_TO_DATE:
                 double currentVersion = UpdateHelper.getCurrentVersion();
-                versionLabel.setText(lang.getString("settings.version.current", currentVersion));
+                versionLabel.setText(Lang.getString("settings.version.current", currentVersion));
 
-                versionActionButton.setText(lang.getString("settings.version.check"));
+                versionActionButton.setText(Lang.getString("settings.version.check"));
                 versionActionButton.setVisible(true);
                 break;
 
             case UPDATE_AVAILABLE:
                 double newVersion = UpdateHelper.getUpdateVersion();
 
-                versionLabel.setText(lang.getString("settings.version.available", newVersion));
+                versionLabel.setText(Lang.getString("settings.version.available", newVersion));
 
-                versionActionButton.setText(lang.getString("settings.update"));
+                versionActionButton.setText(Lang.getString("settings.update"));
                 versionActionButton.setVisible(true);
                 break;
 
             case ERROR:
-                versionLabel.setText(lang.getString("settings.version.error"));
+                versionLabel.setText(Lang.getString("settings.version.error"));
                 versionLabel.setId("error");
 
-                versionActionButton.setText(lang.getString("settings.version.retry"));
+                versionActionButton.setText(Lang.getString("settings.version.retry"));
                 versionActionButton.setVisible(true);
                 break;
         }
@@ -170,7 +167,7 @@ public class SettingsController implements StageController {
 
     public void chooseInvoiceDir() {
         DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle(lang.getString("settings.file_chooser.title"));
+        chooser.setTitle(Lang.getString("settings.file_chooser.title"));
 
         File currentDir = Config.localPreferences().getPathProperty(INVOICE_DIRECTORY);
         if (currentDir != null && currentDir.getParentFile() != null && currentDir.getParentFile().exists()) {

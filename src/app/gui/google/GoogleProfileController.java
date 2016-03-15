@@ -8,6 +8,7 @@ import app.model.invoice.InvoiceModel;
 import app.model.item.ItemModel;
 import app.util.ExceptionLogger;
 import com.google.api.services.oauth2.model.Userinfoplus;
+import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageManager;
 import com.wx.fx.util.callback.SimpleCallback;
 import com.wx.util.log.LogHelper;
@@ -50,7 +51,7 @@ public class GoogleProfileController {
         private final String text;
 
         ButtonAction(String key) {
-            this.text = App.getLang().getString(key);
+            this.text = Lang.getString(key);
         }
     }
 

@@ -1,6 +1,5 @@
 package app.google;
 
-import app.App;
 import app.config.Config;
 import app.util.ExceptionLogger;
 import app.util.gui.AlertBuilder;
@@ -8,8 +7,8 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.oauth2.model.Userinfoplus;
+import com.wx.fx.Lang;
 import com.wx.fx.util.callback.SimpleCallback;
-import com.wx.properties.PropertiesManager;
 import com.wx.util.log.LogHelper;
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
@@ -26,8 +25,7 @@ import static app.config.preferences.properties.LocalProperty.DRIVE_CURRENT_USER
 
 
 /**
- * // TODO: 3/1/16 Doc for all Google package
- * Created on 14/07/2015
+ * // TODO: 3/1/16 Doc for all Google package Created on 14/07/2015
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
  * @version 0.1
@@ -75,11 +73,10 @@ public class DriveConfigHelper {
             Task<Void> task = new Task<Void>() {
                 @Override
                 protected Void call() {
-                    PropertiesManager lang = App.getLang();
 
                     try {
                         setCurrentState(DriveConfigHelper.State.ACTING);
-                        setServiceStatus(lang.getString("drive_status." + action.name().toLowerCase()));
+                        setServiceStatus(Lang.getString("drive_status." + action.name().toLowerCase()));
 
                         Object[] params = executeAction(action, args);
 
@@ -94,10 +91,10 @@ public class DriveConfigHelper {
                         ExceptionLogger.logException(e);
                         serviceException.set(e);
                         if (isUserRegistered()) {
-                            setServiceStatus(lang.getString("drive_status.error", e.getMessage()));
+                            setServiceStatus(Lang.getString("drive_status.error", e.getMessage()));
                             setCurrentState(DriveConfigHelper.State.FAILED);
                         } else {
-                            setServiceStatus(lang.getString("drive_status.error_registration", e.getMessage()));
+                            setServiceStatus(Lang.getString("drive_status.error_registration", e.getMessage()));
                             setCurrentState(DriveConfigHelper.State.FAILED_REGISTRATION);
                         }
 

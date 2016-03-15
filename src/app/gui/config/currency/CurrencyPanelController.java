@@ -6,6 +6,7 @@ import app.util.helpers.InvoiceHelper;
 import app.config.preferences.properties.SharedProperty;
 import app.currency.ECBRetriever;
 import app.currency.Rates;
+import com.wx.fx.Lang;
 import com.wx.properties.PropertiesManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -51,10 +52,8 @@ public class CurrencyPanelController {
     private Rates rates;
 
     public void initialize() {
-        PropertiesManager lang = App.getLang();
-
-        final String euro = lang.getString("currency.euro");
-        final String chf = lang.getString("currency.chf");
+        final String euro = Lang.getString("currency.euro");
+        final String chf = Lang.getString("currency.chf");
 
         final NumberFormat rateFormat = InvoiceHelper.getFormat("#0.0###");
 
@@ -113,7 +112,7 @@ public class CurrencyPanelController {
         rightSpinnerLabel.textProperty().bind(rightSpinnerText);
 
         // CURRENT RATE + INFO
-        currentRateLabel.setText(lang.getString("currency.current_rate") + " ...");
+        currentRateLabel.setText(Lang.getString("currency.current_rate") + " ...");
         rateInfoLabel.setText("");
 
         new Thread(() -> {
@@ -126,11 +125,11 @@ public class CurrencyPanelController {
                 StringConverter<LocalDate> dateConverter = InvoiceHelper.dateConverter();
 
                 StringBinding currencyRate = Bindings.when(invert)
-                        .then(lang.getString("currency.current_rate") + " 1 " + chf + " = " + currentChfToEuro + " " + euro)
-                        .otherwise(lang.getString("currency.current_rate") + " 1 " + euro + " = " + currentEuroToChf + " " + chf);
+                        .then(Lang.getString("currency.current_rate") + " 1 " + chf + " = " + currentChfToEuro + " " + euro)
+                        .otherwise(Lang.getString("currency.current_rate") + " 1 " + euro + " = " + currentEuroToChf + " " + chf);
                 Platform.runLater(() -> {
                     currentRateLabel.textProperty().bind(currencyRate);
-                    rateInfoLabel.setText(lang.getString("currency.rate_info", dateConverter.toString(rates.getValidityDate())));
+                    rateInfoLabel.setText(Lang.getString("currency.rate_info", dateConverter.toString(rates.getValidityDate())));
                 });
 
                 currentRateLabel.setOnMouseClicked(event -> {
@@ -141,7 +140,7 @@ public class CurrencyPanelController {
 
             } catch (IOException e) {
                 Platform.runLater(() -> {
-                    currentRateLabel.setText(lang.getString("currency.error"));
+                    currentRateLabel.setText(Lang.getString("currency.error"));
                     currentRateLabel.setId("error");
                 });
             }

@@ -42,8 +42,4 @@ public enum Stages implements StageInfo {
         return group;
     }
 
-    @Override
-    public String getBundleBase() {
-        return "text";
-    }
 }

@@ -33,7 +33,7 @@ public class CurrencyShortcutController implements StageController {
     }
 
     @Override
-    public void setContext(Stage stage, PropertiesManager bundle) {
+    public void setContext(Stage stage) {
         currencyPanelController.setContext(stage);
     }
 }

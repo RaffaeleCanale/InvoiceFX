@@ -1,6 +1,7 @@
 package app.util.gui.cell;
 
 import app.App;
+import com.wx.fx.Lang;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -20,7 +21,7 @@ import java.util.Map;
  */
 public class CellLookUpFactory<E> implements Callback<TableColumn<E, String>, TableCell<E, String>> {
 
-    private static final String EMPTY_CELL_LABEL = App.getLang().getString("overview.name_prompt");
+    private static final String EMPTY_CELL_LABEL = Lang.getString("overview.name_prompt");
 
     private final Map<Integer, TableCell<E, String>> lookUp = new HashMap<>();
 

@@ -1,14 +1,14 @@
 package app.util.helpers;
 
-import app.App;
 import app.config.Config;
 import app.config.preferences.properties.SharedProperty;
 import app.model.invoice.InvoiceModel;
 import app.tex.TexFileCreator;
 import app.util.gui.AlertBuilder;
+import com.wx.fx.Lang;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.control.Button;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.ProgressIndicator;
 
 import java.io.IOException;
@@ -17,27 +17,28 @@ import java.io.IOException;
  * Created on 16/07/2015
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
- * @version 0.1
  */
 public class TexCreatorHelper {
 
-    public static void createAsync(InvoiceModel invoice, Button createButton) {
-        String oldText = createButton.getText();
+    /**
+     * Launch the Tex compiler while using the label itself as a visual indicator of the process.
+     *
+     * @param invoice      Invoice to generate in LaTex
+     * @param visualLabel Label used to visually indicated the progress of the process
+     */
+    public static void createAsync(InvoiceModel invoice, Labeled visualLabel) {
+        String originalButtonText = visualLabel.getText();
 
         ProgressIndicator indicator = new ProgressIndicator();
-        indicator.setPrefWidth(createButton.getHeight() - 5);
-        indicator.setPrefHeight(createButton.getHeight() - 5);
-        createButton.setGraphic(indicator);
-        createButton.setText(App.getLang().getString("overview.creating"));
-        createButton.setMouseTransparent(true);
-        createButton.setId("create_in_progress");
+        indicator.setPrefWidth(visualLabel.getHeight() - 5);
+        indicator.setPrefHeight(visualLabel.getHeight() - 5);
+
+        visualLabel.setGraphic(indicator);
+        visualLabel.setText(Lang.getString("overview.creating"));
+        visualLabel.setMouseTransparent(true);
+        visualLabel.setId("create_in_progress");
 
         Task<Void> creationTask = new Task<Void>() {
-
-            @Override
-            protected void failed() {
-                getException().printStackTrace();
-            }
 
             @Override
             protected Void call() {
@@ -73,10 +74,10 @@ public class TexCreatorHelper {
 
             private Void tearDown() {
                 Platform.runLater(() -> {
-                    createButton.setGraphic(null);
-                    createButton.setText(oldText);
-                    createButton.setId(null);
-                    createButton.setMouseTransparent(false);
+                    visualLabel.setGraphic(null);
+                    visualLabel.setText(originalButtonText);
+                    visualLabel.setId(null);
+                    visualLabel.setMouseTransparent(false);
                 });
 
                 return null;
