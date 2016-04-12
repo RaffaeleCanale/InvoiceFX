@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="WXUpdater">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../CurrentWorking/WXUpdater/out/artifacts/WXUpdater_jar/WXUpdater.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../WXUpdater/out/artifacts/WXUpdater_jar/WXUpdater.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -355,15 +355,15 @@ public class Config {
      *
      * @return The executable Jar file
      */
-    public static File getAppLauncher() {
+    public static File getAppLauncher() throws IOException {
         try {
             File file = new File(Config.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
             if (!file.getName().endsWith(".jar")) {
-                throw new RuntimeException("Not a jar file: " + file.getAbsolutePath());
+                throw new IOException("Not a jar file: " + file.getAbsolutePath());
             }
             return file;
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new IOException(e);
         }
     }
 
