@@ -47,8 +47,6 @@ public class SettingsController implements StageController {
     private ProgressIndicator versionProgress;
 
     @FXML
-    private Label versionLabel;
-    @FXML
     private Button versionActionButton;
 
     @FXML
@@ -102,56 +100,13 @@ public class SettingsController implements StageController {
         showCountBox.selectedProperty().bindBidirectional(Config.sharedPreferences().booleanProperty(SHOW_ITEM_COUNT));
 
 
-        // VERSION
-        UpdateHelper.stateProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(() -> showUpdaterState(newValue));
-        });
-        UpdateHelper.tryInitialize();
+        // UPDATER
+        // TODO: 29.04.16 Updater button here
     }
 
     @Override
     public void setContext(Stage stage) {
         currencyPanelController.setContext(stage);
-        showUpdaterState(UpdateHelper.stateProperty().get());
-    }
-
-    private void showUpdaterState(UpdateHelper.State state) {
-        versionLabel.setId("");
-        versionActionButton.setVisible(false);
-        versionProgress.setVisible(false);
-
-        switch (state) {
-            case UNINITIALIZED:
-            case LOADING_INDEX:
-                versionLabel.setText(Lang.getString("settings.version.getting"));
-                versionProgress.setVisible(true);
-                break;
-
-            case UP_TO_DATE:
-                double currentVersion = UpdateHelper.getCurrentVersion();
-                versionLabel.setText(Lang.getString("settings.version.current", currentVersion));
-
-                versionActionButton.setText(Lang.getString("settings.version.check"));
-                versionActionButton.setVisible(true);
-                break;
-
-            case UPDATE_AVAILABLE:
-                double newVersion = UpdateHelper.getUpdateVersion();
-
-                versionLabel.setText(Lang.getString("settings.version.available", newVersion));
-
-                versionActionButton.setText(Lang.getString("settings.update"));
-                versionActionButton.setVisible(true);
-                break;
-
-            case ERROR:
-                versionLabel.setText(Lang.getString("settings.version.error"));
-                versionLabel.setId("error");
-
-                versionActionButton.setText(Lang.getString("settings.version.retry"));
-                versionActionButton.setVisible(true);
-                break;
-        }
     }
 
     private Locale findCurrentLocale() {
@@ -207,69 +162,7 @@ public class SettingsController implements StageController {
     }
 
     public void versionAction() {
-        switch (UpdateHelper.stateProperty().get()) {
-            case UP_TO_DATE:
-                UpdateHelper.reload();
-                break;
-            case UPDATE_AVAILABLE:
-                Common.clearDirectoryFiles(Config.getConfigFile("template"));
-
-//                UpdateHelper.progressPropertyProperty().addListener(new ChangeListener<Number>() {
-//                    @Override
-//                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//                        System.out.println(newValue);
-//                    }
-//                });
-                UpdateHelper.update();
-
-                break;
-            case ERROR:
-                UpdateHelper.reload();
-                break;
-            default:
-                break;
-        }
-
-//        versionActionButton.setVisible(false);
-//        versionProgress.setVisible(true);
-//
-//        new Thread(() -> {
-//            try {
-//                Platform.runLater(() -> {
-//                    versionProgress.setProgress(0.0);
-//                    versionProgress.setPrefHeight(45);
-//                    versionProgress.setPrefWidth(45);
-//                    versionLabel.setText(Lang.get("settings.version.downloading"));
-//                });
-//                UpdateHelper.update(p -> Platform.runLater(() -> versionProgress.setProgress(p)));
-//                Platform.runLater(() -> versionProgress.setProgress(1.0));
-//
-//
-//                File templateDir = Config.getConfigFile("template");
-//                if (templateDir.isDirectory() && templateDir.exists()) {
-//                    for (File file : templateDir.listFiles()) {
-//                        if (file.isFile()) {
-//                            file.delete();
-//                        }
-//                    }
-//                }
-//                Platform.runLater(StageManager::closeAll);
-//
-//            } catch (IOException e) {
-//                ExceptionLogger.logException(e);
-//
-//                Platform.runLater(() -> {
-//                    versionLabel.setText(Lang.get("settings.version.error"));
-//                    versionLabel.setId("error");
-//
-//                    versionProgress.setProgress(0.0);
-//                    versionProgress.setPrefHeight(50);
-//                    versionProgress.setPrefWidth(50);
-//                    versionProgress.setVisible(false);
-//                });
-//            }
-//
-//        }).start();
+        // TODO: 29.04.16 update
     }
 
     public void showAdvanced() {

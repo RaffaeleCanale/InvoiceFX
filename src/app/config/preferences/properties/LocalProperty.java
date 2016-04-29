@@ -37,9 +37,9 @@ public enum LocalProperty implements ConfigProperty {
     DRIVE_CURRENT_USER(stringProperty("")),
     ARCHIVES_VIEW_SPLITTER(doubleProperty(0.5)),
     ARCHIVES_VIEW_ENABLED(booleanProperty(false)),
-    BACKUP_INTERVAL_DAYS(intProperty(7)),
-    BACKUP_LENGTH(intProperty(10)),
-    FAST_BACKUP_LENGTH(intProperty(5));
+    BACKUP_INTERVAL_DAYS(intProperty(1)),
+    BACKUP_LENGTH(intProperty(50)),
+    FAST_BACKUP_LENGTH(intProperty(50));
 
 
     private final PropertyCore core;
