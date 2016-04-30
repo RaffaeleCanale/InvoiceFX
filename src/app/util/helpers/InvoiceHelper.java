@@ -123,7 +123,7 @@ public class InvoiceHelper {
      * @param vat   VAT for this item
      */
     public static void setDefaultValues(ItemModel model, double vat) {
-        model.setVat(vat);
+        model.setTva(vat);
         model.setPrice(0.0);
         model.setItemName("");
         model.setDefaultDateEnabled(DateEnabled.BOTH);

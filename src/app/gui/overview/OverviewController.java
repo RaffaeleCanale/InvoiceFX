@@ -191,7 +191,7 @@ public class OverviewController implements StageController {
         boolean changed = Config.mergeLists(
                 Config.itemsManager().get(),
                 activeItems,
-                i -> new Pair<>(i.getVat(), i.getItemName()),
+                i -> new Pair<>(i.getTva(), i.getItemName()),
                 false);
 
         if (changed) {

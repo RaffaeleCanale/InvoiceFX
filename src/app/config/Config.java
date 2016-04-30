@@ -298,7 +298,7 @@ public class Config {
     public static ObservableList<ItemModel> getItemGroup(double vat) {
         ObservableList<ItemModel> group = itemGroups.get(vat);
         if (group == null) {
-            group = new FilteredList<>(itemsManager.get(), i -> i.getVat() == vat);
+            group = new FilteredList<>(itemsManager.get(), i -> i.getTva() == vat);
             itemGroups.put(vat, group);
         }
 

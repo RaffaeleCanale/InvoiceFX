@@ -87,7 +87,7 @@ public class ItemPanelController {
 
     public Set<FormElement> bind(ClientItem clientItem) {
         Set<FormElement> forms = new HashSet<>();
-        double vat = clientItem.getItem().getVat();
+        double vat = clientItem.getItem().getTva();
 
         // CLIENT NAME
         clientNameField.textProperty().bindBidirectional(clientItem.clientNameProperty());

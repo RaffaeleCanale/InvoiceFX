@@ -57,7 +57,7 @@ public class ItemEditorController implements StageController {
             }
         });
 
-        Config.itemsManager().get().stream().sorted((o1, o2) -> Double.compare(o1.getVat(), o2.getVat()))
+        Config.itemsManager().get().stream().sorted((o1, o2) -> Double.compare(o1.getTva(), o2.getTva()))
                 .map(ItemModel::copyOf)
                 .forEach(copies::add);
     }
@@ -112,7 +112,7 @@ public class ItemEditorController implements StageController {
 
 
         return list.stream()
-                .filter(item -> identifiers.add(new Pair<>(item.getVat(), item.getItemName())))
+                .filter(item -> identifiers.add(new Pair<>(item.getTva(), item.getItemName())))
                 .collect(Collectors.toList());
     }
 

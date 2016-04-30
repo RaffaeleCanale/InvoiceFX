@@ -31,7 +31,7 @@ public class ItemModel implements ValidationModel {
     public static void copyValues(ItemModel from, ItemModel to) {
         to.setItemName(from.getItemName());
         to.setPrice(from.getPrice());
-        to.setVat(from.getVat());
+        to.setTva(from.getTva());
         to.setDefaultDateEnabled(from.getDefaultDateEnabled());
     }
 
@@ -42,13 +42,13 @@ public class ItemModel implements ValidationModel {
     private final DoubleProperty price = new SimpleDoubleProperty();
     private final BooleanBinding priceValidity = price.greaterThanOrEqualTo(0);
 
-    private final DoubleProperty vat = new SimpleDoubleProperty();
-    private final BooleanBinding vatValidity = vat.greaterThanOrEqualTo(0).and(vat.lessThanOrEqualTo(100));
+    private final DoubleProperty tva = new SimpleDoubleProperty();
+    private final BooleanBinding tvaValidity = tva.greaterThanOrEqualTo(0).and(tva.lessThanOrEqualTo(100));
 
     private final ObjectProperty<DateEnabled> defaultDateEnabled = new SimpleObjectProperty<>();
 
     public BooleanBinding overallValidity() {
-        return itemNameValidity.and(priceValidity).and(vatValidity);
+        return itemNameValidity.and(priceValidity).and(tvaValidity);
     }
 
     @Override
@@ -105,20 +105,20 @@ public class ItemModel implements ValidationModel {
     /*
         --- VAT ---
      */
-    public DoubleProperty vatProperty() {
-        return vat;
+    public DoubleProperty tvaProperty() {
+        return tva;
     }
 
-    public void setVat(double vat) {
-        this.vat.set(vat);
+    public void setTva(double tva) {
+        this.tva.set(tva);
     }
 
-    public double getVat() {
-        return vat.get();
+    public double getTva() {
+        return tva.get();
     }
 
-    public BooleanBinding vatValidityProperty() {
-        return vatValidity;
+    public BooleanBinding tvaValidityProperty() {
+        return tvaValidity;
     }
 
     /*
@@ -138,6 +138,6 @@ public class ItemModel implements ValidationModel {
 
     @Override
     public String toString() {
-        return getItemName() + " " + getPrice() + " (" + getVat() + "%)";
+        return getItemName() + " " + getPrice() + " (" + getTva() + "%)";
     }
 }

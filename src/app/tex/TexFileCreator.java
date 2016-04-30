@@ -182,7 +182,7 @@ public class TexFileCreator {
 
             initCommand(clientsString, "itemSep");
 
-            double vat = item.getVat();
+            double vat = item.getTva();
             double sum = clientItem.sumProperty().get();
             Double oldSum = vatTotals.get(vat);
             if (oldSum != null) {

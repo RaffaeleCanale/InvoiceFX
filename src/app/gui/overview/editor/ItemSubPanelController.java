@@ -69,8 +69,8 @@ public class ItemSubPanelController {
 
         // VAT
         DoubleProperty vatValue = DoubleProperty.doubleProperty(vatField.valueProperty());
-        vatValue.bindBidirectional(item.vatProperty());
-        forms.add(FormElement.simple(item.vatValidityProperty(), vatField));
+        vatValue.bindBidirectional(item.tvaProperty());
+        forms.add(FormElement.simple(item.tvaValidityProperty(), vatField));
 
         return forms;
     }
