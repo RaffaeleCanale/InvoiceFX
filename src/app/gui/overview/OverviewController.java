@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -198,7 +199,8 @@ public class OverviewController implements StageController {
             Config.saveSafe(Config.itemsManager());
         }
 
-        setArguments(savedInvoice); // TODO: 11/4/15 A bit overkill
+        StageManager.close(Stages.OVERVIEW);
+        StageManager.show(Stages.OVERVIEW, savedInvoice);
     }
 
     public void newInvoice() {
