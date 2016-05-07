@@ -151,7 +151,7 @@ public class TexFileCreator {
         initDef(updateMap, "totalChf", moneyFormat.format(chf_sum));
         initDef(updateMap, "totalEuro", moneyFormat.format(euro_sum));
 
-        Map<Double, Double> vatTotals = new TreeMap<>();
+        VatsSum vatsSum = new VatsSum();
         StringBuilder clientsString = new StringBuilder();
 
         for (ClientItem clientItem : invoice.getItems()) {
@@ -184,12 +184,8 @@ public class TexFileCreator {
 
             double vat = item.getTva();
             double sum = clientItem.sumProperty().get();
-            Double oldSum = vatTotals.get(vat);
-            if (oldSum != null) {
-                sum += oldSum;
-            }
-            vatTotals.put(vat, sum);
 
+            vatsSum.addFor(vat, sum);
         }
         updateMap.put("% clients", clientsString.toString());
 
@@ -198,18 +194,12 @@ public class TexFileCreator {
         StringBuilder vatString = new StringBuilder();
         NumberFormat vatFormat = InvoiceHelper.getFormat("#0.#");
 
-        int vatIndex = 0;
-        for (Map.Entry<Double, Double> entry : vatTotals.entrySet()) {
-            double vat = entry.getKey();
-            double vatSum = entry.getValue();
-            double vatShare = Common.computeVatShare(vat, vatSum);
-
+        vatsSum.nonZeroVatSums().forEach(v -> {
             initCommand(vatString, "vat",
-                    vatFormat.format(vat),
-                    moneyFormat.format(vatShare),
-                    String.valueOf(vatIndex));
-            vatIndex++;
-        }
+                    vatFormat.format(v.vat),
+                    moneyFormat.format(v.vatShare),
+                    String.valueOf(v.vatIndex));
+        });
 
         updateMap.put("% vat", vatString.toString());
 
