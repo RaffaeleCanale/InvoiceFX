@@ -34,6 +34,10 @@ public enum LocalProperty implements ConfigProperty {
             SupportedOs.UNIX, "xdg-open \"${0}\"",
             SupportedOs.WINDOWS, "start \"\" \"${0}\""
     ))),
+    UPDATE_SCRIPT_NAME(osProperty(ImmutableMap.of(
+            SupportedOs.UNIX, "update.sh",
+            SupportedOs.WINDOWS, "update.bat"
+    ))),
     DRIVE_CURRENT_USER(stringProperty("")),
     ARCHIVES_VIEW_SPLITTER(doubleProperty(0.5)),
     ARCHIVES_VIEW_ENABLED(booleanProperty(false)),
