@@ -5,7 +5,7 @@ import javafx.collections.ObservableList;
 import java.io.IOException;
 
 /**
- * Represents the interface of a manager able to load and save an abstract model E.
+ * Represents the interface of a manager able to get and save an abstract model E.
  * <p>
  * The manager should contain the list of models E.
  * <p>

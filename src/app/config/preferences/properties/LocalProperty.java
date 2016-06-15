@@ -1,12 +1,10 @@
 package app.config.preferences.properties;
 
 import app.cmd.CommandRunner.SupportedOs;
-import app.config.Config;
 import app.util.helpers.KeyWordHelper;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
-import java.time.LocalDate;
 
 import static app.config.preferences.properties.PropertyCore.*;
 

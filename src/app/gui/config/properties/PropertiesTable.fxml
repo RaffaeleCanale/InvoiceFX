@@ -5,8 +5,8 @@
 
 <TableView fx:id="table" editable="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.gui.config.properties.PropertiesTableController">
     <columns>
-        <TableColumn sortable="false" editable="false" prefWidth="75.0" text="%properties_editor.key" />
-        <TableColumn sortable="false" editable="true" prefWidth="75.0" text="%properties_editor.value" />
+        <TableColumn sortable="true" editable="false" prefWidth="75.0" text="%properties_editor.key" />
+        <TableColumn sortable="true" editable="true" prefWidth="75.0" text="%properties_editor.value" />
     </columns>
     <columnResizePolicy>
         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

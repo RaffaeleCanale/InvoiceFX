@@ -4,9 +4,9 @@ import app.Stages;
 import app.config.Config;
 import app.config.manager.ModelManager;
 import app.config.preferences.properties.SharedProperty;
-import app.model.invoice.InvoiceModel;
-import app.model.item.ClientItem;
-import app.model.item.ItemModel;
+import app.model_legacy.invoice.InvoiceModel;
+import app.model_legacy.item.ClientItem;
+import app.model_legacy.item.ItemModel;
 import app.util.ExceptionLogger;
 import app.util.bindings.FormElement;
 import app.util.bindings.GenericListContentBinding;
@@ -14,7 +14,7 @@ import app.util.gui.AlertBuilder;
 import app.util.gui.components.AlternateColorPanel;
 import app.util.gui.components.NumberTextField;
 import app.util.helpers.InvoiceHelper;
-import app.util.helpers.InvoiceViewer;
+import app.util.gui.InvoiceViewer;
 import app.util.helpers.TexCreatorHelper;
 import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -70,7 +69,7 @@ public class OverviewController implements StageController {
     }
 
     public void initialize() {
-        // ADDRESS
+        // idTextFieldADDRESS
         addressTextArea.textProperty().bindBidirectional(invoice.addressProperty());
         forms.add(FormElement.simple(invoice.addressValidityProperty(), addressTextArea));
 

@@ -3,11 +3,8 @@ package app.gui.config.properties;
 import app.util.gui.cell.CTextFieldTableCell;
 import app.util.gui.cell.CellLookUpFactory;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -17,11 +14,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyCode;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 
 import java.util.*;
@@ -132,7 +126,7 @@ public class PropertiesTableController<K> {
             properties.add(new Property(prop));
         }
 
-        Collections.sort(properties, Comparator.comparing(Property::getKey));
+//        Collections.sort(properties, Comparator.comparing(Property::getKey));
 
         Platform.runLater(this::refreshCellsStyle);
     }

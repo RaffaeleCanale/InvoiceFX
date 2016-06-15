@@ -38,6 +38,7 @@ public class DriveFunctions {
     private static final Logger LOG = LogHelper.getLogger(DriveFunctions.class);
 
     private static String userId = "user";
+
     /**
      * Directory to store user credentials for this application.
      */
@@ -71,6 +72,7 @@ public class DriveFunctions {
             HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
         } catch (Throwable t) {
+            // TODO: 14.06.16 Not good!
             t.printStackTrace();
             System.exit(1);
         }

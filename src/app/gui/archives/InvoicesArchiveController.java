@@ -1,20 +1,19 @@
 package app.gui.archives;
 
-import app.App;
 import app.Stages;
 import app.config.Config;
+import app.util.gui.InvoiceViewer;
 import app.util.helpers.*;
 import app.config.manager.ModelManager;
 import app.config.preferences.properties.LocalProperty;
 import app.config.preferences.properties.SharedProperty;
-import app.model.invoice.InvoiceModel;
-import app.model.item.ClientItem;
+import app.model_legacy.invoice.InvoiceModel;
+import app.model_legacy.item.ClientItem;
 import app.util.gui.AlertBuilder;
 import app.util.gui.cell.FormatFactory;
 import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
-import com.wx.properties.PropertiesManager;
 import com.wx.util.log.LogHelper;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.IntegerBinding;

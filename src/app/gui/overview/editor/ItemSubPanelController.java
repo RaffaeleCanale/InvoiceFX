@@ -3,7 +3,7 @@ package app.gui.overview.editor;
 import app.config.Config;
 import app.util.helpers.InvoiceHelper;
 import app.config.preferences.properties.SharedProperty;
-import app.model.item.ItemModel;
+import app.model_legacy.item.ItemModel;
 import app.util.bindings.FormElement;
 import app.util.gui.components.NumberTextField;
 import javafx.beans.property.DoubleProperty;

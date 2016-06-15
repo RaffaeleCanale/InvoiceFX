@@ -3,14 +3,14 @@ package app.config.manager;
 import app.google.DriveConfigHelper;
 import app.util.ExceptionLogger;
 import app.util.backup.BackUpManager;
-import app.model.ListContainer;
+import app.model_legacy.ListContainer;
 
 import java.io.IOException;
 
 /**
  * This {@link ModelManager} based on the {@link DriveConfigHelper} will automatically synchronize with a Google Drive:
  * <ul>
- *     <li>In case of load: If a more recent version is available on Drive, it is used to replace the current version and then loaded.</li>
+ *     <li>In case of get: If a more recent version is available on Drive, it is used to replace the current version and then loaded.</li>
  *     <li>In case of save: The Drive version is automatically updated.</li>
  * </ul>
  * <p>

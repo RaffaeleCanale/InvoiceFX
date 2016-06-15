@@ -1,0 +1,12 @@
+- Use a Preferences manager to keep track of the all the nodes where we have prefences (or at least, find a way to find those nodes)
+
+- ArchiveManager: Retreive a specific record
+- Drive Sync Icon: Show a tooltip
+- Sync error: More information
+
+- Better "Advanced Config" Window: Sort tables, more controls, etc...
+
+- List (exhaustively) all the components that need to be loaded in a graph!
+- Draw a graph of all bindings for every window
+
+- Update: Have a Singleton Update Thread that will check for update available from time to time

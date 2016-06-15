@@ -2,7 +2,7 @@ package app.config.manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import app.model.ListContainer;
+import app.model_legacy.ListContainer;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  * A simple {@link ModelManager} that uses a single file to store the models. <br> The {@code JAXB} libraries are used
- * to store and load models to the file.
+ * to store and get models to the file.
  * <p>
  * Due to some {@code JAXB} limitations, a class that wraps a list of model must be provided (see {@link ListContainer}).
  * <p>
