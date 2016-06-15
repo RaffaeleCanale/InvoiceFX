@@ -96,22 +96,23 @@ public class NumberTextField extends TextField {
      */
     private void parseAndFormatInput() {
         String input = getText();
-        if (input == null || input.length() == 0) {
-            return;
-        }
+//        if (input == null || input.length() == 0) {
+//            return;
+//        }
 
         try {
             Number parsedNumber = nf.parse(input);
 //            BigDecimal newValue = new BigDecimal(parsedNumber.toString());
             setNumber(viewToNumber.apply(parsedNumber.doubleValue()));
-            selectAll();
         } catch (ParseException ex) {
             try {
                 double value = Double.parseDouble(input);
                 setNumber(viewToNumber.apply(value));
-                selectAll();
+
             } catch (NumberFormatException e) {}
-            updateText(number.get());
         }
+
+        selectAll();
+        updateText(number.get());
     }
 }

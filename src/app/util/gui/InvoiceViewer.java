@@ -1,6 +1,7 @@
-package app.util.helpers;
+package app.util.gui;
 
 import app.model.invoice.InvoiceModel;
+import app.util.helpers.InvoiceHtmlPrinter;
 import com.wx.fx.gui.window.StageManager;
 import javafx.scene.Node;
 import javafx.scene.web.WebView;
