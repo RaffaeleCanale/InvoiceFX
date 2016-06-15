@@ -1,8 +1,8 @@
-package app.model.item;
+package app.model_legacy.item;
 
-import app.model.DateEnabled;
+import app.model_legacy.DateEnabled;
 import app.util.adapter.LocalDateAdapter;
-import app.model.ValidationModel;
+import app.model_legacy.ValidationModel;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;

@@ -2,7 +2,7 @@ package app.util.helpers;
 
 import app.config.Config;
 import app.config.preferences.properties.SharedProperty;
-import app.model.invoice.InvoiceModel;
+import app.model_legacy.invoice.InvoiceModel;
 import app.tex.TexFileCreator;
 import app.util.gui.AlertBuilder;
 import com.wx.fx.Lang;

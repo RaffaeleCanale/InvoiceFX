@@ -1,8 +1,8 @@
-package app.model.invoice;
+package app.model_legacy.invoice;
 
-import app.model.item.ClientItem;
+import app.model_legacy.ValidationModel;
+import app.model_legacy.item.ClientItem;
 import app.util.adapter.LocalDateAdapter;
-import app.model.ValidationModel;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
@@ -47,7 +47,7 @@ public class InvoiceModel implements ValidationModel {
 
 
     private final IntegerProperty id = new SimpleIntegerProperty();
-    private final BooleanBinding idValidity = id.greaterThanOrEqualTo(1);
+    private final BooleanBinding idValidity = id.greaterThan(0);
 
     private final StringProperty address = new SimpleStringProperty();
     private final BooleanBinding addressValidity = address.isNotEmpty();

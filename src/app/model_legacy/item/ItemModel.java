@@ -1,9 +1,9 @@
-package app.model.item;
+package app.model_legacy.item;
 
-import app.model.DateEnabled;
+import app.model_legacy.DateEnabled;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
-import app.model.ValidationModel;
+import app.model_legacy.ValidationModel;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.logging.Logger;

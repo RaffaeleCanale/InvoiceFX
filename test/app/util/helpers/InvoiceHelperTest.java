@@ -2,7 +2,7 @@ package app.util.helpers;
 
 import app.config.Config;
 import app.config.ModelManagerFactory;
-import app.model.invoice.InvoiceModel;
+import app.model_legacy.invoice.InvoiceModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

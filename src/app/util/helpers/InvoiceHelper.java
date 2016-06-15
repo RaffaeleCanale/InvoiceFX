@@ -2,10 +2,10 @@ package app.util.helpers;
 
 import app.config.Config;
 import app.config.preferences.properties.SharedProperty;
-import app.model.DateEnabled;
-import app.model.invoice.InvoiceModel;
-import app.model.item.ClientItem;
-import app.model.item.ItemModel;
+import app.model_legacy.DateEnabled;
+import app.model_legacy.invoice.InvoiceModel;
+import app.model_legacy.item.ClientItem;
+import app.model_legacy.item.ItemModel;
 import app.util.adapter.DateConverter;
 import javafx.beans.binding.NumberExpression;
 import javafx.beans.binding.StringBinding;

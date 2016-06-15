@@ -1,4 +1,4 @@
-package app.model;
+package app.model_legacy;
 
 import java.util.logging.Logger;
 

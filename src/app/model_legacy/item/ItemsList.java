@@ -1,6 +1,6 @@
-package app.model.item;
+package app.model_legacy.item;
 
-import app.model.ListContainer;
+import app.model_legacy.ListContainer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

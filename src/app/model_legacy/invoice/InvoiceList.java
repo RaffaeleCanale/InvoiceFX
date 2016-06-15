@@ -1,6 +1,6 @@
-package app.model.invoice;
+package app.model_legacy.invoice;
 
-import app.model.ListContainer;
+import app.model_legacy.ListContainer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

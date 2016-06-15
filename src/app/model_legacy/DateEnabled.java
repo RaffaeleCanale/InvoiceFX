@@ -1,4 +1,4 @@
-package app.model;
+package app.model_legacy;
 
 import javax.xml.bind.annotation.XmlEnum;
 

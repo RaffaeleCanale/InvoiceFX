@@ -1,7 +1,7 @@
 package app.util.helpers;
 
-import app.model.invoice.InvoiceModel;
-import app.model.item.ClientItem;
+import app.model_legacy.invoice.InvoiceModel;
+import app.model_legacy.item.ClientItem;
 
 import java.util.List;
 
