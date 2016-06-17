@@ -1,8 +1,8 @@
 package app.util.helpers;
 
 import app.config.Config;
-import app.config.ModelManagerFactory;
-import app.model_legacy.invoice.InvoiceModel;
+import app.legacy.config.ModelManagerFactory;
+import app.legacy.model.invoice.InvoiceModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

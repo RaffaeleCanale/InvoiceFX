@@ -3,7 +3,6 @@ package app.model.client;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleExpression;
-import javafx.beans.binding.ListBinding;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -18,11 +17,11 @@ import javafx.collections.ObservableList;
  */
 public class Client {
 
-    private final IntegerProperty clientId = new SimpleIntegerProperty();
-    private final BooleanBinding clientIdValidity = clientId.greaterThan(0);
+    private final LongProperty id = new SimpleLongProperty();
+    private final BooleanBinding idValidity = id.greaterThan(0);
 
-    private final StringProperty clientName = new SimpleStringProperty();
-    private final BooleanBinding clientNameValidity = clientName.isNotNull();
+    private final StringProperty name = new SimpleStringProperty();
+    private final BooleanBinding nameValidity = name.isNotNull();
 
     private final ObservableList<PurchasedItem> purchasedItems = FXCollections.observableArrayList();
     private final BooleanBinding purchasedItemsValidity = Bindings.isNotEmpty(purchasedItems);
@@ -34,9 +33,7 @@ public class Client {
         purchasedItems.addListener((ListChangeListener<PurchasedItem>) c -> recomputeTotal());
     }
 
-    public ReadOnlyDoubleProperty sumProperty() {
-        return sum;
-    }
+
 
     private void recomputeTotal() {
         sum.unbind();
@@ -48,36 +45,36 @@ public class Client {
     }
 
     //<editor-fold desc="Getters & Setters" defaultstate="collapsed">
-    public int getClientId() {
-        return clientId.get();
+    public long getId() {
+        return id.get();
     }
 
-    public IntegerProperty clientIdProperty() {
-        return clientId;
+    public LongProperty idProperty() {
+        return id;
     }
 
-    public void setClientId(int clientId) {
-        this.clientId.set(clientId);
+    public void setId(long id) {
+        this.id.set(id);
     }
 
-    public BooleanBinding clientIdValidityProperty() {
-        return clientIdValidity;
+    public BooleanBinding idValidityProperty() {
+        return idValidity;
     }
 
-    public String getClientName() {
-        return clientName.get();
+    public String getName() {
+        return name.get();
     }
 
-    public StringProperty clientNameProperty() {
-        return clientName;
+    public StringProperty nameProperty() {
+        return name;
     }
 
-    public void setClientName(String clientName) {
-        this.clientName.set(clientName);
+    public void setName(String name) {
+        this.name.set(name);
     }
 
-    public BooleanBinding clientNameValidityProperty() {
-        return clientNameValidity;
+    public BooleanBinding nameValidityProperty() {
+        return nameValidity;
     }
 
     public ObservableList<PurchasedItem> getPurchasedItems() {
@@ -92,8 +89,8 @@ public class Client {
         return sum.get();
     }
 
-    public void setSum(double sum) {
-        this.sum.set(sum);
+    public ReadOnlyDoubleProperty sumProperty() {
+        return sum;
     }
     //</editor-fold>
 }

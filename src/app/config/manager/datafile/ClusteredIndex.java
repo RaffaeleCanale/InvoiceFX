@@ -2,14 +2,15 @@ package app.config.manager.datafile;
 
 import app.config.manager.storage.PartitionedStorage;
 import app.util.UpperBoundBinarySearch;
+import com.wx.util.collections.CollectionsUtil;
 import com.wx.util.future.IoIterator;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+
+import static com.wx.util.collections.CollectionsUtil.emptyIterator;
 
 /**
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)
@@ -304,27 +305,6 @@ public class ClusteredIndex {
             return super.hasNext() &&
                     acceptValue == (long) partitionsBuffer.get(currentPartitionIndex).get(nextRowIndex)[sortKey];
         }
-    }
-
-
-    private static final IoIterator<Object> EMPTY_ITERATOR = new emptyIterator<>();
-    @SuppressWarnings("unchecked")
-    public static <T> IoIterator<T> emptyIterator() {
-        return (IoIterator<T>) EMPTY_ITERATOR;
-    }
-    private static class emptyIterator<T> implements IoIterator<T> {
-        // TODO: 17.06.16 Move this to WXLibraries! + Make it singleton, probably
-
-        @Override
-        public T next() throws IOException {
-            throw new NoSuchElementException();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return false;
-        }
-
     }
 
 }

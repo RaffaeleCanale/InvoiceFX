@@ -19,7 +19,7 @@ import java.time.LocalDate;
  */
 public class Invoice {
 
-    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final LongProperty id = new SimpleLongProperty();
     private final BooleanBinding idValidity = id.greaterThan(0);
 
     private final StringProperty address = new SimpleStringProperty();
@@ -50,15 +50,15 @@ public class Invoice {
     }
 
     //<editor-fold desc="Getters & Setters" defaultstate="collapsed">
-    public int getId() {
+    public long getId() {
         return id.get();
     }
 
-    public IntegerProperty idProperty() {
+    public LongProperty idProperty() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id.set(id);
     }
 

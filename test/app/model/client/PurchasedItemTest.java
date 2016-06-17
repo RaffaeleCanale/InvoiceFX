@@ -1,6 +1,6 @@
 package app.model.client;
 
-import app.model.item.ItemModel;
+import app.model.item.Item;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,11 +11,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class PurchasedItemTest {
 
-    public static ItemModel item(double price) {
-        ItemModel item = new ItemModel();
+    public static Item item(double price) {
+        Item item = new Item();
         item.setPrice(price);
-        item.setItemName("Some name");
-        item.setItemId(1);
+        item.setName("Some name");
+        item.setId(1);
 
         return item;
     }
@@ -23,7 +23,7 @@ public class PurchasedItemTest {
     @Test
     public void sumTest() {
         PurchasedItem purchasedItem = new PurchasedItem();
-        ItemModel item = item(10.0);
+        Item item = item(10.0);
 
         purchasedItem.setItem(item);
         purchasedItem.setItemCount(1);

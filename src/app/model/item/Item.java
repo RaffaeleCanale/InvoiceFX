@@ -15,11 +15,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Item {
 
-    private final IntegerProperty itemId = new SimpleIntegerProperty();
-    private final BooleanBinding itemIdValidity = itemId.greaterThan(0);
+    private final LongProperty id = new SimpleLongProperty();
+    private final BooleanBinding idValidity = id.greaterThan(0);
 
-    private final StringProperty itemName = new SimpleStringProperty();
-    private final BooleanBinding itemNameValidity = itemName.isNotEmpty();
+    private final StringProperty name = new SimpleStringProperty();
+    private final BooleanBinding nameValidity = name.isNotEmpty();
 
     private final DoubleProperty price = new SimpleDoubleProperty();
     private final BooleanBinding priceValidity = new BooleanBinding() {
@@ -37,36 +37,36 @@ public class Item {
 
 
     //<editor-fold desc="Getters & Setters" defaultstate="collpased">
-    public int getItemId() {
-        return itemId.get();
+    public long getId() {
+        return id.get();
     }
 
-    public IntegerProperty itemIdProperty() {
-        return itemId;
+    public LongProperty idProperty() {
+        return id;
     }
 
-    public void setItemId(int itemId) {
-        this.itemId.set(itemId);
+    public void setId(long id) {
+        this.id.set(id);
     }
 
-    public BooleanBinding itemIdValidityProperty() {
-        return itemIdValidity;
+    public BooleanBinding idValidityProperty() {
+        return idValidity;
     }
 
-    public String getItemName() {
-        return itemName.get();
+    public String getName() {
+        return name.get();
     }
 
-    public StringProperty itemNameProperty() {
-        return itemName;
+    public StringProperty nameProperty() {
+        return name;
     }
 
-    public void setItemName(String itemName) {
-        this.itemName.set(itemName);
+    public void setName(String name) {
+        this.name.set(name);
     }
 
-    public BooleanBinding itemNameValidityProperty() {
-        return itemNameValidity;
+    public BooleanBinding nameValidityProperty() {
+        return nameValidity;
     }
 
     public double getPrice() {

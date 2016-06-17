@@ -1,7 +1,7 @@
 package app.config.manager.datafile;
 
 import app.config.manager.TestsHelper.*;
-import com.wx.properties.property.SimpleProperty;
+import com.wx.util.future.IoIterator;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -18,28 +18,43 @@ import static org.junit.Assert.*;
 public class ClusteredIndexTest {
 
     private static final int DEF_PARTITION_SIZE = 100;
+    private static final int SORT_KEY = 2;
 
-    private List<Object[]> readFromManager() {
-        return manager.stream().collect(Collectors.toList());
+    private List<Object[]> readFromManager() throws IOException {
+        return read(manager.iterator());
     }
 
-//    private List<Object[]> read(DummyPartitionedStorage storage) {
-//        return read(createManager(storage));
-//    }
+    private List<Object[]> readFromManager(int max) throws IOException {
+        List<Object[]> read = new ArrayList<>();
 
-    int getSortKey() {
-        return 2;
+        IoIterator<Object[]> it = manager.iterator();
+        while (it.hasNext() && read.size() < max) {
+            read.add(it.next());
+        }
+
+
+        return read;
     }
 
-    void createManager(int... partitions) {
+    private List<Object[]> read(IoIterator<Object[]> it) throws IOException {
+        List<Object[]> read = new ArrayList<>();
+        it.forEachRemaining(read::add);
+        return read;
+    }
+
+    ClusteredIndex createManager(DummyPartitionedStorage storage) {
+        return new ClusteredIndex(storage, DEF_PARTITION_SIZE, SORT_KEY);
+    }
+
+    private void createManager(int... partitions) {
         data = new ArrayList<>();
-        storage = dummyStorage(2, data, partitions);
-        manager = new ClusteredIndex(storage, DEF_PARTITION_SIZE, getSortKey(), new SimpleProperty<>(storage.getMaxId()));
+        storage = dummyStorage(SORT_KEY, data, partitions);
+        manager = createManager(storage);
     }
 
-    void createManager(List<Object[]>... partitions) {
+    private void createManager(List<Object[]>... partitions) {
         storage = dummyStorage(partitions);
-        manager = new ClusteredIndex(storage, DEF_PARTITION_SIZE, getSortKey(), new SimpleProperty<>(storage.getMaxId()));
+        manager = createManager(storage);
     }
 
     private List<Object[]> data;
@@ -47,42 +62,42 @@ public class ClusteredIndexTest {
     private ClusteredIndex manager;
 
     @Test
-    public void readTestSimple() {
+    public void readTestSimple() throws IOException {
         createManager(DEF_PARTITION_SIZE);
 
         assertDataEquals(reverse(data), readFromManager());
     }
 
     @Test
-    public void multiPartitionRead() {
+    public void multiPartitionRead() throws IOException {
         createManager(40, 40, 20);
 
         assertDataEquals(reverse(data), readFromManager());
     }
 
     @Test
-    public void emptyPartitionRead() {
+    public void emptyPartitionRead() throws IOException {
         createManager(0);
         assertDataEquals(Collections.emptyList(), readFromManager());
     }
 
     @Test
-    public void holePartitionRead() {
+    public void holePartitionRead() throws IOException {
         createManager(50, 0, 50);
         assertDataEquals(reverse(data), readFromManager());
     }
 
     @Test
-    public void lazyReadTest() {
+    public void lazyReadTest() throws IOException {
         createManager(25, 25, 25, 25);
 
         for (int i = 0; i < 4; i++) {
             storage.assertReadWriteCount(i, 0, 0);
         }
 
-        List<Object[]> read30 = manager.stream().limit(30).collect(Collectors.toList());
+        List<Object[]> read30 = readFromManager(30);
         assertDataEquals(reverse(data).subList(0, 30), read30);
-        read30 = manager.stream().limit(30).collect(Collectors.toList());
+        read30 = readFromManager(30);
         assertDataEquals(reverse(data).subList(0, 30), read30);
 
         storage.assertReadWriteCount(0, 0, 0);
@@ -93,7 +108,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void repartition() throws IOException {
-        data = generateData(220, getSortKey());
+        data = generateData(220, SORT_KEY);
 
         createManager(
                 data.subList(20, 120),
@@ -126,32 +141,43 @@ public class ClusteredIndexTest {
     }
 
     @Test
-    public void getById() throws IOException {
+    public void query1() throws IOException {
         createManager(100, 100, 0, 11);
 
         Object[] someRow = data.get(22);
-        Optional<Object[]> query = manager.getById((Long) someRow[0]);
+        Optional<Object[]> query = manager.queryIndexFirst((Long) someRow[SORT_KEY]);
 
 
         assertTrue(query.isPresent());
         assertArrayEquals(query.get(), someRow);
-
-        assertFalse(manager.getById(100000L).isPresent());
-        assertFalse(manager.getById(-1L).isPresent());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void duplicateId() throws IOException {
-        createManager(100);
+    @Test
+    public void query2() throws IOException {
+        data = new ArrayList<>();
 
-        manager.insert(data.get(0));
+        for (int i = 0; i < 5; i++) {
+            data.add(new Object[]{i, 0L});
+        }
+        for (int i = 5; i < 15; i++) {
+            data.add(new Object[]{i, 1L});
+        }
+        for (int i = 15; i < 20; i++) {
+            data.add(new Object[]{i, 2L});
+        }
+
+        storage = dummyStorage(data.subList(0,10), data.subList(10,20));
+        manager = new ClusteredIndex(storage, 10, 1);
+
+        assertFalse(manager.queryIndex(-1).hasNext());
+        assertDataEquals(reverse(data.subList(5, 15)), read(manager.queryIndex(1)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nullSortKey() throws IOException {
         createManager(0);
-        data = generateData(1, getSortKey());
-        data.get(0)[2] = null;
+        data = generateData(1, SORT_KEY);
+        data.get(0)[SORT_KEY] = null;
 
         manager.insert(this.data.get(0));
     }
@@ -160,33 +186,31 @@ public class ClusteredIndexTest {
     public void addEmpty() throws IOException {
         createManager(new int[0]);
 
-        data = generateData(1, getSortKey());
+        data = generateData(1, SORT_KEY);
         manager.insert(data.get(0));
 
         assertDataEquals(data, readFromManager());
-        assertEquals(data.get(0)[0], manager.getLargestId());
     }
 
     @Test
     public void addNewSimple() throws IOException {
-        data = generateData(10, getSortKey());
+        data = generateData(10, SORT_KEY);
         RemovedRow removedRow = new RemovedRow(data, 9);
 
 
         createManager(removedRow.remainderData);
-        removedRow.insertAsNewIn(manager);
+        manager.insert(removedRow.removed);
 
         assertDataEquals(reverse(data), readFromManager());
-        assertEquals(9L, manager.getLargestId());
     }
 
     @Test
     public void addNewFull1() throws IOException {
-        data = generateData(101, getSortKey());
+        data = generateData(101, SORT_KEY);
         RemovedRow removedRow = new RemovedRow(data, 100);
 
         createManager(removedRow.remainderData);
-        removedRow.insertAsNewIn(manager);
+        manager.insert(removedRow.removed);
 
         assertEquals(2, storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), storage.getPartition(0).getTable());
@@ -195,14 +219,14 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewFull2() throws IOException {
-        data = generateData(151, getSortKey());
+        data = generateData(151, SORT_KEY);
         RemovedRow removedRow = new RemovedRow(data, 100);
 
         createManager(
                 removedRow.remainderData.subList(0, 100),
                 removedRow.remainderData.subList(100, 150)
         );
-        removedRow.insertAsNewIn(manager);
+        manager.insert(removedRow.removed);
 
         assertEquals(2, storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), storage.getPartition(0).getTable());
@@ -211,14 +235,14 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewFull3() throws IOException {
-        data = generateData(151, getSortKey());
+        data = generateData(151, SORT_KEY);
         RemovedRow removedRow = new RemovedRow(data, 10);
 
         createManager(
                 removedRow.remainderData.subList(0, 100),
                 removedRow.remainderData.subList(100, 150)
         );
-        removedRow.insertAsNewIn(manager);
+        manager.insert(removedRow.removed);
 
         assertEquals(2, storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), storage.getPartition(0).getTable());
@@ -227,7 +251,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewFull4() throws IOException {
-        data = generateData(301, getSortKey());
+        data = generateData(301, SORT_KEY);
         RemovedRow removedRow = new RemovedRow(data, 0);
 
         createManager(
@@ -235,7 +259,7 @@ public class ClusteredIndexTest {
                 removedRow.remainderData.subList(100, 200),
                 removedRow.remainderData.subList(200, 300)
         );
-        removedRow.insertAsNewIn(manager);
+        manager.insert(removedRow.removed);
 
         assertEquals(4, storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), storage.getPartition(0).getTable());
@@ -246,7 +270,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewInHole1() throws IOException {
-        data = generateData(201, getSortKey());
+        data = generateData(201, SORT_KEY);
         RemovedRow removedRow = new RemovedRow(data, 50);
 
         createManager(
@@ -255,7 +279,7 @@ public class ClusteredIndexTest {
                 Collections.emptyList(),
                 removedRow.remainderData.subList(100, 200)
         );
-        removedRow.insertAsNewIn(manager);
+        manager.insert(removedRow.removed);
 
         assertEquals(4, storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), storage.getPartition(0).getTable());
@@ -266,7 +290,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewInHole2() throws IOException {
-        data = generateData(201, getSortKey());
+        data = generateData(201, SORT_KEY);
         RemovedRow removedRow = new RemovedRow(data, 100);
 
         createManager(
@@ -274,7 +298,7 @@ public class ClusteredIndexTest {
                 Collections.emptyList(),
                 removedRow.remainderData.subList(100, 200)
         );
-        removedRow.insertAsNewIn(manager);
+        manager.insert(removedRow.removed);
 
         assertEquals(3, storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), storage.getPartition(0).getTable());
@@ -282,7 +306,7 @@ public class ClusteredIndexTest {
         assertDataEquals(data.subList(101, 201), storage.getPartition(2).getTable());
     }
 
-    private class RemovedRow {
+    private static class RemovedRow {
         private final List<Object[]> remainderData;
         private final Object[] removed;
 //        private final long removedId;
@@ -293,12 +317,5 @@ public class ClusteredIndexTest {
 //            removedId = (long) removed[0];
         }
 
-        void insertAsNewIn(ClusteredIndex manager) throws IOException {
-//            removed[0] = null;
-            manager.insert(removed);
-
-            assertEquals("Last ID do not match", storage.getMaxId(), manager.getLargestId());
-//            assertEquals("Insert ID is wrong", removedId, manager.insert(removed));
-        }
     }
 }

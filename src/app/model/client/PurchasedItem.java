@@ -1,7 +1,7 @@
 package app.model.client;
 
 import app.model.DateEnabled;
-import app.model.item.ItemModel;
+import app.model.item.Item;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
@@ -15,10 +15,7 @@ import java.time.LocalDate;
  */
 public class PurchasedItem {
 
-    private final IntegerProperty purchaseId = new SimpleIntegerProperty();
-    private final BooleanBinding purchaseIdValidity = purchaseId.greaterThan(0);
-
-    private final ObjectProperty<ItemModel> item = new SimpleObjectProperty<>();
+    private final ObjectProperty<Item> item = new SimpleObjectProperty<>();
     private final BooleanBinding itemValidity = item.isNotNull();
 
     private final IntegerProperty itemCount = new SimpleIntegerProperty();
@@ -37,40 +34,16 @@ public class PurchasedItem {
     private final DoubleBinding sum = Bindings.selectDouble(item, "price").multiply(itemCount);
 
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">
-    public int getPurchaseId() {
-        return purchaseId.get();
-    }
-
-    public IntegerProperty purchaseIdProperty() {
-        return purchaseId;
-    }
-
-    public void setPurchaseId(int purchaseId) {
-        this.purchaseId.set(purchaseId);
-    }
-
-    public Boolean getPurchaseIdValidity() {
-        return purchaseIdValidity.get();
-    }
-
-    public BooleanBinding purchaseIdValidityProperty() {
-        return purchaseIdValidity;
-    }
-
-    public ItemModel getItem() {
+    public Item getItem() {
         return item.get();
     }
 
-    public ObjectProperty<ItemModel> itemProperty() {
+    public ObjectProperty<Item> itemProperty() {
         return item;
     }
 
-    public void setItem(ItemModel item) {
+    public void setItem(Item item) {
         this.item.set(item);
-    }
-
-    public Boolean getItemValidity() {
-        return itemValidity.get();
     }
 
     public BooleanBinding itemValidityProperty() {
@@ -89,10 +62,6 @@ public class PurchasedItem {
         this.itemCount.set(itemCount);
     }
 
-    public Boolean getItemCountValidity() {
-        return itemCountValidity.get();
-    }
-
     public BooleanBinding itemCountValidityProperty() {
         return itemCountValidity;
     }
@@ -107,10 +76,6 @@ public class PurchasedItem {
 
     public void setDateEnabled(DateEnabled dateEnabled) {
         this.dateEnabled.set(dateEnabled);
-    }
-
-    public Boolean getDateEnabledValidity() {
-        return dateEnabledValidity.get();
     }
 
     public BooleanBinding dateEnabledValidityProperty() {
@@ -129,10 +94,6 @@ public class PurchasedItem {
         this.fromDate.set(fromDate);
     }
 
-    public Boolean getFromDateValidity() {
-        return fromDateValidity.get();
-    }
-
     public BooleanBinding fromDateValidityProperty() {
         return fromDateValidity;
     }
@@ -147,10 +108,6 @@ public class PurchasedItem {
 
     public void setToDate(LocalDate toDate) {
         this.toDate.set(toDate);
-    }
-
-    public Boolean getToDateValidity() {
-        return toDateValidity.get();
     }
 
     public BooleanBinding toDateValidityProperty() {
