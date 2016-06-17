@@ -1,7 +1,7 @@
 package app.util.helpers;
 
-import app.model_legacy.invoice.InvoiceModel;
-import app.model_legacy.item.ClientItem;
+import app.legacy.model.invoice.InvoiceModel;
+import app.legacy.model.item.ClientItem;
 
 import java.util.List;
 
@@ -103,9 +103,9 @@ public class PdfNameHelper {
 //    private static String getClientField(ClientItem client, String field) {
 //        switch (field) {
 //            case "name":
-//                return client.getClientName();
+//                return client.getName();
 ////            case "item":
-////                return client.getItems().get(0).getItem().itemNameProperty();
+////                return client.getItems().get(0).getItem().nameProperty();
 ////            case "fromdate":
 ////            case "date":
 ////                return new SimpleDateFormat("dd-MM-yyyy").format(client.getFromDate());

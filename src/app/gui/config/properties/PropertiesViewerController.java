@@ -2,14 +2,14 @@ package app.gui.config.properties;
 
 import app.Stages;
 import app.config.Config;
-import app.config.manager.DefaultModelManager;
+import app.legacy.config.manager.DefaultModelManager;
 import app.config.preferences.UserPreferences;
 import app.config.preferences.properties.ConfigProperty;
 import app.config.preferences.properties.LocalProperty;
 import app.config.preferences.properties.SharedProperty;
 import app.google.DriveConfigHelper;
-import app.model_legacy.invoice.InvoiceList;
-import app.model_legacy.invoice.InvoiceModel;
+import app.legacy.model.invoice.InvoiceList;
+import app.legacy.model.invoice.InvoiceModel;
 import app.util.ExceptionLogger;
 import app.util.backup.BackUpFile;
 import app.util.backup.BackUpManager;

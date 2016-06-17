@@ -2,10 +2,10 @@ package app.util.helpers;
 
 import app.config.Config;
 import app.config.preferences.properties.SharedProperty;
-import app.model_legacy.DateEnabled;
-import app.model_legacy.invoice.InvoiceModel;
-import app.model_legacy.item.ClientItem;
-import app.model_legacy.item.ItemModel;
+import app.legacy.model.DateEnabled;
+import app.legacy.model.invoice.InvoiceModel;
+import app.legacy.model.item.ClientItem;
+import app.legacy.model.item.ItemModel;
 import app.util.adapter.DateConverter;
 import javafx.beans.binding.NumberExpression;
 import javafx.beans.binding.StringBinding;
@@ -130,12 +130,12 @@ public class InvoiceHelper {
     }
 
     /**
-     * Test if the given invoice has any field value that contains the query.
+     * Test if the given invoice has any field value that contains the queryIndexFirst.
      *
      * @param invoice Invoice to test
-     * @param query   Value to query
+     * @param query   Value to queryIndexFirst
      *
-     * @return {@code true} if the invoice has a field containing the query
+     * @return {@code true} if the invoice has a field containing the queryIndexFirst
      */
     public static boolean queryContains(InvoiceModel invoice, String query) {
         String[] words = query.split("\\s+");

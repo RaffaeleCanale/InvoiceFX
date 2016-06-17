@@ -1,8 +1,8 @@
-package app.config.manager;
+package app.legacy.config.manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import app.model_legacy.ListContainer;
+import app.legacy.model.ListContainer;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

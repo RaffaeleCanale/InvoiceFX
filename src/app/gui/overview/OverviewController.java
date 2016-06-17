@@ -2,11 +2,11 @@ package app.gui.overview;
 
 import app.Stages;
 import app.config.Config;
-import app.config.manager.ModelManager;
+import app.legacy.config.manager.ModelManager;
 import app.config.preferences.properties.SharedProperty;
-import app.model_legacy.invoice.InvoiceModel;
-import app.model_legacy.item.ClientItem;
-import app.model_legacy.item.ItemModel;
+import app.legacy.model.invoice.InvoiceModel;
+import app.legacy.model.item.ClientItem;
+import app.legacy.model.item.ItemModel;
 import app.util.ExceptionLogger;
 import app.util.bindings.FormElement;
 import app.util.bindings.GenericListContentBinding;

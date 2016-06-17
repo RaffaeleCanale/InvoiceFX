@@ -2,9 +2,9 @@ package app.gui.overview.editor;
 
 import app.Stages;
 import app.config.Config;
-import app.config.manager.ModelManager;
+import app.legacy.config.manager.ModelManager;
 import app.config.preferences.properties.SharedProperty;
-import app.model_legacy.item.ItemModel;
+import app.legacy.model.item.ItemModel;
 import app.util.bindings.AddedRemovedListener;
 import app.util.bindings.FormElement;
 import app.util.gui.components.AlternateColorPanel;

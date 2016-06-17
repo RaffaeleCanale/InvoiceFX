@@ -1,4 +1,4 @@
-package app.config.manager;
+package app.legacy.config.manager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

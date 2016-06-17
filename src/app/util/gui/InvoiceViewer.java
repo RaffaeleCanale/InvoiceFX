@@ -1,6 +1,6 @@
 package app.util.gui;
 
-import app.model_legacy.invoice.InvoiceModel;
+import app.legacy.model.invoice.InvoiceModel;
 import app.util.helpers.InvoiceHtmlPrinter;
 import com.wx.fx.gui.window.StageManager;
 import javafx.scene.Node;

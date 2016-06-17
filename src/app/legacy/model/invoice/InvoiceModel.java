@@ -1,7 +1,7 @@
-package app.model_legacy.invoice;
+package app.legacy.model.invoice;
 
-import app.model_legacy.ValidationModel;
-import app.model_legacy.item.ClientItem;
+import app.legacy.model.ValidationModel;
+import app.legacy.model.item.ClientItem;
 import app.util.adapter.LocalDateAdapter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;

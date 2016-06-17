@@ -3,9 +3,9 @@ package app.gui.overview;
 import app.config.Config;
 import app.util.helpers.InvoiceHelper;
 import app.config.preferences.properties.SharedProperty;
-import app.model_legacy.DateEnabled;
-import app.model_legacy.item.ClientItem;
-import app.model_legacy.item.ItemModel;
+import app.legacy.model.DateEnabled;
+import app.legacy.model.item.ClientItem;
+import app.legacy.model.item.ItemModel;
 import app.util.bindings.FormElement;
 import app.util.bindings.GenericListContentBinding;
 import app.util.gui.components.NumberTextField;
@@ -109,7 +109,7 @@ public class ItemPanelController {
 
         itemComboBox.getSelectionModel().select(clientItem.getItem().getItemName());
         clientItem.getItem().itemNameProperty().bind(itemComboBox.getSelectionModel().selectedItemProperty());
-        //clientItem.getItem().itemNameProperty().bind(itemComboBox.getEditor().textProperty());
+        //clientItem.getItem().nameProperty().bind(itemComboBox.getEditor().textProperty());
         itemComboBox.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
             itemComboBox.getSelectionModel().select(newValue);
             // FIXME: 11/3/15 A bit overkill

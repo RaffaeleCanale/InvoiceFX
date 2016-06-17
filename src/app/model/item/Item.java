@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @version 0.1
  */
 @XmlRootElement
-public class ItemModel {
+public class Item {
 
     private final IntegerProperty itemId = new SimpleIntegerProperty();
     private final BooleanBinding itemIdValidity = itemId.greaterThan(0);

@@ -1,15 +1,16 @@
 package app.config;
 
-import app.config.manager.ModelManager;
+import app.legacy.config.ModelManagerFactory;
+import app.legacy.config.manager.ModelManager;
 import app.config.preferences.UserPreferences;
 import app.config.preferences.properties.LocalProperty;
 import app.config.preferences.properties.SharedProperty;
 import app.google.DriveConfigHelper;
-import app.model_legacy.invoice.InvoiceModel;
-import app.model_legacy.item.ItemModel;
+import app.legacy.model.invoice.InvoiceModel;
+import app.legacy.model.item.ItemModel;
 import app.util.ExceptionLogger;
 import app.util.gui.AlertBuilder;
-import app.model_legacy.ValidationModel;
+import app.legacy.model.ValidationModel;
 import com.wx.io.AccessorUtil;
 import com.wx.io.file.FileUtil;
 import com.wx.util.log.LogHelper;

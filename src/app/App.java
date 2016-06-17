@@ -1,7 +1,7 @@
 package app;
 
 import app.config.Config;
-import app.config.ModelManagerFactory;
+import app.legacy.config.ModelManagerFactory;
 import app.currency.ECBRetriever;
 import app.gui.Splash;
 import app.util.ExceptionLogger;

@@ -1,9 +1,9 @@
-package app.config.manager;
+package app.legacy.config.manager;
 
 import app.google.DriveConfigHelper;
 import app.util.ExceptionLogger;
 import app.util.backup.BackUpManager;
-import app.model_legacy.ListContainer;
+import app.legacy.model.ListContainer;
 
 import java.io.IOException;
 
