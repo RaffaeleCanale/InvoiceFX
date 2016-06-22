@@ -15,6 +15,9 @@ import java.time.LocalDate;
  */
 public class PurchasedItem {
 
+    private final ObjectProperty<Client> client = new SimpleObjectProperty<>();
+    private final BooleanBinding clientValidity = client.isNotNull();
+
     private final ObjectProperty<Item> item = new SimpleObjectProperty<>();
     private final BooleanBinding itemValidity = item.isNotNull();
 
@@ -31,9 +34,31 @@ public class PurchasedItem {
     private final BooleanBinding toDateValidity = toDate.isNotNull().or(dateEnabled.isNotEqualTo(DateEnabled.BOTH));
 
 
-    private final DoubleBinding sum = Bindings.selectDouble(item, "price").multiply(itemCount);
+    private final DoubleBinding sum;
+
+    public PurchasedItem(Client client, Item item) {
+        this.client.setValue(client);
+        this.item.setValue(item);
+        this.sum = Bindings.selectDouble(this.item, "price").multiply(itemCount);
+    }
 
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">
+    public Client getClient() {
+        return client.get();
+    }
+
+    public ObjectProperty<Client> clientProperty() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client.set(client);
+    }
+
+    public BooleanBinding clientValidityProperty() {
+        return clientValidity;
+    }
+
     public Item getItem() {
         return item.get();
     }

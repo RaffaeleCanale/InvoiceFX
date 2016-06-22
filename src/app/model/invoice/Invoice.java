@@ -1,6 +1,7 @@
 package app.model.invoice;
 
 import app.model.client.Client;
+import app.model.client.PurchasedItem;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleExpression;
@@ -28,8 +29,8 @@ public class Invoice {
     private final ObjectProperty<LocalDate> date = new SimpleObjectProperty<>(LocalDate.now());
     private final BooleanBinding dateValidity = date.isNotNull();
 
-    private final ObservableList<Client> clients = FXCollections.observableArrayList();
-    private final BooleanBinding clientsValidity = Bindings.isNotEmpty(clients);
+    private final ObservableList<PurchasedItem> purchases = FXCollections.observableArrayList();
+    private final BooleanBinding purchasesValidity = Bindings.isNotEmpty(purchases);
 
     private final StringProperty pdfFileName = new SimpleStringProperty();
     private final BooleanBinding pdfFileNameValidity = pdfFileName.isNotEmpty();
@@ -37,13 +38,13 @@ public class Invoice {
     private final DoubleProperty sum = new SimpleDoubleProperty();
 
     public Invoice() {
-        clients.addListener((ListChangeListener<Client>) c -> recomputeTotal());
+        purchases.addListener((ListChangeListener<PurchasedItem>) i -> recomputeTotal());
     }
 
     private void recomputeTotal() {
         sum.unbind();
 
-        clients.stream()
+        purchases.stream()
                 .map(i -> (DoubleExpression) i.sumProperty())
                 .reduce(DoubleExpression::add)
                 .ifPresent(sum::bind);
@@ -98,12 +99,12 @@ public class Invoice {
         return dateValidity;
     }
 
-    public ObservableList<Client> getClients() {
-        return clients;
+    public ObservableList<PurchasedItem> getPurchases() {
+        return purchases;
     }
 
-    public BooleanBinding clientsValidityProperty() {
-        return clientsValidity;
+    public BooleanBinding purchasesValidityProperty() {
+        return purchasesValidity;
     }
 
     public String getPdfFileName() {

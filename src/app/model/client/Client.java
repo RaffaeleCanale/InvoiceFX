@@ -23,27 +23,6 @@ public class Client {
     private final StringProperty name = new SimpleStringProperty();
     private final BooleanBinding nameValidity = name.isNotNull();
 
-    private final ObservableList<PurchasedItem> purchasedItems = FXCollections.observableArrayList();
-    private final BooleanBinding purchasedItemsValidity = Bindings.isNotEmpty(purchasedItems);
-
-
-    private final DoubleProperty sum = new SimpleDoubleProperty();
-
-    public Client() {
-        purchasedItems.addListener((ListChangeListener<PurchasedItem>) c -> recomputeTotal());
-    }
-
-
-
-    private void recomputeTotal() {
-        sum.unbind();
-
-        purchasedItems.stream()
-                .map(PurchasedItem::sumProperty)
-                .reduce(DoubleExpression::add)
-                .ifPresent(sum::bind);
-    }
-
     //<editor-fold desc="Getters & Setters" defaultstate="collapsed">
     public long getId() {
         return id.get();
@@ -75,22 +54,6 @@ public class Client {
 
     public BooleanBinding nameValidityProperty() {
         return nameValidity;
-    }
-
-    public ObservableList<PurchasedItem> getPurchasedItems() {
-        return purchasedItems;
-    }
-
-    public BooleanBinding purchasedItemsValidityProperty() {
-        return purchasedItemsValidity;
-    }
-
-    public double getSum() {
-        return sum.get();
-    }
-
-    public ReadOnlyDoubleProperty sumProperty() {
-        return sum;
     }
     //</editor-fold>
 }

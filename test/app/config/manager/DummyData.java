@@ -1,9 +1,12 @@
 package app.config.manager;
 
 import app.config.manager.datafile.DataFile;
+import app.config.manager.local.RecordSerializer;
 import app.config.manager.storage.PartitionedStorage;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,7 +19,9 @@ import static org.junit.Assert.assertEquals;
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)
  * @version 0.1 - created on 16.06.16.
  */
-public class TestsHelper {
+public class DummyData {
+
+
 
     public static String dataToString(List<Object[]> data) {
         return "    " + data.stream()

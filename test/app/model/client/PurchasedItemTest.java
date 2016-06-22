@@ -22,10 +22,8 @@ public class PurchasedItemTest {
 
     @Test
     public void sumTest() {
-        PurchasedItem purchasedItem = new PurchasedItem();
         Item item = item(10.0);
-
-        purchasedItem.setItem(item);
+        PurchasedItem purchasedItem = new PurchasedItem(new Client(), item);
         purchasedItem.setItemCount(1);
 
         assertEquals(10.0, purchasedItem.getSum().doubleValue(), 0.0);
