@@ -1,19 +1,13 @@
 package app.config.manager.datafile;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static app.config.manager.DummyData.*;
-import static app.config.manager.local.DirectoryStorage.PartitionFile;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -22,28 +16,11 @@ import static org.junit.Assert.assertEquals;
  */
 public abstract class DataFileTest {
 
-    private DataFile getPartition() {
-        return new PartitionFile(tmpFile, DUMMY_SERIALIZER);
-    }
-
-    @Before
-    public void createTmpFile() throws IOException {
-        Path path = Files.createTempFile("invoicefx_test_partition_file", ".part");
-        tmpFile = path.toFile();
-
-        assertEquals(0, tmpFile.length());
-    }
-
-    @After
-    public void clearTmpFile() throws IOException {
-        Files.delete(tmpFile.toPath());
-    }
-
-    private File tmpFile;
+    protected abstract DataFile getDataFile();
 
     @Test
     public void testReadNew() throws IOException {
-        List<Object[]> read = getPartition().read();
+        List<Object[]> read = getDataFile().read();
         assertEquals(Collections.emptyList(), read);
     }
 
@@ -52,26 +29,26 @@ public abstract class DataFileTest {
     public void testWriteRead() throws IOException {
         List<Object[]> data = Collections.unmodifiableList(generateData(10));
 
-        getPartition().write(data);
+        getDataFile().write(data);
 
 
-        List<Object[]> read = getPartition().read();
+        List<Object[]> read = getDataFile().read();
         assertDataEquals(data, read);
     }
 
     @Test
     public void testInsert() throws IOException {
         List<Object[]> data = generateData(10);
-        getPartition().write(data);
+        getDataFile().write(data);
 
         Object[] newRow = generateData(1).get(0);
         List<Object[]> expected = new ArrayList<>(data);
         expected.add(newRow);
 
 
-        getPartition().append(data, newRow);
+        getDataFile().append(data, newRow);
         assertDataEquals(expected, data);
-        assertDataEquals(expected, getPartition().read());
+        assertDataEquals(expected, getDataFile().read());
     }
 
     @Test
@@ -83,9 +60,22 @@ public abstract class DataFileTest {
         expected.add(newRow);
 
 
-        getPartition().append(data, newRow);
+        getDataFile().append(data, newRow);
         assertDataEquals(expected, data);
-        assertDataEquals(expected, getPartition().read());
+        assertDataEquals(expected, getDataFile().read());
+    }
+    
+    @Test
+    public void testDelete() throws IOException {
+        List<Object[]> data = generateData(10);
+        getDataFile().write(data);
+
+        DataFile dataFile = getDataFile();
+        assertDataEquals(data, dataFile.read());
+        dataFile.delete();
+
+        assertDataEquals(Collections.emptyList(), dataFile.read());
+        assertDataEquals(Collections.emptyList(), getDataFile().read());
     }
 
 

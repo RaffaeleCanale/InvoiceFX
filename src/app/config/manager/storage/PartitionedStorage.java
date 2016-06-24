@@ -14,5 +14,4 @@ public interface PartitionedStorage {
 
     int getPartitionsCount();
 
-    void removePartition(int partitionIndex);
 }

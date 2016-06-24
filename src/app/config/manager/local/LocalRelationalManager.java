@@ -3,25 +3,32 @@ package app.config.manager.local;
 
 import app.config.manager.ManagerInterface;
 import app.config.manager.datafile.ClusteredIndex;
-import app.model.DateEnabled;
 import app.model.client.Client;
 import app.model.client.PurchasedItem;
 import app.model.invoice.Invoice;
 import app.model.item.Item;
+import com.google.common.collect.Table;
+import com.sun.org.apache.regexp.internal.RE;
 import com.wx.properties.property.Property;
 import com.wx.util.future.IoIterator;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.List;
+
+import static app.config.manager.local.RelationalModelHelper.*;
+import static javafx.scene.input.KeyCode.J;
 
 /**
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)
  * @version 0.1 - created on 17.06.16.
  */
 public class LocalRelationalManager implements ManagerInterface {
+
+    private static final int DEFAULT_PARTITION_SIZE = 100;
 
     private static long idIndexedInsert(ClusteredIndex table, Object[] record) throws IOException {
         assert record[0] == null;
@@ -53,16 +60,23 @@ public class LocalRelationalManager implements ManagerInterface {
     private final ClusteredIndex itemsTable;
     private final ClusteredIndex purchasedItemsTable;
 
-    public LocalRelationalManager() {
-        throw new UnsupportedOperationException();
+    public LocalRelationalManager(File dataDirectory) {
+        invoicesTable = new ClusteredIndex(new DirectoryStorage(INVOICE_SERIALIZER, dataDirectory, "invoices"), DEFAULT_PARTITION_SIZE, 2);
+        clientsTable = new ClusteredIndex(new DirectoryStorage(CLIENT_SERIALIZER, dataDirectory, "clients"), DEFAULT_PARTITION_SIZE, 0);
+        itemsTable = new ClusteredIndex(new DirectoryStorage(ITEM_SERIALIZER, dataDirectory, "items"), DEFAULT_PARTITION_SIZE, 0);
+        purchasedItemsTable = new ClusteredIndex(new DirectoryStorage(PURCHASE_SERIALIZER, dataDirectory, "purchases"), DEFAULT_PARTITION_SIZE, 0);
+    }
+
+    public LocalRelationalManager(ClusteredIndex invoicesTable, ClusteredIndex clientsTable, ClusteredIndex itemsTable, ClusteredIndex purchasedItemsTable) {
+        this.invoicesTable = invoicesTable;
+        this.clientsTable = clientsTable;
+        this.itemsTable = itemsTable;
+        this.purchasedItemsTable = purchasedItemsTable;
     }
 
     @Override
-    public Stream<Invoice> getAllInvoices() {
-
-
-
-        throw new UnsupportedOperationException();
+    public IoIterator<Invoice> getAllInvoices() throws IOException {
+        return new InvoicesIterator();
     }
 
     public void garbageCollectUnreferenced() throws IOException {
@@ -75,31 +89,52 @@ public class LocalRelationalManager implements ManagerInterface {
                     .isPresent();
 
             if (!isReferenced) {
-                // TODO: 17.06.16 Add remove to IoIterator
-                // it.remove();
+                it.remove();
             }
         }
     }
 
     @Override
     public void addNewInvoice(Invoice invoice) throws IOException {
-        // TODO: 17.06.16 Begin transaction!
+        // TODO: 17.06.16 Begin transaction (Actually, maybe not to be done here...)
 
         // TODO: 17.06.16 Somehow check the assumption that invoice.getId() is unique!
 
+        if (invoice.getId() <= 0) {
+            throw new IllegalArgumentException("Invoice has no id!");
+        }
+
         invoicesTable.insert(getInvoiceRecord(invoice));
 
-        for (Client client : invoice.getClients()) {
+        for (PurchasedItem purchase : invoice.getPurchases()) {
+            Client client = purchase.getClient();
+            Item item = purchase.getItem();
+
             getOrInsertClient(client);
+            getOrInsertItem(item);
 
-            for (PurchasedItem purchase : client.getPurchasedItems()) {
-                Item item = purchase.getItem();
+            purchasedItemsTable.insert(getPurchaseRecord(invoice, client, purchase));
 
-                getOrInsertItem(item);
-
-                purchasedItemsTable.insert(getPurchaseRecord(invoice, client, purchase));
-            }
         }
+    }
+
+    public void removeInvoice(Invoice invoice) throws IOException {
+        if (invoice.getId() <= 0) {
+            throw new IllegalArgumentException("Invoice has no id!");
+        }
+
+        boolean removed = invoicesTable.removeFirst(r -> (long) r[0] == invoice.getId());
+        if (!removed) {
+            throw new IllegalArgumentException(); // TODO: 24.06.16 Message
+        }
+
+        IoIterator<Object[]> it = purchasedItemsTable.queryIndex(invoice.getId());
+        while (it.hasNext()) {
+            it.remove();
+        }
+
+        garbageCollectUnreferenced();
+        // TODO: 24.06.16 Flush
     }
 
     private void getOrInsertClient(Client client) throws IOException {
@@ -143,92 +178,49 @@ public class LocalRelationalManager implements ManagerInterface {
         return purchasedItemsTable.queryFirst(r -> invoiceId == (long) r[0] && clientId == (long) r[1] && itemId == (long) r[2]);
     }
 
-    private static Object[] getInvoiceRecord(Invoice invoice) {
-        return new Object[] {
-                idOrNull(invoice.getId()),
-                invoice.getAddress(),
-                invoice.getDate(),
-                invoice.getPdfFileName()
-        };
+
+    public String debugPrint() throws IOException {
+        return "Invoices:\n"
+                + invoicesTable.debugPrint()
+                + "\nClients:\n"
+                + clientsTable.debugPrint()
+                + "\nItems:\n"
+                + itemsTable.debugPrint()
+                + "\nPurchases:\n"
+                + purchasedItemsTable.debugPrint();
     }
 
-    private static Invoice getInvoiceModel(List<Client> clients, Object[] record) {
-        Invoice invoice = new Invoice();
-        invoice.setId((long) record[0]);
-        invoice.setAddress((String) record[1]);
-        invoice.setDate((LocalDate) record[2]);
-        invoice.setPdfFileName((String) record[3]);
-        invoice.getClients().setAll(clients);
-        return invoice;
+    public void debugDisplay() throws IOException {
+        JDialog dialog = new JDialog();
+        dialog.setModal(true);
+        dialog.setLayout(new GridLayout(1,4,10,10));
+
+        add(dialog, invoicesTable, "Invoices");
+        add(dialog, clientsTable, "Clients");
+        add(dialog, itemsTable, "Items");
+        add(dialog, purchasedItemsTable, "Purchases");
+
+        dialog.pack();
+        dialog.setVisible(true);
     }
 
-    private static Object[] getClientRecord(Client client) {
-        return new Object[] {
-                idOrNull(client.getId()),
-                client.getName()
-        };
-    }
-
-    private static Client getClientModel(List<PurchasedItem> purchases, Object[] record) {
-        Client client = new Client();
-        client.setId((long) record[0]);
-        client.setName((String) record[1]);
-        client.getPurchasedItems().setAll(purchases);
-        return client;
-    }
-
-    private static Object[] getItemRecord(Item item) {
-        return new Object[] {
-                idOrNull(item.getId()),
-                item.getName(),
-                item.getPrice(),
-                item.getVat(),
-                item.getDefaultDateEnabled()
-        };
-    }
-
-    private static Item getItemModel(Object[] record) {
-        Item item = new Item();
-        item.setId((long) record[0]);
-        item.setName((String) record[1]);
-        item.setPrice((double) record[2]);
-        item.setVat((double) record[3]);
-        item.setDefaultDateEnabled((DateEnabled) record[4]);
-        return item;
-    }
-
-    private static Object[] getPurchaseRecord(Invoice invoice, Client client, PurchasedItem purchase) {
-        return new Object[] {
-                invoice.getId(),
-                client.getId(),
-                purchase.getItem().getId(),
-                purchase.getItemCount(),
-                purchase.getFromDate(),
-                purchase.getToDate(),
-                purchase.getDateEnabled()
-        };
-    }
-
-    private static PurchasedItem getPurchaseModel(Item item, Object[] record) {
-        PurchasedItem purchase = new PurchasedItem();
-        purchase.setItem(item);
-        purchase.setItemCount((int) record[3]);
-        purchase.setFromDate((LocalDate) record[4]);
-        purchase.setToDate((LocalDate) record[5]);
-        purchase.setDateEnabled((DateEnabled) record[6]);
-        return purchase;
-    }
-
-    private static Object idOrNull(long id) {
-        return id > 0 ? id : null;
+    private void add(JDialog parent, ClusteredIndex table, String name) throws IOException {
+        JPanel panel = table.debugDisplay();
+        panel.add(new JLabel(name), BorderLayout.SOUTH);
+        parent.add(panel);
     }
 
     private class InvoicesIterator implements IoIterator<Invoice> {
 
-        private Map<Long, Item> itemsBuffer;
+        private final IoIterator<Object[]> invoicesIterator;
+
+        private final Map<Long, Item> itemsBuffer;
 
 
-        private Iterator<Object[]> invoicesIterator;
+        private InvoicesIterator() throws IOException {
+            invoicesIterator = invoicesTable.iterator();
+            itemsBuffer = new HashMap<>();
+        }
 
         @Override
         public boolean hasNext() {
@@ -238,39 +230,30 @@ public class LocalRelationalManager implements ManagerInterface {
         @Override
         public Invoice next() throws IOException {
             Object[] nextInvoice = invoicesIterator.next();
-
             long invoiceId = (long) nextInvoice[0];
-
-            Map<Long, List<PurchasedItem>> purchasesPerClient = new HashMap<>();
+            List<PurchasedItem> purchases = new ArrayList<>();
 
             IoIterator<Object[]> it = purchasedItemsTable.queryIndex(invoiceId);
             while (it.hasNext()) {
                 Object[] purchase = it.next();
-                long clientId = (long) purchase[1];
+                Client client = loadClient((long) purchase[1]);
                 Item item = getItem((long) purchase[2]);
 
-                purchasesPerClient.computeIfAbsent(clientId, id -> new ArrayList<>())
-                        .add(getPurchaseModel(item, purchase));
+                purchases.add(getPurchaseModel(client, item, purchase));
             }
 
-
-            List<Client> clients = new ArrayList<>(purchasesPerClient.size());
-            for (Map.Entry<Long, List<PurchasedItem>> entry : purchasesPerClient.entrySet()) {
-                clients.add(loadClient(entry.getKey(), entry.getValue()));
-            }
-
-            return getInvoiceModel(clients, nextInvoice);
+            return getInvoiceModel(purchases, nextInvoice);
         }
 
-        private Client loadClient(long clientId, List<PurchasedItem> purchasedItems) throws IOException {
-            Object[] record = clientsTable.queryIndexFirst(clientId).orElseThrow(() -> new IOException()); // TODO: 17.06.16 MESSAGE
-            return getClientModel(purchasedItems, record);
+        private Client loadClient(long clientId) throws IOException {
+            Object[] record = clientsTable.queryIndexFirst(clientId).orElseThrow(() -> new IOException("Client not found for id " + clientId));
+            return getClientModel(record);
         }
 
         private Item getItem(long itemId) throws IOException {
             Item item = itemsBuffer.get(itemId);
             if (item == null) {
-                item = getItemModel(itemsTable.queryIndexFirst(itemId).orElseThrow(() -> new IOException())); // TODO: 17.06.16 MESSAGE
+                item = getItemModel(itemsTable.queryIndexFirst(itemId).orElseThrow(() -> new IOException("Item not found for id " + itemId)));
                 itemsBuffer.put(itemId, item);
             }
 
@@ -278,3 +261,4 @@ public class LocalRelationalManager implements ManagerInterface {
         }
     }
 }
+

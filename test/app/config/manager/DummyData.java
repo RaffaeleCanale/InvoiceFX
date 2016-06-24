@@ -21,11 +21,55 @@ import static org.junit.Assert.assertEquals;
  */
 public class DummyData {
 
+    private static final long X = 1223L;
+    private static final long M = 443L;
 
+    private static Object[][] DATA = {
+            {null, null, "String", 1.0f, 'c'},
+            {null, null, "      ", -1.0f, ' '},
+            {null, null, "  ", 0.0f, '\t'},
+            {null, null, "\nHello\n", 1.0001f, '\n'},
+            {null, null, "", -99.012313f, '^'},
+            {null, null, "§'^è¨éà$<,.-", 1.0f, '$'},
+            {null, null, "°+\"*ç%&/()=?`ü!öä£>;:_", 1.0f, '£'},
+            {null, null, "¬|@#¼½¬|¢]}~[]´{}\\─·̣", 1.0f, '}'},
+    };
+
+    private static Object[] getDataRow(long i) {
+        if (i >= M) {
+            throw new IllegalArgumentException("Too many rows");
+        }
+
+        return new Object[] {
+                i,
+                Math.floorMod(i * X, M),
+                DataGenerator.generateClientName()
+        };
+    }
+
+
+    public static final RecordSerializer DUMMY_SERIALIZER = new RecordSerializer() {
+        @Override
+        public void serialize(Object[] record, DataOutput output) throws IOException {
+            output.writeLong((long) record[0]);
+            output.writeLong((long) record[1]);
+            output.writeUTF((String) record[2]);
+        }
+
+        @Override
+        public Object[] deserialize(DataInput input) throws IOException {
+            return new Object[] {
+                    input.readLong(),
+                    input.readLong(),
+                    input.readUTF()
+            };
+        }
+    };
 
     public static String dataToString(List<Object[]> data) {
         return "    " + data.stream()
                 .map(Arrays::toString)
+                .map(s -> s.replace("\n", "\\n"))
                 .collect(Collectors.joining("\n    "));
     }
 
@@ -39,28 +83,18 @@ public class DummyData {
         }
     }
 
-    public static List<Object[]> generateData(int rows, int sortKey) {
-//        long x = 130000017227L;
-        long x = 1223;
-        long m = 443L;
-        if (rows > m) {
-            throw new IllegalArgumentException("Too many rows...");
-        }
-
+    public static List<Object[]> generateData(int rows) {
         List<Object[]> result = new ArrayList<>(rows);
 
         for (int i = 0; i < rows; i++) {
-            result.add(new Object[]{
-                    (long) i, "Some string " + i, Math.floorMod((long)i*x, m), (double) -i, new int[i], Arrays.asList(i, -i)
-            });
+            result.add(getDataRow(i));
         }
-
-        if (result.stream().mapToLong(r -> (long) r[sortKey]).distinct().count() != rows) {
-            throw new RuntimeException();
-            // TODO: 16.06.16 Pretty sure it's correct
-        }
-        Collections.sort(result, Comparator.comparingLong(r -> (long) r[sortKey]));
         return result;
+    }
+
+    public static List<Object[]> sort(List<Object[]> data, int key) {
+        Collections.sort(data, Comparator.comparingLong(r -> (long) r[key]));
+        return data;
     }
 
     public static List<Object[]> reverse(List<Object[]> list) {
@@ -78,7 +112,7 @@ public class DummyData {
         DummyPartitionedStorage storage = new DummyPartitionedStorage();
 
         int total = IntStream.of(partitionsSize).sum();
-        data.addAll(generateData(total, sortKey));
+        data.addAll(sort(generateData(total), sortKey));
 
         int cursor = 0;
 
@@ -87,7 +121,7 @@ public class DummyData {
             if (size < 0) {
                 storage.partitions.put(i, new ExceptionDataFile());
             } else {
-                storage.getPartition(i).table = data.subList(cursor, cursor + size);
+                storage.getPartition(i).table = new ArrayList<>(data.subList(cursor, cursor + size));
                 cursor += size;
             }
         }
@@ -139,12 +173,7 @@ public class DummyData {
 
         @Override
         public int getPartitionsCount() {
-            return partitions.keySet().stream().mapToInt(i -> i+1).max().orElse(0);
-        }
-
-        @Override
-        public void removePartition(int partitionIndex) {
-            getPartition(partitionIndex).delete();
+            return partitions.keySet().stream().mapToInt(i -> i + 1).max().orElse(0);
         }
 
         @Override

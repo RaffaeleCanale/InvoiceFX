@@ -21,4 +21,6 @@ public interface DataFile {
         write(currentValues);
     }
 
+    void delete() throws IOException;
+
 }

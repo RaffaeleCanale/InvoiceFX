@@ -2,13 +2,20 @@ package app.config.manager.datafile;
 
 import app.config.manager.storage.PartitionedStorage;
 import app.util.UpperBoundBinarySearch;
-import com.wx.util.collections.CollectionsUtil;
 import com.wx.util.future.IoIterator;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.wx.util.collections.CollectionsUtil.emptyIterator;
 
@@ -21,9 +28,6 @@ public class ClusteredIndex {
     private final PartitionedStorage storage;
     private final int maxPartitionSize;
     private final int sortKey;
-//    private final Property<Long> lastId;
-
-//    private IOException readException;
 
     private final Map<Integer, List<Object[]>> partitionsBuffer = new HashMap<>();
 
@@ -58,7 +62,7 @@ public class ClusteredIndex {
 
         int actualCount = storage.getPartitionsCount();
         for (int i = numPartitions; i < actualCount; i++) {
-            storage.removePartition(i);
+            storage.getPartition(i).delete();
         }
     }
 
@@ -102,18 +106,31 @@ public class ClusteredIndex {
     public Optional<Object[]> queryIndexFirst(long value) throws IOException {
         IoIterator<Object[]> it = queryIndex(value);
         return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
-//        int partitionIndex = searchPartitionFor(value);
-//        if (partitionIndex < 0) {
-//            return Optional.empty();
-//        }
-//
-//        List<Object[]> partition = getPartition(partitionIndex);
-//        int rowIndex = binarySearch(partition, value);
-//
-//        return rowIndex < 0 ? Optional.empty() : Optional.of(partition.get(rowIndex));
+    }
+
+    public boolean removeFirst(Predicate<Object[]> query) throws IOException {
+        IoIterator<Object[]> it = iterator();
+
+        while (it.hasNext()) {
+            Object[] next = it.next();
+            if (query.test(next)) {
+                it.remove();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void insertUnique(Object[] row) throws IOException {
+        insert(row, true);
     }
 
     public void insert(Object[] row) throws IOException {
+        insert(row, false);
+    }
+
+    private void insert(Object[] row, boolean ensureUnique) throws IOException {
         if (row[sortKey] == null) {
             throw new IllegalArgumentException("Sort column cannot be null!");
         }
@@ -129,10 +146,12 @@ public class ClusteredIndex {
             } else {
                 insertAtEnd(partitionIndex - 1, row);
             }
-        } else {
-            insertAtMiddle(partitionIndex, row);
+        } else { // Within bounds
+            insertAtMiddle(partitionIndex, row, ensureUnique);
         }
     }
+
+
 
     private void insertAtBeginning(int partitionIndex, Object[] row) throws IOException {
         List<Object[]> partition = getPartition(partitionIndex);
@@ -159,12 +178,14 @@ public class ClusteredIndex {
         }
     }
 
-    private void insertAtMiddle(int partitionIndex, Object[] row) throws IOException {
+    private void insertAtMiddle(int partitionIndex, Object[] row, boolean ensureIsUnique) throws IOException {
         List<Object[]> partition = getPartition(partitionIndex);
 
         int insertIndex = binarySearch(partition, row);
         if (insertIndex < 0) {
             insertIndex = -insertIndex - 1;
+        } else if (ensureIsUnique) {
+            throw new IllegalArgumentException("Unique field value already exists: " + row[sortKey]);
         }
 
         if (insertIndex == 0) {
@@ -245,22 +266,25 @@ public class ClusteredIndex {
 
     private class ReversedIterator implements IoIterator<Object[]> {
 
-        int nextRowIndex;
-        int currentPartitionIndex;
+        private int previousIndex = -1;
+        private int previousPartition = -1;
 
-        private ReversedIterator(int nextRowIndex, int currentPartitionIndex) {
+        int nextRowIndex;
+        int nextPartition;
+
+        private ReversedIterator(int nextRowIndex, int nextPartition) {
             this.nextRowIndex = nextRowIndex;
-            this.currentPartitionIndex = currentPartitionIndex;
+            this.nextPartition = nextPartition;
         }
 
         ReversedIterator(int partitionsCount) throws IOException {
-            currentPartitionIndex = partitionsCount;
+            nextPartition = partitionsCount;
             nextPartition();
         }
 
         @Override
         public boolean hasNext() {
-            return currentPartitionIndex >= 0 && nextRowIndex >= 0;
+            return nextPartition >= 0 && nextRowIndex >= 0;
         }
 
         @Override
@@ -269,11 +293,12 @@ public class ClusteredIndex {
                 throw new NoSuchElementException();
             }
 
-            Object[] next = getPartition(currentPartitionIndex).get(nextRowIndex);
+            Object[] next = getPartition(nextPartition).get(nextRowIndex);
 
+            previousIndex = nextRowIndex;
+            previousPartition = nextPartition;
             if (nextRowIndex == 0) {
                 nextPartition();
-
             } else {
                 nextRowIndex--;
             }
@@ -281,13 +306,22 @@ public class ClusteredIndex {
             return next;
         }
 
+        @Override
+        public void remove() throws IOException {
+            if (previousIndex < 0) {
+                throw new IllegalStateException("Must call next first");
+            }
+
+            getPartition(previousPartition).remove(previousIndex);
+        }
+
         private void nextPartition() throws IOException {
             do {
-                currentPartitionIndex--;
-            } while (currentPartitionIndex >= 0 && getPartition(currentPartitionIndex).isEmpty());
+                nextPartition--;
+            } while (nextPartition >= 0 && getPartition(nextPartition).isEmpty());
 
-            nextRowIndex = currentPartitionIndex >= 0 ?
-                    getPartition(currentPartitionIndex).size() - 1 : -1;
+            nextRowIndex = nextPartition >= 0 ?
+                    getPartition(nextPartition).size() - 1 : -1;
         }
     }
 
@@ -303,8 +337,74 @@ public class ClusteredIndex {
         @Override
         public boolean hasNext() {
             return super.hasNext() &&
-                    acceptValue == (long) partitionsBuffer.get(currentPartitionIndex).get(nextRowIndex)[sortKey];
+                    acceptValue == (long) partitionsBuffer.get(nextPartition).get(nextRowIndex)[sortKey];
         }
+    }
+
+    public String debugPrint() throws IOException {
+        int n = storage.getPartitionsCount();
+
+        String result = n + " partitions.";
+        for (int i = 0; i < n; i++) {
+            List<Object[]> partition = getPartition(i);
+
+            result += "\nPartition " + i + " (" + partition.size() + "):\n    ";
+
+            result += partition.stream()
+                    .map(Arrays::toString)
+                    .collect(Collectors.joining("\n    "));
+        }
+
+        return result;
+    }
+
+    public JPanel debugDisplay() throws IOException {
+        int n = storage.getPartitionsCount();
+
+        Object[] partitionsNames = IntStream.range(0, n + 1)
+                .mapToObj(i -> "Partition " + i)
+                .toArray();
+        partitionsNames[n] = "All partitions";
+
+        List<Object[]> allData = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            allData.addAll(getPartition(i));
+        }
+
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JTable table = new JTable();
+
+        Object[][] tableData = allData.toArray(new Object[allData.size()][]);
+
+        JComboBox<Object> partitionComboBox = new JComboBox<>(partitionsNames);
+        partitionComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Object[][] data = getData();
+                table.setModel(new DefaultTableModel(data, new Object[data[0].length]));
+            }
+
+            private Object[][] getData() {
+                int sel = partitionComboBox.getSelectedIndex();
+                if (sel == n) {
+                    return tableData;
+                } else {
+                    try {
+                        List<Object[]> part = getPartition(sel);
+                        return part.toArray(new Object[part.size()][]);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+        partitionComboBox.setSelectedIndex(n);
+
+        panel.add(partitionComboBox, BorderLayout.NORTH);
+        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        return panel;
     }
 
 }

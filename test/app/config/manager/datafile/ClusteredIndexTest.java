@@ -1,14 +1,15 @@
 package app.config.manager.datafile;
 
-import app.config.manager.TestsHelper.*;
+import app.config.manager.DummyData;
+import app.config.manager.DummyData.*;
+import app.config.manager.storage.PartitionedStorage;
 import com.wx.util.future.IoIterator;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static app.config.manager.TestsHelper.*;
+import static app.config.manager.DummyData.*;
 import static org.junit.Assert.*;
 
 /**
@@ -18,7 +19,7 @@ import static org.junit.Assert.*;
 public class ClusteredIndexTest {
 
     private static final int DEF_PARTITION_SIZE = 100;
-    private static final int SORT_KEY = 2;
+    private static final int SORT_KEY = 1;
 
     private List<Object[]> readFromManager() throws IOException {
         return read(manager.iterator());
@@ -42,8 +43,12 @@ public class ClusteredIndexTest {
         return read;
     }
 
-    ClusteredIndex createManager(DummyPartitionedStorage storage) {
+    protected ClusteredIndex createManager(DummyPartitionedStorage storage) {
         return new ClusteredIndex(storage, DEF_PARTITION_SIZE, SORT_KEY);
+    }
+
+    private List<Object[]> generateData(int count) {
+        return sort(DummyData.generateData(count), SORT_KEY);
     }
 
     private void createManager(int... partitions) {
@@ -108,7 +113,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void repartition() throws IOException {
-        data = generateData(220, SORT_KEY);
+        data = generateData(220);
 
         createManager(
                 data.subList(20, 120),
@@ -176,7 +181,7 @@ public class ClusteredIndexTest {
     @Test(expected = IllegalArgumentException.class)
     public void nullSortKey() throws IOException {
         createManager(0);
-        data = generateData(1, SORT_KEY);
+        data = generateData(1);
         data.get(0)[SORT_KEY] = null;
 
         manager.insert(this.data.get(0));
@@ -186,7 +191,7 @@ public class ClusteredIndexTest {
     public void addEmpty() throws IOException {
         createManager(new int[0]);
 
-        data = generateData(1, SORT_KEY);
+        data = generateData(1);
         manager.insert(data.get(0));
 
         assertDataEquals(data, readFromManager());
@@ -194,7 +199,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewSimple() throws IOException {
-        data = generateData(10, SORT_KEY);
+        data = generateData(10);
         RemovedRow removedRow = new RemovedRow(data, 9);
 
 
@@ -205,8 +210,26 @@ public class ClusteredIndexTest {
     }
 
     @Test
+    public void addUnique1() throws IOException {
+        createManager(10);
+        Object[] someRow = data.get(0);
+
+        manager.insert(someRow);
+        data.add(0, someRow);
+        assertDataEquals(reverse(data), readFromManager());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addUnique2() throws IOException {
+        createManager(10);
+        Object[] someRow = data.get(0);
+
+        manager.insertUnique(someRow);
+    }
+
+    @Test
     public void addNewFull1() throws IOException {
-        data = generateData(101, SORT_KEY);
+        data = generateData(101);
         RemovedRow removedRow = new RemovedRow(data, 100);
 
         createManager(removedRow.remainderData);
@@ -219,7 +242,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewFull2() throws IOException {
-        data = generateData(151, SORT_KEY);
+        data = generateData(151);
         RemovedRow removedRow = new RemovedRow(data, 100);
 
         createManager(
@@ -235,7 +258,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewFull3() throws IOException {
-        data = generateData(151, SORT_KEY);
+        data = generateData(151);
         RemovedRow removedRow = new RemovedRow(data, 10);
 
         createManager(
@@ -251,7 +274,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewFull4() throws IOException {
-        data = generateData(301, SORT_KEY);
+        data = generateData(301);
         RemovedRow removedRow = new RemovedRow(data, 0);
 
         createManager(
@@ -270,7 +293,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewInHole1() throws IOException {
-        data = generateData(201, SORT_KEY);
+        data = generateData(201);
         RemovedRow removedRow = new RemovedRow(data, 50);
 
         createManager(
@@ -290,7 +313,7 @@ public class ClusteredIndexTest {
 
     @Test
     public void addNewInHole2() throws IOException {
-        data = generateData(201, SORT_KEY);
+        data = generateData(201);
         RemovedRow removedRow = new RemovedRow(data, 100);
 
         createManager(
@@ -304,6 +327,48 @@ public class ClusteredIndexTest {
         assertDataEquals(data.subList(0, 100), storage.getPartition(0).getTable());
         assertDataEquals(data.subList(100, 101), storage.getPartition(1).getTable());
         assertDataEquals(data.subList(101, 201), storage.getPartition(2).getTable());
+    }
+
+    @Test
+    public void remove1() throws IOException {
+        createManager(10);
+
+        Object[] row = data.remove(3);
+        assertTrue(manager.removeFirst(r -> r[0] == row[0]));
+        assertDataEquals(reverse(data), readFromManager());
+    }
+
+    @Test
+    public void remove2() throws IOException {
+        createManager(10);
+
+        Object[] row = data.remove(3);
+        IoIterator<Object[]> it = manager.queryIndex((long) row[SORT_KEY]);
+        assertTrue(it.hasNext());
+        assertArrayEquals(row, it.next());
+        it.remove();
+
+        assertDataEquals(reverse(data), readFromManager());
+    }
+
+    @Test
+    public void remove3() throws IOException {
+        createManager(10);
+
+        Object[] row = data.get(3);
+        manager.insert(row);
+        manager.insert(row);
+
+        IoIterator<Object[]> it = manager.queryIndex((long) row[SORT_KEY]);
+        assertTrue(it.hasNext());
+        assertArrayEquals(row, it.next());
+        it.remove();
+
+        assertTrue(it.hasNext());
+        assertArrayEquals(row, it.next());
+        it.remove();
+
+        assertDataEquals(reverse(data), readFromManager());
     }
 
     private static class RemovedRow {
