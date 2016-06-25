@@ -1,8 +1,7 @@
-package app.config.manager.datafile;
+package app.io.datafile;
 
 import app.config.manager.DummyData;
 import app.config.manager.DummyData.*;
-import app.config.manager.storage.PartitionedStorage;
 import com.wx.util.future.IoIterator;
 import org.junit.Test;
 

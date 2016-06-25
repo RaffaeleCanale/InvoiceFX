@@ -1,6 +1,6 @@
-package app.config.manager.datafile;
+package app.io.datafile;
 
-import app.config.manager.storage.PartitionedStorage;
+import app.io.storage.PartitionedStorage;
 import app.util.UpperBoundBinarySearch;
 import com.wx.util.future.IoIterator;
 import org.jetbrains.annotations.NotNull;

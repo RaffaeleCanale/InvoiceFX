@@ -1,7 +1,7 @@
-package app.config.manager.local;
+package app.io.local;
 
-import app.config.manager.storage.PartitionedStorage;
-import app.config.manager.storage.PartitionedStorageTest;
+import app.io.storage.PartitionedStorage;
+import app.io.storage.PartitionedStorageTest;
 import com.wx.io.file.FileUtil;
 import org.junit.After;
 import org.junit.AfterClass;

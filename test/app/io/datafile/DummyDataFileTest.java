@@ -1,4 +1,4 @@
-package app.config.manager.datafile;
+package app.io.datafile;
 
 import app.config.manager.DummyData;
 

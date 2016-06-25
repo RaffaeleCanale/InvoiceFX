@@ -1,7 +1,7 @@
-package app.config.manager.local;
+package app.io.local;
 
-import app.config.manager.datafile.DataFile;
-import app.config.manager.datafile.DataFileTest;
+import app.io.datafile.DataFile;
+import app.io.datafile.DataFileTest;
 import org.junit.After;
 import org.junit.Before;
 

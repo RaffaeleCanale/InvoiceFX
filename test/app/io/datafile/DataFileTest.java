@@ -1,4 +1,4 @@
-package app.config.manager.datafile;
+package app.io.datafile;
 
 import org.junit.Test;
 

@@ -1,7 +1,7 @@
-package app.config.manager.local;
+package app.io.local;
 
-import app.config.manager.datafile.DataFile;
-import app.config.manager.storage.PartitionedStorage;
+import app.io.datafile.DataFile;
+import app.io.storage.PartitionedStorage;
 import com.wx.io.Accessor;
 import org.jetbrains.annotations.NotNull;
 

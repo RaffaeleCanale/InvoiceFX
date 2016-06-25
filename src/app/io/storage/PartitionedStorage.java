@@ -1,6 +1,6 @@
-package app.config.manager.storage;
+package app.io.storage;
 
-import app.config.manager.datafile.DataFile;
+import app.io.datafile.DataFile;
 import org.jetbrains.annotations.NotNull;
 
 /**

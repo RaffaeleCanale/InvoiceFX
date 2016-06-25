@@ -1,4 +1,4 @@
-package app.config.manager.local;
+package app.io.local;
 
 import app.model.DateEnabled;
 import app.model.client.Client;
@@ -9,7 +9,6 @@ import app.model.item.Item;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 

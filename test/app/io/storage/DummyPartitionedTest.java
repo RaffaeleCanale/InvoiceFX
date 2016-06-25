@@ -1,7 +1,7 @@
-package app.config.manager.storage;
+package app.io.storage;
 
 import app.config.manager.DummyData;
-import app.config.manager.local.RecordSerializer;
+import app.io.local.RecordSerializer;
 
 /**
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)

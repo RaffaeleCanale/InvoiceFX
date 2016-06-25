@@ -1,8 +1,9 @@
-package app.config.manager.local;
+package app.io.local;
 
 import app.config.manager.DummyData;
 import app.config.manager.DataGenerator;
-import app.config.manager.datafile.ClusteredIndex;
+import app.config.manager.LocalRelationalManager;
+import app.io.datafile.ClusteredIndex;
 import app.model.invoice.Invoice;
 import com.wx.io.file.FileUtil;
 import com.wx.util.future.IoIterator;

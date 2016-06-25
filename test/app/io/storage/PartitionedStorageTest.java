@@ -1,6 +1,6 @@
-package app.config.manager.storage;
+package app.io.storage;
 
-import app.config.manager.local.RecordSerializer;
+import app.io.local.RecordSerializer;
 import org.junit.Test;
 
 import java.io.IOException;

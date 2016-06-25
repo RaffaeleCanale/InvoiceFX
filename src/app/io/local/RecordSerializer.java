@@ -1,4 +1,4 @@
-package app.config.manager.local;
+package app.io.local;
 
 import java.io.DataInput;
 import java.io.DataOutput;

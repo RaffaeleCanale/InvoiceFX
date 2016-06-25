@@ -1,8 +1,9 @@
-package app.config.manager.local;
+package app.config.manager;
 
 
 import app.config.manager.ManagerInterface;
 import app.config.manager.datafile.ClusteredIndex;
+import app.config.manager.local.DirectoryStorage;
 import app.model.client.Client;
 import app.model.client.PurchasedItem;
 import app.model.invoice.Invoice;
