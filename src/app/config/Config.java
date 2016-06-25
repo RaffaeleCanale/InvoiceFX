@@ -90,27 +90,6 @@ public class Config {
         removeInvalidElements(itemsManager);
         removeInvalidElements(invoicesManager);
 
-        ObservableList<ItemModel> items = itemsManager.get();
-        try(TextAccessor accessor = new TextAccessor().setOut(new File("Items.txt"), false)) {
-            Set<String> names = items.stream().map(ItemModel::getItemName)
-                    .collect(Collectors.toSet());
-            accessor.write(names);
-        }
-
-        ObservableList<InvoiceModel> invoices = invoicesManager.get();
-        try(TextAccessor accessor = new TextAccessor().setOut(new File("Addresses.txt"), false)) {
-            Set<String> addresses = invoices.stream().map(InvoiceModel::getAddress)
-                    .collect(Collectors.toSet());
-            accessor.write(addresses);
-        }
-
-        try(TextAccessor accessor = new TextAccessor().setOut(new File("Clients.txt"), false)) {
-            Set<String> clients = invoices.stream().flatMap(i -> i.getItems().stream())
-                    .map(ClientItem::getClientName)
-                    .collect(Collectors.toSet());
-            accessor.write(clients);
-        }
-
     }
 
     /**

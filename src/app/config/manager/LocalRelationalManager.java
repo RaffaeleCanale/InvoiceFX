@@ -1,15 +1,12 @@
 package app.config.manager;
 
 
-import app.config.manager.ManagerInterface;
-import app.config.manager.datafile.ClusteredIndex;
-import app.config.manager.local.DirectoryStorage;
+import app.io.datafile.ClusteredIndex;
+import app.io.local.DirectoryStorage;
 import app.model.client.Client;
 import app.model.client.PurchasedItem;
 import app.model.invoice.Invoice;
 import app.model.item.Item;
-import com.google.common.collect.Table;
-import com.sun.org.apache.regexp.internal.RE;
 import com.wx.properties.property.Property;
 import com.wx.util.future.IoIterator;
 
@@ -20,8 +17,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-import static app.config.manager.local.RelationalModelHelper.*;
-import static javafx.scene.input.KeyCode.J;
+import static app.io.local.RelationalModelHelper.*;
 
 /**
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)

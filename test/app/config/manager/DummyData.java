@@ -1,8 +1,8 @@
 package app.config.manager;
 
-import app.config.manager.datafile.DataFile;
-import app.config.manager.local.RecordSerializer;
-import app.config.manager.storage.PartitionedStorage;
+import app.io.datafile.DataFile;
+import app.io.local.RecordSerializer;
+import app.io.storage.PartitionedStorage;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInput;
