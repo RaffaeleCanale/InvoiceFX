@@ -3,7 +3,7 @@ package app.gui.overview;
 import app.Stages;
 import app.config.Config;
 import app.legacy.config.manager.ModelManager;
-import app.config.preferences.properties.SharedProperty;
+import com.wx.fx.preferences.properties.SharedProperty;
 import app.legacy.model.invoice.InvoiceModel;
 import app.legacy.model.item.ClientItem;
 import app.legacy.model.item.ItemModel;

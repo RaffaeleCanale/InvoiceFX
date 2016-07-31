@@ -2,16 +2,18 @@ package app.gui.overview.editor;
 
 import app.Stages;
 import app.config.Config;
+import app.config.manager.ManagerInterface;
 import app.legacy.config.manager.ModelManager;
-import app.config.preferences.properties.SharedProperty;
-import app.legacy.model.item.ItemModel;
+import app.model.item.Item;
 import app.util.bindings.AddedRemovedListener;
 import app.util.bindings.FormElement;
 import app.util.gui.components.AlternateColorPanel;
+import app.util.helpers.Common;
 import app.util.helpers.InvoiceHelper;
 import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
+import com.wx.fx.preferences.properties.SharedProperty;
 import com.wx.util.pair.Pair;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 
 /**
  * Created on 07/07/2015
@@ -35,9 +39,12 @@ import java.util.stream.Collectors;
  */
 public class ItemEditorController implements StageController {
 
-    private final ObservableList<ItemModel> copies = FXCollections.observableArrayList();
+    private static final int DEFAULT_ITEMS_PER_PAGE = 100;
+
+    private final ObservableList<Item> copies = FXCollections.observableArrayList();
 
     private final Set<FormElement> forms = new HashSet<>();
+
 
     @FXML
     private Pane itemPanes;
@@ -45,29 +52,39 @@ public class ItemEditorController implements StageController {
     public void initialize() {
         AlternateColorPanel.bind(itemPanes);
 
-        copies.addListener(new AddedRemovedListener<ItemModel>() {
-            @Override
-            public void added(ItemModel item, int index) {
-                addTypeToPanel(item);
-            }
+//        copies.addListener(new AddedRemovedListener<Item>() {
+//            @Override
+//            public void added(Item item, int index) {
+//                addItemPanel(item);
+//            }
+//
+//            @Override
+//            public void removed(Item item, int index) {
+//                itemPanes.getChildren().remove(index);
+//            }
+//        });
 
-            @Override
-            public void removed(ItemModel item, int index) {
-                itemPanes.getChildren().remove(index);
-            }
-        });
+        ManagerInterface manager = ModelManager.instance();
 
-        Config.itemsManager().get().stream().sorted((o1, o2) -> Double.compare(o1.getTva(), o2.getTva()))
-                .map(ItemModel::copyOf)
-                .forEach(copies::add);
+        Stream<Item> itemStream = Common.safeStream(manager.getAllItems());
+
+
+        copies.addAll(
+                itemStream.limit(DEFAULT_ITEMS_PER_PAGE).collect(Collectors.toList())
+        );
+
+//
+//        Config.itemsManager().get().stream().sorted((o1, o2) -> Double.compare(o1.getTva(), o2.getTva()))
+//                .map(Item::copyOf)
+//                .forEach(copies::add);
     }
 
-    public void addNewItem() {
-        ItemModel item = InvoiceHelper.createDefaultItem(Config.sharedPreferences().getDoubleArrayProperty(SharedProperty.VAT)[0]);
-        copies.add(item);
-    }
+//    public void addNewItem() {
+//        Item item = InvoiceHelper.createDefaultItem(Config.sharedPreferences().getDoubleArrayProperty(SharedProperty.VAT)[0]);
+//        copies.add(item);
+//    }
 
-    private void addTypeToPanel(ItemModel item) {
+    private void addItemPanel(Item item) {
         FXMLLoader loader = new FXMLLoader(
                 ItemEditorController.class.getResource("/app/gui/overview/editor/ItemEditorPanel.fxml"),
                 Lang.getBundle());
@@ -96,7 +113,7 @@ public class ItemEditorController implements StageController {
 
     public void save() {
         if (checkForms()) {
-            ModelManager<ItemModel> itemsManager = Config.itemsManager();
+            ModelManager<Item> itemsManager = Config.itemsManager();
 
 
 
@@ -107,7 +124,7 @@ public class ItemEditorController implements StageController {
         }
     }
 
-    private List<ItemModel> distinct(List<ItemModel> list) {
+    private List<Item> distinct(List<Item> list) {
         Set<Pair<Double, String>> identifiers = new HashSet<>();
 
 

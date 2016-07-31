@@ -1,11 +1,12 @@
 package app.gui.overview.editor;
 
 import app.config.Config;
-import app.util.helpers.InvoiceHelper;
-import app.config.preferences.properties.SharedProperty;
-import app.legacy.model.item.ItemModel;
+import app.config.preferences.SharedProperty;
+import app.model.item.Item;
 import app.util.bindings.FormElement;
 import app.util.gui.components.NumberTextField;
+import app.util.helpers.Common;
+import app.util.helpers.InvoiceHelper;
 import javafx.beans.property.DoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -26,11 +27,12 @@ import java.util.stream.DoubleStream;
  */
 public class ItemSubPanelController {
 
-
     @FXML
     private TextField nameField;
+
     @FXML
     private NumberTextField priceField;
+
     @FXML
     private ChoiceBox<Double> vatField;
 
@@ -39,8 +41,10 @@ public class ItemSubPanelController {
 
     public void initialize() {
         vatField.setConverter(new FormatStringConverter<>(InvoiceHelper.vatFormat()));
+
+        double[] vats = Config.sharedPreferences().get(SharedProperty.VAT, Common::decodeDoubleArray);
         vatField.getItems().setAll(
-                DoubleStream.of(Config.sharedPreferences().getDoubleArrayProperty(SharedProperty.VAT)).boxed().toArray(Double[]::new)
+                DoubleStream.of(vats).boxed().toArray(Double[]::new)
         );
     }
 
@@ -55,12 +59,12 @@ public class ItemSubPanelController {
     }
 
 
-    public Set<FormElement> bind(ItemModel item) {
+    public Set<FormElement> bind(Item item) {
         Set<FormElement> forms = new HashSet<>();
 
         // NAME
-        nameField.textProperty().bindBidirectional(item.itemNameProperty());
-        forms.add(FormElement.simple(item.itemNameValidityProperty(), nameField));
+        nameField.textProperty().bindBidirectional(item.nameProperty());
+        forms.add(FormElement.simple(item.nameValidityProperty(), nameField));
 
         // PRICE
         priceField.setNumberFormat(InvoiceHelper.moneyFormat());
@@ -69,8 +73,8 @@ public class ItemSubPanelController {
 
         // VAT
         DoubleProperty vatValue = DoubleProperty.doubleProperty(vatField.valueProperty());
-        vatValue.bindBidirectional(item.tvaProperty());
-        forms.add(FormElement.simple(item.tvaValidityProperty(), vatField));
+        vatValue.bindBidirectional(item.vatProperty());
+        forms.add(FormElement.simple(item.vatValidityProperty(), vatField));
 
         return forms;
     }

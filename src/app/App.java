@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static app.config.preferences.properties.SharedProperty.LANGUAGE;
+import static com.wx.fx.preferences.properties.SharedProperty.LANGUAGE;
 
 /**
  * Starting point of the App. This class will get all the necessary components and show the main frame when it's ready

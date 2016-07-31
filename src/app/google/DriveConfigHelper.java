@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import static app.config.preferences.properties.LocalProperty.DRIVE_CURRENT_USER;
+import static app.config.preferences.LocalProperty.DRIVE_CURRENT_USER;
 
 
 /**

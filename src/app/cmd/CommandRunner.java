@@ -4,6 +4,7 @@ import app.util.ExceptionLogger;
 import app.util.gui.AlertBuilder;
 import com.wx.fx.util.callback.SimpleCallback;
 import com.wx.io.TextAccessor;
+import com.wx.util.OsUtils;
 import com.wx.util.log.LogHelper;
 
 import java.io.File;
@@ -27,19 +28,19 @@ public abstract class CommandRunner {
 
     private static final Logger LOG = LogHelper.getLogger(CommandRunner.class);
 
-    /**
-     * Enumeration of supported operating systems
-     */
-    public enum SupportedOs {
-        UNIX,
-        WINDOWS
-    }
-
-    private static SupportedOs os;
+//    /**
+//     * Enumeration of supported operating systems
+//     */
+//    public enum SupportedOs {
+//        UNIX,
+//        WINDOWS
+//    }
+//
+//    private static SupportedOs os;
 
     /**
      * Get a new instance of a {@code CommandRunner} according to the current platform (see {@link
-     * app.cmd.CommandRunner.SupportedOs})
+     * com.wx.util.OsUtils.OsFamily})
      *
      * @param directory Command working directory
      * @param name      Command display name (in case of error or other message)
@@ -48,51 +49,14 @@ public abstract class CommandRunner {
      * @return A {@code CommandRunner} instance
      */
     public static CommandRunner getInstance(File directory, String name, String cmd) {
-        if (os == null) {
-            checkOs();
-        }
-
-        switch (os) {
+        switch (OsUtils.getOsFamily()) {
             case UNIX:
                 return new UnixCommandRunner(directory, name, cmd);
             case WINDOWS:
                 return new WindowsCommandRunner(directory, name, cmd);
             default:
-                throw new AssertionError();
+                throw new RuntimeException("OS not supported " + OsUtils.getOsFamily());
         }
-    }
-
-    /**
-     * This method assesses the current operating system. In the case the platform is not supported, an error is shown
-     * and the application will exit.
-     * <p>
-     * Note that this method will be automatically called when needed, alternatively, it can be manually called to force
-     * to check the OS at a controlled point (eg. at the application start up).
-     */
-    public static void checkOs() {
-        String osName = System.getProperty("os.name").toLowerCase();
-
-        if (osName.contains("win")) {
-            os = SupportedOs.WINDOWS;
-        } else if (osName.contains("nix") || osName.contains("nux") || osName.indexOf("aix") > 0) {
-            os = SupportedOs.UNIX;
-        } else {
-            AlertBuilder.showFatalError("Unsupported OS", "Your operating system is not supported");
-            System.exit(1);
-        }
-    }
-
-    /**
-     * Get the current operating system.
-     *
-     * @return The current operating system
-     */
-    public static SupportedOs getOs() {
-        if (os == null) {
-            checkOs();
-        }
-
-        return os;
     }
 
     private final File directory;

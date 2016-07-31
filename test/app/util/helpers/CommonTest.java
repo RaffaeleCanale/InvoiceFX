@@ -1,7 +1,7 @@
 package app.util.helpers;
 
 import app.config.Config;
-import app.config.preferences.properties.SharedProperty;
+import com.wx.fx.preferences.properties.SharedProperty;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

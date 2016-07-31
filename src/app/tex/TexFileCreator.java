@@ -23,8 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static app.config.preferences.properties.LocalProperty.INVOICE_DIRECTORY;
-import static app.config.preferences.properties.LocalProperty.TEX_COMMAND;
+import static app.config.Config.Files.TEMPLATE_DIR;
+import static app.config.preferences.LocalProperty.INVOICE_DIRECTORY;
+
 
 /**
  * Created on 09/04/2015
@@ -38,7 +39,6 @@ public class TexFileCreator {
     // TODO: 3/1/16 Add a LocalProperty to specify the template?
      */
 
-    public static final String TEMPLATE_DIR = "template";
     private static final Logger LOG = LogHelper.getLogger(TexFileCreator.class);
 
     private final InvoiceModel invoice;
@@ -68,7 +68,7 @@ public class TexFileCreator {
     }
 
     private File initMainTexFile() throws IOException {
-        File tmpDir = Config.getConfigFile("latex_build");
+        File tmpDir = Config.getConfigFile(Config.Files.LATEX_BUILD);
         FileUtil.autoCreateDirectory(tmpDir);
 
         File body = createCopyTo("invoice_body.tex", tmpDir);
@@ -87,37 +87,39 @@ public class TexFileCreator {
     }
 
     private File initInvoicesDir() throws IOException {
-        File invoiceDir = Config.localPreferences().getPathProperty(INVOICE_DIRECTORY);
+        File invoiceDir = Config.localPreferences().getPath(INVOICE_DIRECTORY);
         FileUtil.autoCreateDirectory(invoiceDir);
 
         return invoiceDir;
     }
 
     private File runLaTex(File mainTexFile, int pdfLatexPasses) throws IOException {
-        File configDirectory = Config.getConfigDirectory();
-
-        String cmd = Config.localPreferences().getProperty(TEX_COMMAND, mainTexFile.getAbsolutePath(), configDirectory.getAbsolutePath());
-
-        CommandRunner runner = CommandRunner.getInstance(
-                mainTexFile.getParentFile(),
-                "pdflatex",
-                cmd
-        );
-        for (int i = 0; i < pdfLatexPasses; i++) {
-            runner.execute();
-        }
-
-        File pdfFile = new File(mainTexFile.getParentFile(), "invoice.pdf");
-        if (!pdfFile.exists()) {
-            runner.logOutput();
-            throw new IOException("PDF not created, see logs.");
-        }
-
-        return pdfFile;
+        // TODO: 30.07.16
+        throw new UnsupportedOperationException();
+//        File configDirectory = Config.getConfigDirectory();
+//
+//        String cmd = Config.localPreferences().getString(TEX_COMMAND, mainTexFile.getAbsolutePath(), configDirectory.getAbsolutePath());
+//
+//        CommandRunner runner = CommandRunner.getInstance(
+//                mainTexFile.getParentFile(),
+//                "pdflatex",
+//                cmd
+//        );
+//        for (int i = 0; i < pdfLatexPasses; i++) {
+//            runner.execute();
+//        }
+//
+//        File pdfFile = new File(mainTexFile.getParentFile(), "invoice.pdf");
+//        if (!pdfFile.exists()) {
+//            runner.logOutput();
+//            throw new IOException("PDF not created, see logs.");
+//        }
+//
+//        return pdfFile;
     }
 
     private File getTemplateFile(String name) throws IOException {
-        File file = Config.getConfigFile(TEMPLATE_DIR + File.separator + name);
+        File file = Config.getConfigFile(TEMPLATE_DIR, name);
         if (!file.exists()) {
             FileUtil.autoCreateDirectory(file.getParentFile());
             extractResource(name, file);
@@ -137,7 +139,7 @@ public class TexFileCreator {
 
     private void update(File file, InvoiceModel invoice) throws IOException {
         StringConverter<LocalDate> dateConverter = InvoiceHelper.dateConverter();
-        NumberFormat moneyFormat = InvoiceHelper.getFormat("#0.00");
+        NumberFormat moneyFormat = InvoiceHelper.getNumberFormat("#0.00");
         Map<String, String> updateMap = new HashMap<>();
 
 
@@ -191,7 +193,7 @@ public class TexFileCreator {
 
         // VAT
         StringBuilder vatString = new StringBuilder();
-        NumberFormat vatFormat = InvoiceHelper.getFormat("#0.#");
+        NumberFormat vatFormat = InvoiceHelper.getNumberFormat("#0.#");
 
         vatsSum.nonZeroVatSums().forEach(v -> {
             initCommand(vatString, "vat",

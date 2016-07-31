@@ -1,8 +1,8 @@
 package app.legacy;
 
-import app.config.preferences.UserPreferences;
-import app.config.preferences.properties.LocalProperty;
-import app.config.preferences.properties.SharedProperty;
+import com.wx.fx.preferences.UserPreferences;
+import com.wx.fx.preferences.properties.LocalProperty;
+import com.wx.fx.preferences.properties.SharedProperty;
 import app.google.DriveConfigHelper;
 import app.legacy.config.ModelManagerFactory;
 import app.legacy.config.manager.ModelManager;
@@ -29,7 +29,7 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
-import static app.config.preferences.properties.LocalProperty.EXPORTED_PREFERENCES;
+import static com.wx.fx.preferences.properties.LocalProperty.EXPORTED_PREFERENCES;
 import static app.google.DriveConfigHelper.Action.UPDATE;
 
 /**

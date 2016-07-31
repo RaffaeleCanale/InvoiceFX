@@ -4,7 +4,6 @@ import app.config.Config;
 import app.legacy.config.manager.GoogleDriveManager;
 import app.legacy.config.manager.ModelManager;
 import app.legacy.config.manager.RuntimeModelManager;
-import app.config.preferences.properties.LocalProperty;
 import app.legacy.model.invoice.InvoiceList;
 import app.legacy.model.invoice.InvoiceModel;
 import app.legacy.model.item.ItemModel;

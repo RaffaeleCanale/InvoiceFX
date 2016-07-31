@@ -15,10 +15,12 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static app.config.Config.Files.LOGS_DIR;
+
 /**
  * Utility classes that allows to display and log exceptions into log files.
  * <p>
- * These methods require {@link Config} to be initialized (see {@link Config#initConfig(ModelManagerFactory.Impl)}).
+ * These methods require {@link Config} to be initialized (see {@link Config#initConfig()} ).
  * <p>
  * Created on 22/04/2015
  *
@@ -29,7 +31,6 @@ public class ExceptionLogger {
 
     private static final Logger LOG = LogHelper.getLogger(ExceptionLogger.class);
 
-    private static final String LOGS_DIR = "Logs";
     private static final String LOG_FILE_NAME = "Exceptions.log";
 
     /**
@@ -74,8 +75,8 @@ public class ExceptionLogger {
 
     private static File getLogFile(String name, boolean fresh) throws IOException {
         File file = fresh ?
-                Config.getFreshConfigFile(LOGS_DIR + File.separator + name, ".txt") :
-                Config.getConfigFile(LOGS_DIR + File.separator + name);
+                Config.getFreshConfigFile(LOGS_DIR, name, ".txt") :
+                Config.getConfigFile(LOGS_DIR, name);
         AccessorUtil.createParent(file);
 
         return file;

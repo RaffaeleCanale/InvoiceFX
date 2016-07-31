@@ -2,7 +2,7 @@ package app.gui.overview;
 
 import app.config.Config;
 import app.util.helpers.InvoiceHelper;
-import app.config.preferences.properties.SharedProperty;
+import com.wx.fx.preferences.properties.SharedProperty;
 import app.legacy.model.DateEnabled;
 import app.legacy.model.item.ClientItem;
 import app.legacy.model.item.ItemModel;

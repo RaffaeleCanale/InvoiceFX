@@ -3,7 +3,7 @@ package app.util.helpers;
 
 import app.App;
 import app.config.Config;
-import app.config.preferences.properties.LocalProperty;
+import app.config.preferences.LocalProperty;
 import app.tex.TexFileCreator;
 import com.wx.io.Accessor;
 import com.wx.io.ProgressInputStream;
@@ -66,7 +66,7 @@ public class UpdateHelper {
     }
 
     private static File exportScript(File appDir) throws IOException {
-        String scriptName = Config.localPreferences().getProperty(LocalProperty.UPDATE_SCRIPT_NAME);
+        String scriptName = Config.localPreferences().getString(LocalProperty.UPDATE_SCRIPT_NAME);
 
         File scriptFile = new File(appDir, scriptName);
 

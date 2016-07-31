@@ -1,35 +1,24 @@
 package app.config;
 
+import app.config.preferences.LocalProperty;
+import app.config.preferences.SharedProperty;
+import app.google.DriveConfigHelper;
 import app.legacy.config.ModelManagerFactory;
 import app.legacy.config.manager.ModelManager;
-import app.config.preferences.UserPreferences;
-import app.config.preferences.properties.LocalProperty;
-import app.config.preferences.properties.SharedProperty;
-import app.google.DriveConfigHelper;
-import app.legacy.model.invoice.InvoiceModel;
-import app.legacy.model.item.ClientItem;
-import app.legacy.model.item.ItemModel;
 import app.util.ExceptionLogger;
-import app.util.gui.AlertBuilder;
-import app.legacy.model.ValidationModel;
-import com.wx.io.Accessor;
+import com.wx.fx.preferences.UserPreferences;
 import com.wx.io.AccessorUtil;
-import com.wx.io.TextAccessor;
 import com.wx.io.file.FileUtil;
 import com.wx.util.log.LogHelper;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.prefs.InvalidPreferencesFormatException;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 
-import static app.config.preferences.properties.LocalProperty.*;
+import static app.config.Config.Files.EXPORTED_PREFERENCES_FILE;
 import static app.google.DriveConfigHelper.Action.UPDATE;
 
 /**
@@ -46,49 +35,52 @@ import static app.google.DriveConfigHelper.Action.UPDATE;
  */
 public class Config {
 
+    public enum TexHandler {
+        PORTABLE_INSTALLATION,
+        SYSTEM_CMD,
+        ONLINE
+    }
+
+    public enum Files {
+        EXPORTED_PREFERENCES_FILE("preferences.xml"),
+        GOOGLE_CREDENTIALS_FILE("credentials"),
+        LOGS_DIR("Logs"),
+        LATEX_BUILD("Latex_Build"),
+        TEMPLATE_DIR("Template")
+        ;
+
+        private final String path;
+
+        Files(String path) {
+            this.path = path;
+        }
+    }
+
     private static final Logger LOG = LogHelper.getLogger(Config.class);
     private static final String CONFIG_DIR_NAME = "Config";
     // TODO: 3/15/16 Add all Config-related constants here! (eg. update, managers locations, etc...)
 
     private static File configDir;
     private static final UserPreferences<LocalProperty> localPreferences =
-            new UserPreferences<>(Preferences.userNodeForPackage(ItemModel.class));
+            new UserPreferences<>(LocalProperty.class);
     private static final UserPreferences<SharedProperty> sharedPreferences =
-            new UserPreferences<>(Preferences.userNodeForPackage(SharedProperty.class));
+            new UserPreferences<>(SharedProperty.class);
 
-    private static ModelManager<ItemModel> itemsManager;
-    private static ModelManager<InvoiceModel> invoicesManager;
 
-    private static final Map<Double, ObservableList<ItemModel>> itemGroups = new HashMap<>();
+//    private static final Map<Double, ObservableList<ItemModel>> itemGroups = new HashMap<>();
 
     /**
      * Initialize this manager, this must be the first method called.
      *
      * @throws IOException If the config directory is not found or cannot be created
-     * @param modelManagerImplementation
      */
-    public static void initConfig(ModelManagerFactory.Impl modelManagerImplementation) throws IOException {
+    public static void initConfig() throws IOException {
         configDir = loadConfigDirectory(CONFIG_DIR_NAME);
         LOG.info("Configuration directory located: " + configDir.getAbsolutePath());
 
-        ModelManagerFactory.setImplementation(modelManagerImplementation);
-        itemsManager = ModelManagerFactory.createItemsManager();
-        invoicesManager = ModelManagerFactory.createInvoiceManager();
     }
 
-    /**
-     * Load the items and invoices managers.
-     *
-     * @throws IOException
-     */
-    public static void loadManagers() throws IOException {
-        LOG.info("Loading managers");
-
-        itemsManager.load();
-        invoicesManager.load();
-
-        removeInvalidElements(itemsManager);
-        removeInvalidElements(invoicesManager);
+    public static void initTexHandler() throws IOException {
 
     }
 
@@ -96,15 +88,14 @@ public class Config {
      * Load all preferences, synchronizing from Google Drive if necessary
      */
     public static void loadPreferences() {
-        File prefs = localPreferences.getPathProperty(EXPORTED_PREFERENCES);
+        File prefs = getConfigFile(EXPORTED_PREFERENCES_FILE);
+
         DriveConfigHelper.performAction(UPDATE, params -> {
             boolean updated = (boolean) params[0];
             if (updated) {
                 LOG.info("Importing Drive preferences");
-                sharedPreferences.clearPreferences();
-                try (InputStream is = new BufferedInputStream(new FileInputStream(prefs))) {
-                    Preferences.importPreferences(is);
-                    sharedPreferences.resyncProperties();
+                try {
+                    sharedPreferences.loadFromFile(prefs);
                 } catch (IOException | InvalidPreferencesFormatException e) {
                     ExceptionLogger.logException(e);
                     LOG.severe("Importation failed: [" + e.getClass().getSimpleName() + "] " + e.getMessage());
@@ -118,7 +109,7 @@ public class Config {
      */
     public static void saveSharedPreferences() {
         if (sharedPreferences.propertiesChanged()) {
-            File prefs = localPreferences.getPathProperty(EXPORTED_PREFERENCES);
+            File prefs = getConfigFile(EXPORTED_PREFERENCES_FILE);
             LOG.info("Saving shared preferences at: " + prefs.getAbsolutePath());
 
             try {
@@ -129,52 +120,6 @@ public class Config {
                 LOG.severe("Saving failed: [" + e.getClass().getSimpleName() + "] " + e.getMessage());
             }
         }
-    }
-
-    /**
-     * Utility method that merges two lists according to a identity function (no duplicates).
-     *
-     * @param source           Source list that will contain all the merged elements
-     * @param toAdd            List to add to the source
-     * @param getId            Identity function (should provide a unique identifier for each element of the lists)
-     * @param prioritizeSource If set to {@code true}, when elements are present on both lists, only those from the
-     *                         source list are kept. Else, those from the second list are kept
-     * @param <E>              Type of the list elements
-     * @param <F>              Type of the elements identifier
-     *
-     * @return {@code true} if the source list changed.
-     */
-    public static <E, F> boolean mergeLists(List<E> source, List<E> toAdd, Function<E, F> getId, boolean prioritizeSource) {
-        Map<F, E> idsMap = source.stream().collect(Collectors.toMap(getId, Function.identity(), (i1, i2) -> {
-            LOG.severe("Duplicates items detected, the following item might be lost: " + i2);
-            return i1;
-        }));
-
-        boolean changed = false;
-
-        for (E e : toAdd) {
-            F eId = getId.apply(e);
-            E existing = idsMap.get(eId);
-
-            if (prioritizeSource) {
-                if (existing == null) {
-                    source.add(e);
-                    changed = true;
-                }
-
-            } else {
-                if (existing != null) {
-                    source.remove(existing);
-                }
-
-                source.add(e);
-                changed = true;
-            }
-
-            idsMap.put(eId, e);
-        }
-
-        return changed;
     }
 
     /**
@@ -195,31 +140,7 @@ public class Config {
         return sharedPreferences;
     }
 
-    /**
-     * Save the given manager. Any exception is dealt locally.
-     * <p>
-     * More specifically, in case of exception, a dialog is started with the user to determine whether to retry or
-     * ignore the error.
-     *
-     * @param manager Manager to save
-     */
-    public static void saveSafe(ModelManager<?> manager) {
-        try {
-            LOG.info("Saving manager");
-            manager.save();
-        } catch (IOException ex) {
-            ExceptionLogger.logException(ex);
-            int choice = AlertBuilder.error(ex)
-                    .key("errors.saving_failed")
-                    .button("dialog.retry")
-                    .button("dialog.ignore")
-                    .show();
 
-            if (choice == 0) {
-                saveSafe(manager);
-            }
-        }
-    }
 
     /**
      * Get a file contained in the config directory.
@@ -228,12 +149,18 @@ public class Config {
      *
      * @return File in the config directory
      */
-    public static File getConfigFile(String... name) {
-        String path = String.join(File.separator, name);
-        File file = new File(configDir, path);
-        AccessorUtil.createParent(file);
+    public static File getConfigFile(Files configFile, String... subFile) {
+        File resultFile;
 
-        return file;
+        if (subFile != null && subFile.length > 1) {
+            String path = configFile.path + File.separator + String.join(File.separator, subFile);
+            resultFile = new File(configDir, path);
+        } else {
+            resultFile = new File(configDir, configFile.path);
+        }
+
+        AccessorUtil.createParent(resultFile);
+        return resultFile;
     }
 
     /**
@@ -244,91 +171,24 @@ public class Config {
      *
      * @return File in the config directory
      */
-    public static File getFreshConfigFile(String name, String extension) {
-        return FileUtil.getFreshFile(configDir, name, extension);
+    public static File getFreshConfigFile(Files configFile, String name, String extension) {
+        String path = configFile.path + File.separator + name;
+        return FileUtil.getFreshFile(configDir, path, extension);
     }
 
-    /**
-     * Suggest an invoice id that has not been used.
-     *
-     * @return A new invoice id
-     */
-    public static int suggestId() {
-        return invoicesManager.get().stream()
-                .mapToInt(InvoiceModel::getId)
-                .max().orElse(0) + 1;
-    }
 
-    /**
-     * Get an invoice model by id.
-     *
-     * @param id Id of the invoice
-     *
-     * @return The corresponding invoice or {@code null} if no invoice has that id
-     */
-    public static InvoiceModel getInvoiceById(int id) {
-        return invoicesManager.get().stream()
-                .filter(i -> i.getId() == id)
-                .findAny().orElse(null);
-    }
-
-    /**
-     * Return the invoice model manager.
-     *
-     * @return The invoice model manager
-     */
-    public static ModelManager<InvoiceModel> invoicesManager() {
-        return invoicesManager;
-    }
-
-    /**
-     * Return the item model manager.
-     *
-     * @return The item model manager
-     */
-    public static ModelManager<ItemModel> itemsManager() {
-        return itemsManager;
-    }
-
-    /**
-     * Return a sub-list of the item models containing only those with the given VAT.
-     *
-     * @param vat VAT the item models
-     *
-     * @return A list containing only the items with the given VAT
-     */
-    public static ObservableList<ItemModel> getItemGroup(double vat) {
-        ObservableList<ItemModel> group = itemGroups.get(vat);
-        if (group == null) {
-            group = new FilteredList<>(itemsManager.get(), i -> i.getTva() == vat);
-            itemGroups.put(vat, group);
-        }
-
-        return group;
-    }
 
     /**
      * Return the config directory.
      *
      * @return The config directory
      */
-    public static File getConfigDirectory() {
+    public static File getConfigDirectory2() {
         return configDir;
     }
 
-    private static <E extends ValidationModel> void removeInvalidElements(ModelManager<E> manager) {
-        for (Iterator<E> iterator = manager.get().iterator(); iterator.hasNext(); ) {
-            E element = iterator.next();
 
-            if (!element.isValid()) {
-                LOG.warning("Invalid element removed: " + element);
-                element.diagnosis(LOG);
-                iterator.remove();
-            }
-        }
-    }
-
-    private static File loadConfigDirectory(String CONFIG_DIR) throws IOException {
+    private static File loadConfigDirectory(String path) throws IOException {
         String programDir;
         try {
             programDir = Config.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
@@ -342,7 +202,7 @@ public class Config {
         }
 
 
-        dir = new File(dir, CONFIG_DIR);
+        dir = new File(dir, path);
         if (!dir.exists() && !dir.mkdir()) {
             throw new FileNotFoundException(dir.getAbsolutePath());
         }

@@ -2,15 +2,16 @@ package app.gui.archives;
 
 import app.Stages;
 import app.config.Config;
-import app.util.gui.InvoiceViewer;
-import app.util.helpers.*;
-import app.legacy.config.manager.ModelManager;
-import app.config.preferences.properties.LocalProperty;
-import app.config.preferences.properties.SharedProperty;
-import app.legacy.model.invoice.InvoiceModel;
+import app.config.ModelManager;
 import app.legacy.model.item.ClientItem;
+import app.model.invoice.Invoice;
 import app.util.gui.AlertBuilder;
+import app.util.gui.InvoiceViewer;
 import app.util.gui.cell.FormatFactory;
+import app.util.helpers.Common;
+import app.util.helpers.InvoiceHelper;
+import app.util.helpers.InvoiceHtmlPrinter;
+import app.util.helpers.TexCreatorHelper;
 import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
@@ -39,8 +40,10 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.logging.Logger;
 
-import static app.config.preferences.properties.LocalProperty.ARCHIVES_VIEW_ENABLED;
-import static app.config.preferences.properties.LocalProperty.ARCHIVES_VIEW_SPLITTER;
+import static app.config.preferences.LocalProperty.ARCHIVES_VIEW_ENABLED;
+import static app.config.preferences.LocalProperty.ARCHIVES_VIEW_SPLITTER;
+import static app.config.preferences.SharedProperty.ARCHIVES_DEFAULT_ACTION;
+
 
 /**
  * Created on 10/07/2015
@@ -59,7 +62,7 @@ public class InvoicesArchiveController implements StageController {
     @FXML
     private SplitPane splitPane;
     @FXML
-    private TableView<InvoiceModel> invoicesTable;
+    private TableView<Invoice> invoicesTable;
     @FXML
     private Button openButton;
     @FXML
@@ -71,8 +74,8 @@ public class InvoicesArchiveController implements StageController {
     @FXML
     private ToggleGroup defaultActionGroup;
 
-    private ModelManager<InvoiceModel> manager;
-    private FilteredList<InvoiceModel> filteredInvoices;
+    private ModelManager manager;
+    private FilteredList<Invoice> filteredInvoices;
 
     private Runnable defaultAction;
 
@@ -81,11 +84,11 @@ public class InvoicesArchiveController implements StageController {
         // DEFAULT ACTION
         defaultActionGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             int index = defaultActionGroup.getToggles().indexOf(newValue);
-            Config.sharedPreferences().setProperty(SharedProperty.ARCHIVES_DEFAULT_ACTION, index);
+            Config.sharedPreferences().setProperty(ARCHIVES_DEFAULT_ACTION, index);
             setDefaultAction(index);
         });
 
-        int index = Config.sharedPreferences().getIntProperty(SharedProperty.ARCHIVES_DEFAULT_ACTION);
+        int index = Config.sharedPreferences().getInt(ARCHIVES_DEFAULT_ACTION);
         setDefaultAction(index);
         defaultActionGroup.getToggles().get(index).setSelected(true);
 
@@ -167,7 +170,7 @@ public class InvoicesArchiveController implements StageController {
         //  name column
         getClientsNameColumn().setCellValueFactory(param -> clientNameExpression(param.getValue()));
         // date column
-        TableColumn<InvoiceModel, LocalDate> dateColumn = getDateColumn();
+        TableColumn<Invoice, LocalDate> dateColumn = getDateColumn();
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         dateColumn.setCellFactory(new FormatFactory<>(InvoiceHelper.dateConverter()::toString));
 
@@ -176,7 +179,7 @@ public class InvoicesArchiveController implements StageController {
         invoicesTable.getSortOrder().add(dateColumn);
         
         // sum column
-        TableColumn<InvoiceModel, Double> sumColumn = getSumColumn();
+        TableColumn<Invoice, Double> sumColumn = getSumColumn();
         sumColumn.setCellValueFactory(new PropertyValueFactory<>("sum"));
         sumColumn.setCellFactory(new FormatFactory<>(InvoiceHelper.moneyFormat()::format));
 
@@ -191,7 +194,7 @@ public class InvoicesArchiveController implements StageController {
         removeButton.disableProperty().bind(selectionSize.isEqualTo(0));
     }
 
-    private StringExpression clientNameExpression(InvoiceModel invoice) {
+    private StringExpression clientNameExpression(Invoice invoice) {
         StringProperty clientName = new SimpleStringProperty(InvoiceHelper.formatClientName(invoice));
 
 
@@ -209,10 +212,10 @@ public class InvoicesArchiveController implements StageController {
 
     @Override
     public void setArguments(Object... args) {
-        this.manager = (ModelManager<InvoiceModel>) args[0];
+        this.manager = (ModelManager) args[0];
 
         filteredInvoices = new FilteredList<>(manager.get());
-        SortedList<InvoiceModel> sortedList = new SortedList<>(filteredInvoices);
+        SortedList<Invoice> sortedList = new SortedList<>(filteredInvoices);
         sortedList.comparatorProperty().bind(invoicesTable.comparatorProperty());
         invoicesTable.setItems(sortedList);
     }
@@ -237,7 +240,7 @@ public class InvoicesArchiveController implements StageController {
     }
 
     public void open() {
-        InvoiceModel selectedInvoice = getSelectedInvoice();
+        Invoice selectedInvoice = getSelectedInvoice();
         File pdf = getFile(selectedInvoice);
 
         if (pdf != null && pdf.exists()) {
@@ -252,12 +255,12 @@ public class InvoicesArchiveController implements StageController {
         StageManager.show(Stages.OVERVIEW, getSelectedInvoice());
     }
 
-    private InvoiceModel getSelectedInvoice() {
+    private Invoice getSelectedInvoice() {
         return invoicesTable.getSelectionModel().getSelectedItem();
     }
 
     public void remove() {
-        ObservableList<InvoiceModel> invoices = invoicesTable.getSelectionModel().getSelectedItems();
+        ObservableList<Invoice> invoices = invoicesTable.getSelectionModel().getSelectedItems();
 
         int choice = AlertBuilder.confirmation()
                 .key("confirmation.remove_confirmation")
@@ -267,7 +270,7 @@ public class InvoicesArchiveController implements StageController {
             return;
         }
 
-        for (InvoiceModel invoice : invoices) {
+        for (Invoice invoice : invoices) {
             File pdf = getFile(invoice);
             if (pdf != null && pdf.exists()) {
                 pdf.delete();
@@ -286,7 +289,7 @@ public class InvoicesArchiveController implements StageController {
         return Config.localPreferences().getPathProperty(LocalProperty.INVOICE_DIRECTORY);
     }
 
-    private File getFile(InvoiceModel invoice) {
+    private File getFile(Invoice invoice) {
         String pdfName = invoice.getPdfFileName();
         if (pdfName == null) {
             return null;
@@ -296,18 +299,18 @@ public class InvoicesArchiveController implements StageController {
 
 
     @SuppressWarnings("unchecked")
-    private TableColumn<InvoiceModel, String> getClientsNameColumn() {
-        return (TableColumn<InvoiceModel, String>) invoicesTable.getColumns().get(0);
+    private TableColumn<Invoice, String> getClientsNameColumn() {
+        return (TableColumn<Invoice, String>) invoicesTable.getColumns().get(0);
     }
 
     @SuppressWarnings("unchecked")
-    private TableColumn<InvoiceModel, LocalDate> getDateColumn() {
-        return (TableColumn<InvoiceModel, LocalDate>) invoicesTable.getColumns().get(1);
+    private TableColumn<Invoice, LocalDate> getDateColumn() {
+        return (TableColumn<Invoice, LocalDate>) invoicesTable.getColumns().get(1);
     }
 
     @SuppressWarnings("unchecked")
-    private TableColumn<InvoiceModel, Double> getSumColumn() {
-        return (TableColumn<InvoiceModel, Double>) invoicesTable.getColumns().get(2);
+    private TableColumn<Invoice, Double> getSumColumn() {
+        return (TableColumn<Invoice, Double>) invoicesTable.getColumns().get(2);
     }
 
 }

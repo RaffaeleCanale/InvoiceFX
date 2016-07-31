@@ -1,7 +1,7 @@
 package app.util.helpers;
 
 import app.config.Config;
-import app.config.preferences.properties.SharedProperty;
+import app.config.preferences.SharedProperty;
 import app.legacy.model.invoice.InvoiceModel;
 import app.tex.TexFileCreator;
 import app.util.gui.AlertBuilder;
@@ -49,7 +49,7 @@ public class TexCreatorHelper {
                 }
 
                 TexFileCreator texFileCreator = new TexFileCreator(invoice,
-                        Config.sharedPreferences().getBooleanProperty(SharedProperty.SHOW_ITEM_COUNT));
+                        Config.sharedPreferences().getBoolean(SharedProperty.SHOW_ITEM_COUNT));
                 try {
                     String pdfName = texFileCreator.create();
 

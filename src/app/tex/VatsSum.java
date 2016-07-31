@@ -1,7 +1,7 @@
 package app.tex;
 
 import app.config.Config;
-import app.config.preferences.properties.SharedProperty;
+import app.config.preferences.SharedProperty;
 import app.util.helpers.Common;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class VatsSum {
     private final double[] vats;
 
     public VatsSum() {
-        vats = Config.sharedPreferences().doubleArrayProperty(SharedProperty.VAT).get();
+        vats = Config.sharedPreferences().get(SharedProperty.VAT, Common::decodeDoubleArray);
         sumPerVat = new HashMap<>();
 
         for (double vat : vats) {

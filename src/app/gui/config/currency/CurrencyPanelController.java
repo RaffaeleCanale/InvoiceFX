@@ -1,13 +1,11 @@
 package app.gui.config.currency;
 
-import app.App;
 import app.config.Config;
 import app.util.helpers.InvoiceHelper;
-import app.config.preferences.properties.SharedProperty;
+import com.wx.fx.preferences.properties.SharedProperty;
 import app.currency.ECBRetriever;
 import app.currency.Rates;
 import com.wx.fx.Lang;
-import com.wx.properties.PropertiesManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleExpression;
@@ -55,7 +53,7 @@ public class CurrencyPanelController {
         final String euro = Lang.getString("currency.euro");
         final String chf = Lang.getString("currency.chf");
 
-        final NumberFormat rateFormat = InvoiceHelper.getFormat("#0.0###");
+        final NumberFormat rateFormat = InvoiceHelper.getNumberFormat("#0.0###");
 
         // SPINNER
         SpinnerValueFactory.DoubleSpinnerValueFactory factory =

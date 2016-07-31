@@ -4,20 +4,14 @@ import app.App;
 import app.Stages;
 import app.config.Config;
 import app.util.ExceptionLogger;
-import app.util.helpers.InvoiceHelper;
 import app.gui.config.currency.CurrencyPanelController;
 import app.util.gui.AlertBuilder;
 import app.util.helpers.Common;
 import app.util.helpers.UpdateHelper;
-import com.sun.javaws.progress.Progress;
 import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
-import com.wx.io.Accessor;
-import com.wx.io.ProgressInputStream;
 import com.wx.io.file.FileUtil;
-import com.wx.properties.PropertiesManager;
-import com.wx.servercomm.http.HttpRequest;
 import com.wx.util.log.LogHelper;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -32,11 +26,10 @@ import javafx.util.StringConverter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import static app.config.preferences.properties.LocalProperty.INVOICE_DIRECTORY;
-import static app.config.preferences.properties.SharedProperty.*;
+import static com.wx.fx.preferences.properties.LocalProperty.INVOICE_DIRECTORY;
+import static com.wx.fx.preferences.properties.SharedProperty.*;
 
 /**
  * Created on 12/07/2015

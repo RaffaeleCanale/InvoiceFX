@@ -2,15 +2,27 @@ package app.util.helpers;
 
 import app.cmd.CommandRunner;
 import app.config.Config;
-import app.config.preferences.properties.LocalProperty;
-import app.config.preferences.properties.SharedProperty;
+import app.config.preferences.LocalProperty;
+import app.config.preferences.SharedProperty;
 import app.util.gui.AlertBuilder;
+import com.google.common.primitives.Doubles;
 import com.wx.fx.gui.window.StageManager;
 import com.wx.fx.transfer.TransferController;
 import com.wx.fx.transfer.TransferTask;
+import com.wx.fx.util.alert.ErrorAlert;
 import com.wx.fx.util.callback.SimpleCallback;
+import com.wx.util.future.Future;
+import com.wx.util.future.IoIterator;
+import com.wx.util.iterator.PeekIterator;
+import com.wx.util.representables.DelimiterEncoder;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.wx.fx.transfer.TransferTask.Action.MOVE;
 
@@ -22,6 +34,58 @@ import static com.wx.fx.transfer.TransferTask.Action.MOVE;
  * @author Raffaele Canale (raffaelecanale@gmail.com)
  */
 public class Common {
+
+    private static class SafeIterator<T> implements Iterator<T> {
+        private final PeekIterator<Future<T>> it;
+        private boolean isStuck;
+
+        private SafeIterator(IoIterator<T> ioIterator) {
+            this.it = new PeekIterator<>(ioIterator.iterator());
+
+            prepareNext();
+        }
+
+        private void prepareNext() {
+            Future<T> next = it.peek();
+            if (!next.isValid()) {
+                isStuck = true;
+
+                // TODO: 18.07.16 ERROR
+                ErrorAlert.showGenericErrorAlert(next.getException());
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !isStuck && it.hasNext();
+        }
+
+        @Override
+        public T next() {
+            if (isStuck) {
+                throw new NoSuchElementException();
+            }
+
+            prepareNext();
+            return it.next().getSafe();
+        }
+    }
+
+    public static <T> Stream<T> safeStream(IoIterator<T> iterator) {
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(new SafeIterator<>(iterator), Spliterator.ORDERED),
+                false);
+    }
+
+    public static String encodeDoubleArray(double[] values) {
+        return DelimiterEncoder.encode("/", Doubles.asList(values).stream().map(Object::toString));
+    }
+
+    public static double[] decodeDoubleArray(String value) {
+        return DelimiterEncoder.decode("/", value).stream()
+                .mapToDouble(Double::parseDouble)
+                .toArray();
+    }
 
     /**
      * Open a file using the default system application.
@@ -36,7 +100,7 @@ public class Common {
             return;
         }
 
-        String launcher = Config.localPreferences().getProperty(LocalProperty.DEFAULT_APP_OPEN, file.getAbsolutePath());
+        String launcher = Config.localPreferences().getString(LocalProperty.DEFAULT_APP_OPEN, file.getAbsolutePath());
         CommandRunner.getInstance(null, "explorer", launcher).executeInBackground();
     }
 
@@ -130,7 +194,7 @@ public class Common {
      * @see SharedProperty#EURO_TO_CHF_CURRENCY
      */
     public static double computeEuro(double chf_sum) {
-        double euro_to_chf = Config.sharedPreferences().getDoubleProperty(SharedProperty.EURO_TO_CHF_CURRENCY);
+        double euro_to_chf = Config.sharedPreferences().getDouble(SharedProperty.EURO_TO_CHF_CURRENCY);
 
         double euro_sum = chf_sum / euro_to_chf;
         return Math.round(euro_sum * 100.0) / 100.0;
@@ -168,7 +232,7 @@ public class Common {
             vatSum = vat*sum / (1+vat)
 
          */
-        boolean roundTo5 = Config.sharedPreferences().getBooleanProperty(SharedProperty.VAT_ROUND);
+        boolean roundTo5 = Config.sharedPreferences().getBoolean(SharedProperty.VAT_ROUND);
         double vat_n = vat / 100.0; // Normalize VAT
 
         double vatSum = vat_n * sum / (1.0 + vat_n);

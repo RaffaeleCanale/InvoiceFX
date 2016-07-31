@@ -43,7 +43,7 @@ public class DriveFunctions {
      * Directory to store user credentials for this application.
      */
     private static final java.io.File DATA_STORE_DIR =
-            Config.getConfigFile("credentials");
+            Config.getConfigFile(Config.Files.GOOGLE_CREDENTIALS_FILE);
 
     /**
      * Global instance of the {@link FileDataStoreFactory}.

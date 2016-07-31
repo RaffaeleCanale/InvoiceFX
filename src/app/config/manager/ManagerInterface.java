@@ -1,6 +1,7 @@
 package app.config.manager;
 
 import app.model.invoice.Invoice;
+import app.model.item.Item;
 import com.wx.util.future.IoIterator;
 
 import java.io.IOException;
@@ -16,4 +17,5 @@ public interface ManagerInterface {
 
     void addNewInvoice(Invoice invoice) throws IOException;
 
+    IoIterator<Item> getAllItems() throws IOException;
 }
