@@ -2,7 +2,7 @@ package app.config.manager;
 
 import app.config.manager.datafile.DataFile;
 import app.config.manager.storage.PartitionedStorage;
-import org.jetbrains.annotations.NotNull;
+import com.sun.istack.internal.NotNull;
 
 import java.io.IOException;
 import java.util.*;

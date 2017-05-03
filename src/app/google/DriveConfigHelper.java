@@ -17,6 +17,7 @@ import javafx.concurrent.Task;
 import javafx.scene.control.ButtonType;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -125,6 +126,7 @@ public class DriveConfigHelper {
     }
 
     private static Object[] executeAction(Action action, Object[] args) throws IOException {
+//        System.out.println(action + "  " + Arrays.toString(args));
         switch (action) {
             case INSERT:
                 insertFile((java.io.File) args[0]);
@@ -271,6 +273,7 @@ public class DriveConfigHelper {
         if (driveService == null) {
             driveService = DriveFunctions.getDriveService(false);
         }
+
         return driveService;
     }
 

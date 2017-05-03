@@ -89,6 +89,8 @@ public class DriveFunctions {
         // Load client secrets.
         InputStream in =
                 DriveFunctions.class.getResourceAsStream("/google/client_secret_926831742589-1s03oj41qb0k4kfcibhhpp29bcrbn3a9.apps.googleusercontent.com.json");
+        if (in == null) throw new IOException("Internal error: Client secret not found");
+
         GoogleClientSecrets clientSecrets =
                 GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 

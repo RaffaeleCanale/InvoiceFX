@@ -38,7 +38,10 @@ public class ClusteredIndexTest {
 
     private List<Object[]> read(IoIterator<Object[]> it) throws IOException {
         List<Object[]> read = new ArrayList<>();
-        it.forEachRemaining(read::add);
+
+        while (it.hasNext())
+            read.add(it.next());
+
         return read;
     }
 
