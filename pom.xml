@@ -24,4 +24,21 @@
 		</plugins>
 	</build>
 
+    <dependencies>
+        <dependency>
+            <groupId>fxlibraries</groupId>
+            <artifactId>com.wx.fx</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/FXLibraries.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>wxlibraries</groupId>
+            <artifactId>com.wx</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/WXLibraries.jar</systemPath>
+        </dependency>
+    </dependencies>
+
 </project>

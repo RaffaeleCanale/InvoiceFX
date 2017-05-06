@@ -11,5 +11,23 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Maven: fxlibraries:com.wx.fx:1.0">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/FXLibraries.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: wxlibraries:com.wx:1.0">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/WXLibraries.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
