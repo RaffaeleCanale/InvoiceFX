@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+<Stage title="%settings.title" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+       fx:controller="app.gui.shortcuts.CurrencyShortcutController">
+    <scene>
+        <Scene>
+            <BorderPane>
+                <center>
+                    <fx:include fx:id="currencyPanel" source="../config/currency/CurrencyPanel.fxml" />
+                </center>
+                <bottom>
+                    <FlowPane alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                        <Button cancelButton="true" defaultButton="true" onAction="#close" text="%settings.close"/>
+                    </FlowPane>
+                </bottom>
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                </padding>
+            </BorderPane>
+        </Scene>
+    </scene>
+</Stage>

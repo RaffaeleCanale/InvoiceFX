@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import app.util.gui.components.NumberTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="app.gui.overview.editor.ItemSubPanelController">
+    <HBox alignment="CENTER_LEFT" spacing="10.0" VBox.vgrow="NEVER">
+        <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+        </padding>
+        <Label text="%item.name" HBox.hgrow="NEVER"/>
+        <TextField fx:id="nameField" HBox.hgrow="ALWAYS"/>
+        <Button onAction="#remove" text="X" textFill="RED" HBox.hgrow="NEVER"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+        </padding>
+        <Label text="%item.price"/>
+        <NumberTextField fx:id="priceField" prefWidth="100.0"/>
+        <Label text="%item.vat"/>
+        <ChoiceBox fx:id="vatField" prefWidth="80.0"/>
+    </HBox>
+</VBox>
