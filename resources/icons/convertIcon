@@ -1,5 +1,0 @@
-#!/bin/bash
-
-convert icon.png -resize 64x64 icon_64.png
-convert icon.png -resize 128x128 icon_128.png
-convert icon.png -resize 256x256 icon.ico
