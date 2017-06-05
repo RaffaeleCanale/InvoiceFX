@@ -1,16 +1,20 @@
 package app.config;
 
-import app.config.manager.ModelManager;
+import app.legacy.config.ModelManagerFactory;
+import app.legacy.config.manager.ModelManager;
 import app.config.preferences.UserPreferences;
 import app.config.preferences.properties.LocalProperty;
 import app.config.preferences.properties.SharedProperty;
 import app.google.DriveConfigHelper;
-import app.model.invoice.InvoiceModel;
-import app.model.item.ItemModel;
+import app.legacy.model.invoice.InvoiceModel;
+import app.legacy.model.item.ClientItem;
+import app.legacy.model.item.ItemModel;
 import app.util.ExceptionLogger;
 import app.util.gui.AlertBuilder;
-import app.model.ValidationModel;
+import app.legacy.model.ValidationModel;
+import com.wx.io.Accessor;
 import com.wx.io.AccessorUtil;
+import com.wx.io.TextAccessor;
 import com.wx.io.file.FileUtil;
 import com.wx.util.log.LogHelper;
 import javafx.collections.ObservableList;
@@ -18,10 +22,7 @@ import javafx.collections.transformation.FilteredList;
 
 import java.io.*;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -88,6 +89,28 @@ public class Config {
 
         removeInvalidElements(itemsManager);
         removeInvalidElements(invoicesManager);
+
+        ObservableList<ItemModel> items = itemsManager.get();
+        try(TextAccessor accessor = new TextAccessor().setOut(new File("Items.txt"), false)) {
+            Set<String> names = items.stream().map(ItemModel::getItemName)
+                    .collect(Collectors.toSet());
+            accessor.write(names);
+        }
+
+        ObservableList<InvoiceModel> invoices = invoicesManager.get();
+        try(TextAccessor accessor = new TextAccessor().setOut(new File("Addresses.txt"), false)) {
+            Set<String> addresses = invoices.stream().map(InvoiceModel::getAddress)
+                    .collect(Collectors.toSet());
+            accessor.write(addresses);
+        }
+
+        try(TextAccessor accessor = new TextAccessor().setOut(new File("Clients.txt"), false)) {
+            Set<String> clients = invoices.stream().flatMap(i -> i.getItems().stream())
+                    .map(ClientItem::getClientName)
+                    .collect(Collectors.toSet());
+            accessor.write(clients);
+        }
+
     }
 
     /**
@@ -298,7 +321,7 @@ public class Config {
     public static ObservableList<ItemModel> getItemGroup(double vat) {
         ObservableList<ItemModel> group = itemGroups.get(vat);
         if (group == null) {
-            group = new FilteredList<>(itemsManager.get(), i -> i.getVat() == vat);
+            group = new FilteredList<>(itemsManager.get(), i -> i.getTva() == vat);
             itemGroups.put(vat, group);
         }
 

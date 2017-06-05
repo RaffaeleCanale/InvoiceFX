@@ -1,6 +1,7 @@
 package app.util;
 
 import app.config.Config;
+import app.legacy.config.ModelManagerFactory;
 import com.wx.io.AccessorUtil;
 import com.wx.io.TextAccessor;
 import com.wx.util.Format;
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
 /**
  * Utility classes that allows to display and log exceptions into log files.
  * <p>
- * These methods require {@link Config} to be initialized (see {@link Config#initConfig(app.config.ModelManagerFactory.Impl)}).
+ * These methods require {@link Config} to be initialized (see {@link Config#initConfig(ModelManagerFactory.Impl)}).
  * <p>
  * Created on 22/04/2015
  *

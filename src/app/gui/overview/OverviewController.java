@@ -2,11 +2,11 @@ package app.gui.overview;
 
 import app.Stages;
 import app.config.Config;
-import app.config.manager.ModelManager;
+import app.legacy.config.manager.ModelManager;
 import app.config.preferences.properties.SharedProperty;
-import app.model.invoice.InvoiceModel;
-import app.model.item.ClientItem;
-import app.model.item.ItemModel;
+import app.legacy.model.invoice.InvoiceModel;
+import app.legacy.model.item.ClientItem;
+import app.legacy.model.item.ItemModel;
 import app.util.ExceptionLogger;
 import app.util.bindings.FormElement;
 import app.util.bindings.GenericListContentBinding;
@@ -14,7 +14,7 @@ import app.util.gui.AlertBuilder;
 import app.util.gui.components.AlternateColorPanel;
 import app.util.gui.components.NumberTextField;
 import app.util.helpers.InvoiceHelper;
-import app.util.helpers.InvoiceViewer;
+import app.util.gui.InvoiceViewer;
 import app.util.helpers.TexCreatorHelper;
 import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
@@ -69,7 +69,7 @@ public class OverviewController implements StageController {
     }
 
     public void initialize() {
-        // ADDRESS
+        // idTextFieldADDRESS
         addressTextArea.textProperty().bindBidirectional(invoice.addressProperty());
         forms.add(FormElement.simple(invoice.addressValidityProperty(), addressTextArea));
 
@@ -191,14 +191,15 @@ public class OverviewController implements StageController {
         boolean changed = Config.mergeLists(
                 Config.itemsManager().get(),
                 activeItems,
-                i -> new Pair<>(i.getVat(), i.getItemName()),
+                i -> new Pair<>(i.getTva(), i.getItemName()),
                 false);
 
         if (changed) {
             Config.saveSafe(Config.itemsManager());
         }
 
-        setArguments(savedInvoice); // TODO: 11/4/15 A bit overkill
+        StageManager.close(Stages.OVERVIEW);
+        StageManager.show(Stages.OVERVIEW, savedInvoice);
     }
 
     public void newInvoice() {

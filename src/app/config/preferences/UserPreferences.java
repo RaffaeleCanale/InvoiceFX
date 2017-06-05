@@ -15,8 +15,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
+import java.util.prefs.*;
 import java.util.stream.DoubleStream;
 
 
@@ -28,6 +27,7 @@ import java.util.stream.DoubleStream;
  * <p>
  * <p>
  * Created on 14/07/2015
+ * // TODO: 14.06.16 Render Preferences completely invisible inside this class! Change the constructor, offer methods to get/store, remove resyncProperties. Make the assumption that no-one modifies the underlying preferences (better yet! Add a change listener to the preferences(!!))
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
  * @version 1.0

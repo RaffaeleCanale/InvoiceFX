@@ -3,7 +3,7 @@ package app.gui.overview.editor;
 import app.config.Config;
 import app.util.helpers.InvoiceHelper;
 import app.config.preferences.properties.SharedProperty;
-import app.model.item.ItemModel;
+import app.legacy.model.item.ItemModel;
 import app.util.bindings.FormElement;
 import app.util.gui.components.NumberTextField;
 import javafx.beans.property.DoubleProperty;
@@ -69,8 +69,8 @@ public class ItemSubPanelController {
 
         // VAT
         DoubleProperty vatValue = DoubleProperty.doubleProperty(vatField.valueProperty());
-        vatValue.bindBidirectional(item.vatProperty());
-        forms.add(FormElement.simple(item.vatValidityProperty(), vatField));
+        vatValue.bindBidirectional(item.tvaProperty());
+        forms.add(FormElement.simple(item.tvaValidityProperty(), vatField));
 
         return forms;
     }

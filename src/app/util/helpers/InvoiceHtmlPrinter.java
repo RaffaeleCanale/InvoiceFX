@@ -1,8 +1,8 @@
 package app.util.helpers;
 
-import app.model.DateEnabled;
-import app.model.invoice.InvoiceModel;
-import app.model.item.ClientItem;
+import app.legacy.model.DateEnabled;
+import app.legacy.model.invoice.InvoiceModel;
+import app.legacy.model.item.ClientItem;
 import app.util.ExceptionLogger;
 import com.wx.fx.Lang;
 import com.wx.io.TextAccessor;

@@ -10,6 +10,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ * This class represents a unidirectional binding between a list to the an other list of a any type.
+ * <p>
  * Created on 19/07/2015
  *
  * @author Raffaele Canale (raffaelecanale@gmail.com)
@@ -17,22 +19,43 @@ import java.util.stream.Collectors;
  */
 public class GenericListContentBinding<E, F> implements ListChangeListener<E>, WeakListener {
 
-
-    public static <E,F> Object bind(List<F> list1, ObservableList<E> list2, Function<E, F> converter) {
-        GenericListContentBinding<E, F> contentBinding = new GenericListContentBinding<>(list1, converter);
-        if (list1 instanceof ObservableList) {
-            ((ObservableList<F>) list1).setAll(convert(list2, converter));
+    /**
+     * Bind an observable list with any list (of any type) using a converter. Every add, remove or set operation on the
+     * observed list will propagate to the observer list. The converter is used to "cast" values from the observer to
+     * the observed list.
+     * <p>
+     * When creating the binding, the observer list content will be reset to match the observed list. The binding is not
+     * deep, any change applied directly on the objects in the list will not propagate.
+     * <p>
+     * This binding is unidirectional, any change on the observer will not reflect on the observed.
+     * <p>
+     * <b>Important:</b> This method cannot "lock" the observer from changes and any changes applied directly on the
+     * observer may result in unexpected behaviors.
+     *
+     * @param observer  List to bind
+     * @param observed  List to observe
+     * @param converter Converter to cast values from the observed list to the observer list
+     * @param <E>       Type of the observed list
+     * @param <F>       Type of the observer list
+     *
+     * @return The created binding
+     */
+    public static <E, F> GenericListContentBinding<E, F> bind(List<F> observer, ObservableList<E> observed, Function<E, F> converter) {
+        GenericListContentBinding<E, F> contentBinding = new GenericListContentBinding<>(observer, converter);
+        if (observer instanceof ObservableList) {
+            ((ObservableList<F>) observer).setAll(convert(observed, converter));
         } else {
-            list1.clear();
-            list1.addAll(convert(list2, converter));
+            observer.clear();
+            observer.addAll(convert(observed, converter));
         }
-        list2.removeListener(contentBinding);
-        list2.addListener(contentBinding);
+        observed.removeListener(contentBinding);
+        observed.addListener(contentBinding);
+
         return contentBinding;
     }
 
-    private static <E, F> List<F> convert(List<E> list1, Function<E,F> converter) {
-        return list1.stream().map(converter).collect(Collectors.toList());
+    private static <E, F> List<F> convert(List<? extends E> list, Function<E, F> converter) {
+        return list.stream().map(converter).collect(Collectors.toList());
     }
 
     private final WeakReference<List<F>> listRef;
@@ -66,12 +89,7 @@ public class GenericListContentBinding<E, F> implements ListChangeListener<E>, W
     }
 
     private void addAll(List<F> list, int from, List<? extends E> subList) {
-        list.addAll(from, subList.stream().map(converter).collect(Collectors.toList()));
-
-//        for (E e : subList) {
-//            list.add(from, converter.apply(e));
-//            from++;
-//        }
+        list.addAll(from, convert(subList, converter));
     }
 
     @Override

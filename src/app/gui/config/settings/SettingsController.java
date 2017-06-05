@@ -3,16 +3,21 @@ package app.gui.config.settings;
 import app.App;
 import app.Stages;
 import app.config.Config;
+import app.util.ExceptionLogger;
 import app.util.helpers.InvoiceHelper;
 import app.gui.config.currency.CurrencyPanelController;
 import app.util.gui.AlertBuilder;
 import app.util.helpers.Common;
 import app.util.helpers.UpdateHelper;
+import com.sun.javaws.progress.Progress;
 import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageController;
 import com.wx.fx.gui.window.StageManager;
+import com.wx.io.Accessor;
+import com.wx.io.ProgressInputStream;
 import com.wx.io.file.FileUtil;
 import com.wx.properties.PropertiesManager;
+import com.wx.servercomm.http.HttpRequest;
 import com.wx.util.log.LogHelper;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -27,6 +32,7 @@ import javafx.util.StringConverter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import static app.config.preferences.properties.LocalProperty.INVOICE_DIRECTORY;
@@ -42,12 +48,11 @@ public class SettingsController implements StageController {
 
     private static final Logger LOG = LogHelper.getLogger(SettingsController.class);
 
+    private static final long PROGRESS_INTERVAL = 1024 * 100;
 
     @FXML
-    private ProgressIndicator versionProgress;
+    private ProgressBar versionProgress;
 
-    @FXML
-    private Label versionLabel;
     @FXML
     private Button versionActionButton;
 
@@ -102,56 +107,13 @@ public class SettingsController implements StageController {
         showCountBox.selectedProperty().bindBidirectional(Config.sharedPreferences().booleanProperty(SHOW_ITEM_COUNT));
 
 
-        // VERSION
-        UpdateHelper.stateProperty().addListener((observable, oldValue, newValue) -> {
-            Platform.runLater(() -> showUpdaterState(newValue));
-        });
-        UpdateHelper.tryInitialize();
+        // UPDATER
+        // TODO: 29.04.16 Updater button here
     }
 
     @Override
     public void setContext(Stage stage) {
         currencyPanelController.setContext(stage);
-        showUpdaterState(UpdateHelper.stateProperty().get());
-    }
-
-    private void showUpdaterState(UpdateHelper.State state) {
-        versionLabel.setId("");
-        versionActionButton.setVisible(false);
-        versionProgress.setVisible(false);
-
-        switch (state) {
-            case UNINITIALIZED:
-            case LOADING_INDEX:
-                versionLabel.setText(Lang.getString("settings.version.getting"));
-                versionProgress.setVisible(true);
-                break;
-
-            case UP_TO_DATE:
-                double currentVersion = UpdateHelper.getCurrentVersion();
-                versionLabel.setText(Lang.getString("settings.version.current", currentVersion));
-
-                versionActionButton.setText(Lang.getString("settings.version.check"));
-                versionActionButton.setVisible(true);
-                break;
-
-            case UPDATE_AVAILABLE:
-                double newVersion = UpdateHelper.getUpdateVersion();
-
-                versionLabel.setText(Lang.getString("settings.version.available", newVersion));
-
-                versionActionButton.setText(Lang.getString("settings.update"));
-                versionActionButton.setVisible(true);
-                break;
-
-            case ERROR:
-                versionLabel.setText(Lang.getString("settings.version.error"));
-                versionLabel.setId("error");
-
-                versionActionButton.setText(Lang.getString("settings.version.retry"));
-                versionActionButton.setVisible(true);
-                break;
-        }
     }
 
     private Locale findCurrentLocale() {
@@ -207,69 +169,22 @@ public class SettingsController implements StageController {
     }
 
     public void versionAction() {
-        switch (UpdateHelper.stateProperty().get()) {
-            case UP_TO_DATE:
-                UpdateHelper.reload();
-                break;
-            case UPDATE_AVAILABLE:
-                Common.clearDirectoryFiles(Config.getConfigFile("template"));
+        // TODO: 29.04.16 update
+        versionActionButton.setVisible(false);
+        versionProgress.setVisible(true);
 
-//                UpdateHelper.progressPropertyProperty().addListener(new ChangeListener<Number>() {
-//                    @Override
-//                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//                        System.out.println(newValue);
-//                    }
-//                });
-                UpdateHelper.update();
+        versionProgress.setProgress(-1);
 
-                break;
-            case ERROR:
-                UpdateHelper.reload();
-                break;
-            default:
-                break;
-        }
 
-//        versionActionButton.setVisible(false);
-//        versionProgress.setVisible(true);
-//
-//        new Thread(() -> {
-//            try {
-//                Platform.runLater(() -> {
-//                    versionProgress.setProgress(0.0);
-//                    versionProgress.setPrefHeight(45);
-//                    versionProgress.setPrefWidth(45);
-//                    versionLabel.setText(Lang.get("settings.version.downloading"));
-//                });
-//                UpdateHelper.update(p -> Platform.runLater(() -> versionProgress.setProgress(p)));
-//                Platform.runLater(() -> versionProgress.setProgress(1.0));
-//
-//
-//                File templateDir = Config.getConfigFile("template");
-//                if (templateDir.isDirectory() && templateDir.exists()) {
-//                    for (File file : templateDir.listFiles()) {
-//                        if (file.isFile()) {
-//                            file.delete();
-//                        }
-//                    }
-//                }
-//                Platform.runLater(StageManager::closeAll);
-//
-//            } catch (IOException e) {
-//                ExceptionLogger.logException(e);
-//
-//                Platform.runLater(() -> {
-//                    versionLabel.setText(Lang.get("settings.version.error"));
-//                    versionLabel.setId("error");
-//
-//                    versionProgress.setProgress(0.0);
-//                    versionProgress.setPrefHeight(50);
-//                    versionProgress.setPrefWidth(50);
-//                    versionProgress.setVisible(false);
-//                });
-//            }
-//
-//        }).start();
+        UpdateHelper.update(versionProgress::setProgress, PROGRESS_INTERVAL, e -> Platform.runLater(() -> {
+            ExceptionLogger.logException(e);
+            AlertBuilder.error(e).show();
+
+            versionProgress.setVisible(false);
+            versionActionButton.setVisible(true);
+        }));
+
+
     }
 
     public void showAdvanced() {

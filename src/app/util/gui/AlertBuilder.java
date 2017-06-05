@@ -150,7 +150,7 @@ public class AlertBuilder {
     /**
      * Set the content key. This key will be used to fetch the content to display in the language resources.
      * <p>
-     * More specifically, it will load the following properties from the language resources:
+     * More specifically, it will get the following properties from the language resources:
      * <p>
      * <lu> <li>{key}.title</li> <li>{key}.header</li> <li>{key}.content</li> </lu>
      *

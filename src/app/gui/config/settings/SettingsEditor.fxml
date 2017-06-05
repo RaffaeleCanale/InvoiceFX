@@ -66,12 +66,11 @@
 
                             <Label text="%settings.version" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
                             <FlowPane GridPane.rowIndex="6" GridPane.columnIndex="1" hgap="10" alignment="CENTER_LEFT">
-                                <Label fx:id="versionLabel" text="%settings.version.getting"/>
+                                <!--<Label fx:id="versionLabel" text="%settings.version.getting"/>-->
                                 <StackPane>
-                                    <ProgressIndicator fx:id="versionProgress" prefWidth="25" prefHeight="25"
-                                                       id="customProgressIndicator" visible="false"/>
+                                    <ProgressBar fx:id="versionProgress" visible="false"/>
                                     <Button fx:id="versionActionButton" onAction="#versionAction" text="%settings.update"
-                                            visible="false"/>
+                                            visible="true"/>
                                 </StackPane>
                             </FlowPane>
 

@@ -3,10 +3,10 @@ package app.tex;
 import app.cmd.CommandRunner;
 import app.config.Config;
 import app.util.helpers.InvoiceHelper;
-import app.model.DateEnabled;
-import app.model.invoice.InvoiceModel;
-import app.model.item.ClientItem;
-import app.model.item.ItemModel;
+import app.legacy.model.DateEnabled;
+import app.legacy.model.invoice.InvoiceModel;
+import app.legacy.model.item.ClientItem;
+import app.legacy.model.item.ItemModel;
 import app.util.helpers.Common;
 import app.util.helpers.PdfNameHelper;
 import com.wx.io.Accessor;
@@ -21,7 +21,6 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import static app.config.preferences.properties.LocalProperty.INVOICE_DIRECTORY;
@@ -151,7 +150,7 @@ public class TexFileCreator {
         initDef(updateMap, "totalChf", moneyFormat.format(chf_sum));
         initDef(updateMap, "totalEuro", moneyFormat.format(euro_sum));
 
-        Map<Double, Double> vatTotals = new TreeMap<>();
+        VatsSum vatsSum = new VatsSum();
         StringBuilder clientsString = new StringBuilder();
 
         for (ClientItem clientItem : invoice.getItems()) {
@@ -182,14 +181,10 @@ public class TexFileCreator {
 
             initCommand(clientsString, "itemSep");
 
-            double vat = item.getVat();
+            double vat = item.getTva();
             double sum = clientItem.sumProperty().get();
-            Double oldSum = vatTotals.get(vat);
-            if (oldSum != null) {
-                sum += oldSum;
-            }
-            vatTotals.put(vat, sum);
 
+            vatsSum.addFor(vat, sum);
         }
         updateMap.put("% clients", clientsString.toString());
 
@@ -198,18 +193,12 @@ public class TexFileCreator {
         StringBuilder vatString = new StringBuilder();
         NumberFormat vatFormat = InvoiceHelper.getFormat("#0.#");
 
-        int vatIndex = 0;
-        for (Map.Entry<Double, Double> entry : vatTotals.entrySet()) {
-            double vat = entry.getKey();
-            double vatSum = entry.getValue();
-            double vatShare = Common.computeVatShare(vat, vatSum);
-
+        vatsSum.nonZeroVatSums().forEach(v -> {
             initCommand(vatString, "vat",
-                    vatFormat.format(vat),
-                    moneyFormat.format(vatShare),
-                    String.valueOf(vatIndex));
-            vatIndex++;
-        }
+                    vatFormat.format(v.vat),
+                    moneyFormat.format(v.vatShare),
+                    String.valueOf(v.vatIndex));
+        });
 
         updateMap.put("% vat", vatString.toString());
 
