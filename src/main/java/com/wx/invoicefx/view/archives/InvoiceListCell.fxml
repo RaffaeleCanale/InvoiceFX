@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+
+
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wx.invoicefx.view.archives.InvoiceListCellController">
+    <left>
+        <Label fx:id="idLabel" prefWidth="100.0" text="Label" BorderPane.alignment="TOP_LEFT">
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </Label>
+    </left>
+    <center>
+        <FlowPane fx:id="clientsPane" hgap="10.0" vgap="10.0" BorderPane.alignment="TOP_CENTER">
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </FlowPane>
+    </center>
+    <right>
+        <VBox prefWidth="100.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="dateLabel" text="Label" />
+                <Label fx:id="sumLabel" text="Label" />
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </VBox>
+    </right>
+</BorderPane>

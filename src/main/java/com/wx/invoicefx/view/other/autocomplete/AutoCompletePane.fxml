@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import com.wx.invoicefx.view.other.autocomplete.AutoCompleteTextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.geometry.Insets?>
+<StackPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.wx.invoicefx.view.other.autocomplete.AutoCompletePaneController"
+           alignment="CENTER_LEFT">
+    <children>
+        <AutoCompleteTextField fx:id="searchField" prefWidth="600"/>
+        <HBox fx:id="clientOverBox" alignment="CENTER_LEFT" maxHeight="15" spacing="5">
+            <padding>
+                <Insets left="5.0" right="2.0" />
+            </padding>
+            <children>
+
+            </children>
+        </HBox>
+    </children>
+</StackPane>

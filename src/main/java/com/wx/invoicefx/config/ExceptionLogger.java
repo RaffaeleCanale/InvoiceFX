@@ -13,12 +13,13 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.wx.invoicefx.config.ConfigDirectory.Files.LOGS_DIR;
+import static com.wx.invoicefx.config.Places.Dirs.LOGS_DIR;
+import static com.wx.invoicefx.config.Places.Files.LOG_FILE;
 
 /**
  * Utility classes that allows to display and log exceptions into log files.
  * <p>
- * These methods require {@link ConfigDirectory} to be initialized (see {@link ConfigDirectory#init()} ).
+ * These methods require {@link Places} to be initialized (see {@link Places#init()} ).
  * <p>
  * Created on 22/04/2015
  *
@@ -29,8 +30,6 @@ public class ExceptionLogger {
 
     private static final Logger LOG = LogHelper.getLogger(ExceptionLogger.class);
 
-    private static final String LOG_FILE_NAME = "Exceptions.log";
-
     /**
      * Log an exception into a log file. The exception is also displayed in the console logger.
      *
@@ -39,7 +38,7 @@ public class ExceptionLogger {
     public static void logException(Exception e) {
         LOG.warning("[" + e.getClass().getSimpleName() + "] " + e.getMessage());
         try {
-            File file = getLogFile(LOG_FILE_NAME, false);
+            File file = Places.getFile(LOG_FILE);
 
             PrintWriter writer = new PrintWriter(new FileOutputStream(file, true));
             writer.write("\n\n" + Format.formatDate(new Date().getTime()) + "\n");
@@ -61,22 +60,15 @@ public class ExceptionLogger {
     public static void logProcessOutput(String output, String name, Object cmd, int code) {
         LOG.warning("Command " + cmd + " (" + name + ") exited with code " + code);
 
+        File file = Places.getCustomFile(LOGS_DIR, name + ".log");
+
         try (TextAccessor accessor = new TextAccessor()
-                .setOut(getLogFile(name, true), false)) {
+                .setOut(file, false)) {
             accessor.write(cmd.toString());
             accessor.write("Exit code: " + code);
             accessor.write(output);
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, "Failed to write logs", ex);
         }
-    }
-
-    private static File getLogFile(String name, boolean fresh) throws IOException {
-        File file = fresh ?
-                ConfigDirectory.getFreshConfigFile(LOGS_DIR, name, ".txt") :
-                ConfigDirectory.getConfigFile(LOGS_DIR, name);
-        AccessorUtil.createParent(file);
-
-        return file;
     }
 }

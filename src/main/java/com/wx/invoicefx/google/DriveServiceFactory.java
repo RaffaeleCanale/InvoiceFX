@@ -17,6 +17,7 @@ import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.Oauth2Scopes;
 import com.google.api.services.oauth2.model.Userinfoplus;
 import com.wx.invoicefx.App;
+import com.wx.invoicefx.util.DesktopUtils;
 import com.wx.util.Format;
 import com.wx.util.log.LogHelper;
 
@@ -123,7 +124,7 @@ class DriveServiceFactory {
             String redirectUri = receiver.getRedirectUri();
             AuthorizationCodeRequestUrl authorizationUrl =
                     flow.newAuthorizationUrl().setRedirectUri(redirectUri);
-            App.openUrl(authorizationUrl.build());
+            DesktopUtils.openUrl(authorizationUrl.build());
             // receive authorization code and exchange it for an access token
             String code = receiver.waitForCode();
             TokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();

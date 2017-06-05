@@ -6,6 +6,7 @@ import com.wx.fx.preferences.properties.UserProperty;
 import com.wx.util.OsUtils;
 
 import java.io.File;
+import java.util.Locale;
 
 import static com.wx.fx.preferences.properties.PropertyCore.*;
 import static com.wx.invoicefx.util.string.KeyWordHelper.validatePath;
@@ -27,6 +28,7 @@ public enum LocalProperty implements UserProperty {
 //            OsUtils.OsFamily.UNIX, "\"pdflatex\" -synctex=1 -interaction=nonstopmode \"${0}\"",
 //            OsUtils.OsFamily.WINDOWS, "\"${1}\\miktex\\miktex\\bin\\pdflatex\" -synctex=1 -interaction=nonstopmode \"${0}\""
 //    ))),
+    LANGUAGE(stringProperty(Locale.getDefault().toLanguageTag())),
     DEFAULT_APP_OPEN(osProperty(ImmutableMap.of(
             OsUtils.OsFamily.UNIX, "xdg-open \"${0}\"",
             OsUtils.OsFamily.WINDOWS, "start \"\" \"${0}\""

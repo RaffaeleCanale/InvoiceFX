@@ -3,6 +3,7 @@ package com.wx.invoicefx.util;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;
 
@@ -27,18 +28,18 @@ public class BindingUtilsTest {
     @Test
     public void testMap() {
         ObjectProperty<String> stringProperty = new SimpleObjectProperty<>("foo");
-        ReadOnlyObjectProperty<Integer> length = BindingUtils.map(stringProperty, String::length);
+        ReadOnlyProperty<Integer> length = BindingUtils.map(stringProperty, String::length);
 
-        assertEquals(3, length.get().intValue());
+        assertEquals(3, length.getValue().intValue());
 
         stringProperty.set("foo bar");
-        assertEquals(7, length.get().intValue());
+        assertEquals(7, length.getValue().intValue());
 
         stringProperty.set(null);
-        assertNull(length.get());
+        assertNull(length.getValue());
 
         stringProperty.set("");
-        assertEquals(0, length.get().intValue());
+        assertEquals(0, length.getValue().intValue());
     }
 
 }

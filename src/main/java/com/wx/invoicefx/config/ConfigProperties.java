@@ -8,14 +8,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.prefs.InvalidPreferencesFormatException;
 
-import static com.wx.invoicefx.config.ConfigDirectory.Files.EXPORTED_PREFERENCES_FILE;
-import static com.wx.invoicefx.config.ConfigDirectory.getConfigFile;
+import static com.wx.invoicefx.config.Places.Files.PREFERENCES_FILE;
 
 /**
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)
  * @version 0.1 - created on 11.05.17.
  */
-public class ConfigPreferences {
+public class ConfigProperties {
 
 //        public enum TexHandler {
 //            PORTABLE_INSTALLATION,
@@ -32,23 +31,17 @@ public class ConfigPreferences {
                 new UserPreferences<>(SharedProperty.class);
 
 
-        public static void initTexHandler() throws IOException {
-
-        }
-
         /**
          * Load all preferences, synchronizing from Google Drive if necessary
          */
-        public static void loadPreferences() {
-            File prefs = getConfigFile(EXPORTED_PREFERENCES_FILE);
+        public static void loadPreferences() throws IOException, InvalidPreferencesFormatException {
+            File prefs = Places.getFile(PREFERENCES_FILE);
 
 
-
-            try {
+            if (prefs.exists()) {
                 sharedPreferences.loadFromFile(prefs);
-            } catch (IOException | InvalidPreferencesFormatException e) {
-                ExceptionLogger.logException(e);
             }
+
 
 //            DriveConfigHelper.performAction(UPDATE, params -> {
 //                boolean updated = (boolean) params[0];
@@ -69,7 +62,7 @@ public class ConfigPreferences {
          */
         public static void saveSharedPreferences() {
             if (sharedPreferences.propertiesChanged()) {
-                File prefs = getConfigFile(EXPORTED_PREFERENCES_FILE);
+                File prefs = Places.getFile(PREFERENCES_FILE);
 //                LOG.info("Saving shared preferences at: " + prefs.getAbsolutePath());
 
                 try {
@@ -100,7 +93,7 @@ public class ConfigPreferences {
         }
 
 
-        private ConfigPreferences() {
+        private ConfigProperties() {
         }
 
     }

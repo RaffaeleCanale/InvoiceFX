@@ -1,16 +1,16 @@
-package com.wx.invoicefx.io.util;
+package com.wx.invoicefx.io.util.data;
 
 
 import com.wx.invoicefx.io.interfaces.DataFile;
 import com.wx.invoicefx.io.interfaces.PartitionedStorage;
 import com.wx.invoicefx.io.interfaces.RecordSerializer;
+import com.wx.invoicefx.io.util.data.DummyData;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -43,7 +43,7 @@ public class DummyStorage {
         return new Object[] {
                 i,
                 Math.floorMod(i * X, M),
-                DataGenerator.generateClientName()
+                DummyData.generateClientName()
         };
     }
 

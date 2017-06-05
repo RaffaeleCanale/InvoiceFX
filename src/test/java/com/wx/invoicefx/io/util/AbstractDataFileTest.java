@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.wx.invoicefx.io.util.DummyStorage.assertDataEquals;
-import static com.wx.invoicefx.io.util.DummyStorage.generateData;
+import static com.wx.invoicefx.io.util.data.DummyStorage.assertDataEquals;
+import static com.wx.invoicefx.io.util.data.DummyStorage.generateData;
 import static org.junit.Assert.assertEquals;
 
 /**

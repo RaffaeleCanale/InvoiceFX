@@ -6,9 +6,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.wx.invoicefx.io.util.DummyStorage.*;
+import static com.wx.invoicefx.io.util.data.DummyStorage.*;
 import static org.junit.Assert.*;
 
 /**
@@ -28,7 +30,7 @@ public class ClusteredIndexTest {
         private ClusteredIndex index;
 
         public void write(int... partitions) {
-            int total = IntStream.of(partitions).sum();
+            int total = IntStream.of(partitions).filter(n -> n > 0).sum();
             expectedData = sort(generateData(total), SORT_KEY);
 
             storage = dummyStorage(partition(expectedData, partitions));
@@ -200,6 +202,25 @@ public class ClusteredIndexTest {
     }
 
     @Test
+    public void normalQuery() throws IOException {
+        td.write(10, 10, 10);
+
+        Predicate<Object[]> predicate = o -> (long) o[SORT_KEY] < 10;
+
+        List<Object[]> expected = td.expectedData.stream().filter(predicate).collect(Collectors.toList());
+
+        assertDataEquals(reverse(expected), td.getIndex().query(predicate).collect());
+    }
+
+    @Test(expected = IOException.class)
+    public void normalQueryException() throws IOException {
+        td.write(10, -1, 10);
+
+        Predicate<Object[]> predicate = o -> (long) o[SORT_KEY] < 10;
+        td.getIndex().query(predicate).collect();
+    }
+
+    @Test
     public void query1() throws IOException {
         td.write(100, 100, 0, 11);
 
@@ -236,14 +257,14 @@ public class ClusteredIndexTest {
         Object[] row = generateData(1).get(0);
         row[SORT_KEY] = null;
 
-        td.getIndex().insert(row);
+        td.getIndex().insertWithIndex(row);
     }
 
     @Test
     public void addEmpty() throws IOException {
 
         Object[] row = generateData(1).get(0);
-        td.getIndex().insert(row);
+        td.getIndex().insertWithIndex(row);
 
         assertDataEquals(Collections.singletonList(row), td.read());
     }
@@ -255,7 +276,7 @@ public class ClusteredIndexTest {
 
 
         td.write(removedRow.remainderData);
-        td.getIndex().insert(removedRow.removed);
+        td.getIndex().insertWithIndex(removedRow.removed);
 
         assertDataEquals(reverse(data), td.read());
     }
@@ -265,7 +286,7 @@ public class ClusteredIndexTest {
         td.write(10);
         Object[] someRow = td.expectedData.get(0);
 
-        td.getIndex().insert(someRow);
+        td.getIndex().insertWithIndex(someRow);
         td.expectedData.add(0, someRow);
 
         assertDataEquals(reverse(td.expectedData), td.read());
@@ -276,7 +297,7 @@ public class ClusteredIndexTest {
         td.write(10);
         Object[] someRow = td.expectedData.get(0);
 
-        td.getIndex().insertUnique(someRow);
+        td.getIndex().insertWithIndexUnique(someRow);
     }
 
     @Test
@@ -285,7 +306,7 @@ public class ClusteredIndexTest {
         RemovedRow removedRow = new RemovedRow(data, 100);
 
         td.write(removedRow.remainderData);
-        td.getIndex().insert(removedRow.removed);
+        td.getIndex().insertWithIndex(removedRow.removed);
 
         assertEquals(2, td.storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), td.storage.getPartition(0).getTable());
@@ -301,7 +322,7 @@ public class ClusteredIndexTest {
                 removedRow.remainderData.subList(0, 100),
                 removedRow.remainderData.subList(100, 150)
         );
-        td.getIndex().insert(removedRow.removed);
+        td.getIndex().insertWithIndex(removedRow.removed);
 
         assertEquals(2, td.storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), td.storage.getPartition(0).getTable());
@@ -317,7 +338,7 @@ public class ClusteredIndexTest {
                 removedRow.remainderData.subList(0, 100),
                 removedRow.remainderData.subList(100, 150)
         );
-        td.getIndex().insert(removedRow.removed);
+        td.getIndex().insertWithIndex(removedRow.removed);
 
         assertEquals(2, td.storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), td.storage.getPartition(0).getTable());
@@ -334,7 +355,7 @@ public class ClusteredIndexTest {
                 removedRow.remainderData.subList(100, 200),
                 removedRow.remainderData.subList(200, 300)
         );
-        td.getIndex().insert(removedRow.removed);
+        td.getIndex().insertWithIndex(removedRow.removed);
 
         assertEquals(4, td.storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), td.storage.getPartition(0).getTable());
@@ -354,7 +375,7 @@ public class ClusteredIndexTest {
                 Collections.emptyList(),
                 removedRow.remainderData.subList(100, 200)
         );
-        td.getIndex().insert(removedRow.removed);
+        td.getIndex().insertWithIndex(removedRow.removed);
 
         assertEquals(4, td.storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), td.storage.getPartition(0).getTable());
@@ -373,7 +394,7 @@ public class ClusteredIndexTest {
                 Collections.emptyList(),
                 removedRow.remainderData.subList(100, 200)
         );
-        td.getIndex().insert(removedRow.removed);
+        td.getIndex().insertWithIndex(removedRow.removed);
 
         assertEquals(3, td.storage.getPartitionsCount());
         assertDataEquals(data.subList(0, 100), td.storage.getPartition(0).getTable());
@@ -408,8 +429,8 @@ public class ClusteredIndexTest {
         td.write(10);
 
         Object[] row = td.expectedData.get(3);
-        td.getIndex().insert(row);
-        td.getIndex().insert(row);
+        td.getIndex().insertWithIndex(row);
+        td.getIndex().insertWithIndex(row);
 
         IoIterator<Object[]> it = td.getIndex().queryIndex((long) row[SORT_KEY]);
         assertTrue(it.hasNext());

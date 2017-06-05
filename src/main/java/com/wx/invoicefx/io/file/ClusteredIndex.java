@@ -2,19 +2,14 @@ package com.wx.invoicefx.io.file;
 
 import com.wx.invoicefx.io.interfaces.PartitionedStorage;
 import com.wx.invoicefx.util.UpperBoundBinarySearch;
+import com.wx.util.future.Future;
 import com.wx.util.future.IoIterator;
+import com.wx.util.iterator.FilteredIterator;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.wx.util.collections.CollectionsUtil.emptyIterator;
 
@@ -102,6 +97,30 @@ public class ClusteredIndex {
         return Optional.empty();
     }
 
+    public IoIterator<Object[]> query(Predicate<Object[]> query) throws IOException {
+
+        FilteredIterator<Future<Object[]>> filteredIterator = new FilteredIterator<>(iterator().iterator(), future -> {
+            if (future.isException()) return true;
+
+            return query.test(future.getValue());
+        });
+
+        return IoIterator.reversed(filteredIterator);
+
+//        while (it.hasNext()) {
+//            Object[] next = it.next();
+//            if (query.test(next)) {
+//                return Optional.of(next);
+//            }
+//        }
+//
+//        return Optional.empty();
+    }
+
+    public IoIterator<Object[]> queryColumn(int col, Object value) throws IOException {
+        return query((row) -> Objects.equals(row[col], value));
+    }
+
     public Optional<Object[]> queryIndexFirst(long value) throws IOException {
         IoIterator<Object[]> it = queryIndex(value);
         return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
@@ -121,12 +140,12 @@ public class ClusteredIndex {
         return false;
     }
 
-    public void insertUnique(Object[] row) throws IOException {
-        insert(row, true);
+    public void insertWithIndexUnique(Object[] row) throws IOException {
+        insertWithIndex(row, true);
     }
 
-    public void insert(Object[] row) throws IOException {
-        insert(row, false);
+    public void insertWithIndex(Object[] row) throws IOException {
+        insertWithIndex(row, false);
     }
 
     public void flush() throws IOException {
@@ -135,7 +154,13 @@ public class ClusteredIndex {
         }
     }
 
-    private void insert(Object[] row, boolean ensureUnique) throws IOException {
+    public PartitionedStorage getStorage() {
+        return storage;
+    }
+
+    protected void onRemoved(Object[] removed) {}
+
+    private void insertWithIndex(Object[] row, boolean ensureUnique) throws IOException {
         if (row[sortKey] == null) {
             throw new IllegalArgumentException("Sort column cannot be null!");
         }
@@ -316,7 +341,8 @@ public class ClusteredIndex {
                 throw new IllegalStateException("Must call next first");
             }
 
-            getPartition(previousPartition).remove(previousIndex);
+            Object[] removed = getPartition(previousPartition).remove(previousIndex);
+            onRemoved(removed);
         }
 
         private void nextPartition() throws IOException {
@@ -360,55 +386,6 @@ public class ClusteredIndex {
         }
 
         return result;
-    }
-
-    public JPanel debugDisplay() throws IOException {
-        int n = storage.getPartitionsCount();
-
-        Object[] partitionsNames = IntStream.range(0, n + 1)
-                .mapToObj(i -> "Partition " + i)
-                .toArray();
-        partitionsNames[n] = "All partitions";
-
-        List<Object[]> allData = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            allData.addAll(getPartition(i));
-        }
-
-        JPanel panel = new JPanel(new BorderLayout());
-
-        JTable table = new JTable();
-
-        Object[][] tableData = allData.toArray(new Object[allData.size()][]);
-
-        JComboBox<Object> partitionComboBox = new JComboBox<>(partitionsNames);
-        partitionComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Object[][] data = getData();
-                table.setModel(new DefaultTableModel(data, new Object[data[0].length]));
-            }
-
-            private Object[][] getData() {
-                int sel = partitionComboBox.getSelectedIndex();
-                if (sel == n) {
-                    return tableData;
-                } else {
-                    try {
-                        List<Object[]> part = getPartition(sel);
-                        return part.toArray(new Object[part.size()][]);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
-        partitionComboBox.setSelectedIndex(n);
-
-        panel.add(partitionComboBox, BorderLayout.NORTH);
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
-
-        return panel;
     }
 
 }

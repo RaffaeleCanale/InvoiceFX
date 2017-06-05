@@ -3,7 +3,7 @@ package com.wx.invoicefx.io.dummy;
 import com.wx.invoicefx.io.interfaces.PartitionedStorage;
 import com.wx.invoicefx.io.interfaces.RecordSerializer;
 import com.wx.invoicefx.io.util.AbstractPartitionedStorageTest;
-import com.wx.invoicefx.io.util.DummyStorage;
+import com.wx.invoicefx.io.util.data.DummyStorage;
 
 /**
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)

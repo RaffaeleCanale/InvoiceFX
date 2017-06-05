@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.wx.invoicefx.io.util.DummyStorage.DUMMY_SERIALIZER;
+import static com.wx.invoicefx.io.util.data.DummyStorage.DUMMY_SERIALIZER;
 import static org.junit.Assert.assertEquals;
 
 /**

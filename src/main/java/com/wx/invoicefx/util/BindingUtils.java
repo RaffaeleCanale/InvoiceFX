@@ -3,9 +3,7 @@ package com.wx.invoicefx.util;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 import java.util.function.Function;
 
@@ -44,10 +42,10 @@ public class BindingUtils {
 //        };
 //    }
 
-    public static <E,F> ReadOnlyObjectProperty<F> map(ObjectProperty<E> property, Function<E, F> map) {
+    public static <E,F> ReadOnlyProperty<F> map(Property<E> property, Function<E, F> map) {
         SimpleObjectProperty<F> mapped = new SimpleObjectProperty<>(null);
 
-        E currentValue = property.get();
+        E currentValue = property.getValue();
         if (currentValue != null) {
             mapped.setValue(map.apply(currentValue));
         }
@@ -62,5 +60,9 @@ public class BindingUtils {
 
         return mapped;
     }
+
+//    public static <F> ReadOnlyProperty<F> mapString(StringProperty property, Function<String, F> map) {
+//        return null;
+//    }
 
 }

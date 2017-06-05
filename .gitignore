@@ -118,3 +118,6 @@ target/*
 !/.mvn/wrapper/maven-wrapper.jar
 
 # End of https://www.gitignore.io/api/java,maven,linux,intellij
+
+
+src/main/resources/google

@@ -15,49 +15,72 @@ import javafx.beans.property.StringProperty;
  */
 public class Client {
 
-    private final LongProperty id = new SimpleLongProperty();
-    private final BooleanBinding idValidity = id.greaterThan(0);
+    private long id;
+    private String name;
 
-    private final StringProperty name = new SimpleStringProperty();
-    private final BooleanBinding nameValidity = name.isNotNull();
-
-    //<editor-fold desc="Getters & Setters" defaultstate="collapsed">
     public long getId() {
-        return id.get();
-    }
-
-    public LongProperty idProperty() {
         return id;
     }
 
     public void setId(long id) {
-        this.id.set(id);
-    }
-
-    public BooleanBinding idValidityProperty() {
-        return idValidity;
+        this.id = id;
     }
 
     public String getName() {
-        return name.get();
-    }
-
-    public StringProperty nameProperty() {
         return name;
     }
 
     public void setName(String name) {
-        this.name.set(name);
+        this.name = name;
     }
 
-    public BooleanBinding nameValidityProperty() {
-        return nameValidity;
-    }
-    //</editor-fold>
+    //
+//
+//    private final LongProperty id = new SimpleLongProperty();
+//    private final BooleanBinding idValidity = id.greaterThan(0);
+//
+//    private final StringProperty name = new SimpleStringProperty();
+//    private final BooleanBinding nameValidity = name.isNotNull();
+//
+//    //<editor-fold desc="Getters & Setters" defaultstate="collapsed">
+//    public long getId() {
+//        return id.get();
+//    }
+//
+//    public LongProperty idProperty() {
+//        return id;
+//    }
+//
+//    public void setId(long id) {
+//        this.id.set(id);
+//    }
+//
+//    public BooleanBinding idValidityProperty() {
+//        return idValidity;
+//    }
+//
+//    public String getName() {
+//        return name.get();
+//    }
+//
+//    public StringProperty nameProperty() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name.set(name);
+//    }
+//
+//    public BooleanBinding nameValidityProperty() {
+//        return nameValidity;
+//    }
+//    //</editor-fold>
 
 
     @Override
     public String toString() {
-        return "[" + getId() + "] " + getName();
+        return String.valueOf(getId());
+//        return getName();
+//        return "[" + getId() + "] " + getName();
     }
 }

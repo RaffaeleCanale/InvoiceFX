@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import com.wx.invoicefx.view.other.NumberTextField?>
+<VBox styleClass="itemPanel" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.wx.invoicefx.view.overview.ItemPanelController" spacing="10" prefHeight="150">
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+    </padding>
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <Label text="item.client_name" minWidth="-Infinity" HBox.hgrow="NEVER"/>
+        <TextField fx:id="clientNameField" minWidth="-Infinity" HBox.hgrow="ALWAYS"/>
+        <Button alignment="CENTER" onAction="#remove" text="x" textFill="RED"/>
+        <!--<FlowPane alignment="CENTER_RIGHT" HBox.hgrow="SOMETIMES">-->
+            <!-- -->
+        <!--</FlowPane>-->
+    </HBox>
+
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <Label text="item.name" minWidth="-Infinity" HBox.hgrow="NEVER"/>
+        <Spinner minWidth="-Infinity" prefWidth="60" fx:id="itemCountSpinner" HBox.hgrow="NEVER"/>
+        <ComboBox editable="true" fx:id="itemComboBox" prefHeight="25.0" prefWidth="500" HBox.hgrow="ALWAYS"/>
+        <Label text="item.price" minWidth="-Infinity" HBox.hgrow="NEVER"/>
+        <NumberTextField fx:id="priceField" prefWidth="100" HBox.hgrow="NEVER" minWidth="-Infinity"/>
+    </HBox>
+
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <Label text="item.from_date" minWidth="-Infinity"/>
+        <CheckBox fx:id="fromDateCheckbox" selected="true">
+            <graphic>
+                <DatePicker fx:id="fromDatePicker" prefWidth="120.0" minWidth="-Infinity"/>
+            </graphic>
+        </CheckBox>
+        <Label text="item.to_date" minWidth="-Infinity"/>
+        <CheckBox fx:id="toDateCheckbox" selected="true">
+            <graphic>
+                <DatePicker fx:id="toDatePicker" prefWidth="120.0" minWidth="-Infinity"/>
+            </graphic>
+        </CheckBox>
+        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" fx:id="sumPane" spacing="10">
+            <Label text="item.total" />
+            <Label fx:id="sumLabel" id="price" alignment="CENTER" />
+        </HBox>
+    </HBox>
+
+    <FlowPane alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" >
+        <Label fx:id="vatLabel" id="vat" />
+    </FlowPane>
+</VBox>
