@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import com.wx.invoicefx.ui.components.NumberTextField?>
+<?import com.wx.invoicefx.ui.components.suggestion.itemized.simple.ItemizedSuggestionTextField?>
+<VBox styleClass="setting-card" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.wx.invoicefx.ui.views.overview.ItemPanelController" spacing="10" prefHeight="160">
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+    </padding>
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <!--<Label text="%stage.overview.item.label.client_name" minWidth="-Infinity" HBox.hgrow="NEVER"/>-->
+        <ItemizedSuggestionTextField fx:id="clientNameField" promptText="%stage.overview.item.label.client_name" minWidth="-Infinity" HBox.hgrow="ALWAYS" styleClass="custom-text-field"/>
+        <Button alignment="CENTER" text="x" styleClass="right-button, text-important-2" fx:id="removeButton"/>
+    </HBox>
+
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <!--<Label text="%stage.overview.item.label.item_name" minWidth="-Infinity" HBox.hgrow="NEVER"/>-->
+        <Spinner minWidth="-Infinity" prefWidth="60" fx:id="itemCountSpinner" HBox.hgrow="NEVER" styleClass="custom-spinner"/>
+
+        <fx:include source="../../components/suggestion/combobox/SuggestionComboBox.fxml" fx:id="itemComboBox"/>
+        <Label text="%stage.overview.item.label.price" minWidth="-Infinity" HBox.hgrow="NEVER"/>
+        <NumberTextField fx:id="priceField" prefWidth="100" HBox.hgrow="NEVER" minWidth="-Infinity" styleClass="custom-text-field"/>
+    </HBox>
+
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <Label text="%stage.overview.item.label.from_date" minWidth="-Infinity"/>
+        <CheckBox fx:id="fromDateCheckbox" selected="true" styleClass="custom-check-box">
+            <graphic>
+                <DatePicker fx:id="fromDatePicker" prefWidth="120.0" minWidth="-Infinity" styleClass="custom-date-picker"/>
+            </graphic>
+        </CheckBox>
+        <Label text="%stage.overview.item.label.to_date" minWidth="-Infinity"/>
+        <CheckBox fx:id="toDateCheckbox" selected="true" styleClass="custom-check-box">
+            <graphic>
+                <DatePicker fx:id="toDatePicker" prefWidth="120.0" minWidth="-Infinity" styleClass="custom-date-picker"/>
+            </graphic>
+        </CheckBox>
+        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" fx:id="sumPane" spacing="10">
+            <Label text="%stage.overview.item.label.total"/>
+            <Label fx:id="sumLabel" styleClass="text-important-1" alignment="CENTER"/>
+        </HBox>
+    </HBox>
+
+    <FlowPane alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+        <Label fx:id="vatLabel" styleClass="text-disabled-1"/>
+    </FlowPane>
+</VBox>

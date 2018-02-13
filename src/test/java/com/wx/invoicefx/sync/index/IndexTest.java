@@ -1,6 +1,6 @@
 package com.wx.invoicefx.sync.index;
 
-import com.wx.invoicefx.util.InvalidDataException;
+import com.wx.invoicefx.util.io.InvalidDataException;
 import com.wx.properties.page.PageBuilder;
 import com.wx.properties.page.ResourcePage;
 import com.wx.util.pair.Pair;
@@ -14,20 +14,20 @@ import static org.junit.Assert.*;
  */
 public class IndexTest {
 
-    private static Index sampleIndex(int filesCoount) {
+    private static Index sampleIndex(int filesCount) {
         ResourcePage page = new PageBuilder().get();
 
-        page.setProperty("version", 2.0);
-        page.setProperty("branch_version", 1.0);
-        page.setProperty("files_count", filesCoount);
+        page.setProperty("index.version", 2.0);
+        page.setProperty("index.base_version", 1.0);
+        page.setProperty("index.files_count", filesCount);
 
-        for (int i = 0; i < filesCoount; i++) {
-            page.setProperty("files." + i + ".filename", "File " + i);
-            page.setProperty("files." + i + ".timestamp", i);
-            page.setProperty("files." + i + ".check_sum", new byte[]{(byte) i});
+        for (int i = 0; i < filesCount; i++) {
+            page.setProperty("index.files." + i + ".filename", "File " + i);
+            page.setProperty("index.files." + i + ".timestamp", i);
+            page.setProperty("index.files." + i + ".check_sum", new byte[]{(byte) i});
         }
 
-//        page.setProperty("unrelatedProperty", filesCoount);
+        page.setProperty("unrelatedProperty", filesCount);
 
         return new Index(page);
     }
@@ -64,23 +64,23 @@ public class IndexTest {
     }
 
     @Test
-    public void getSetBranchVersion() {
+    public void getSetBaseVersion() {
         Index index = sampleIndex(0);
 
-        assertEquals(1.0, index.getBranchVersion(), 0.0);
+        assertEquals(1.0, index.getBaseVersion(), 0.0);
 
-        index.setBranchVersion(1.5);
-        assertEquals(1.5, index.getBranchVersion(), 0.0);
+        index.setBaseVersion(1.5);
+        assertEquals(1.5, index.getBaseVersion(), 0.0);
 
-        index.setBranchVersion(2.0);
-        assertEquals(2.0, index.getBranchVersion(), 0.0);
+        index.setBaseVersion(2.0);
+        assertEquals(2.0, index.getBaseVersion(), 0.0);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidBranchVersion() {
         Index index = sampleIndex(0);
 
-        index.setBranchVersion(2.1);
+        index.setBaseVersion(2.1);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class IndexTest {
 
         FileInfo[] newFiles = new FileInfo[n / 2];
         for (int i = 0; i < newFiles.length; i++) {
-            newFiles[i] = new FileInfo(String.valueOf(i), -i, new byte[]{(byte) i, (byte) i});
+            newFiles[i] = new FileInfo(String.valueOf(i), -i, new byte[]{(byte) i, (byte) i}, (long) i);
         }
 
         index.setFiles(newFiles);
@@ -133,22 +133,22 @@ public class IndexTest {
         Index copy = sampleIndex(101);
 
         copy.setVersion(77);
-        copy.setBranchVersion(77);
+        copy.setBaseVersion(77);
 
         index.copyTo(copy);
 
         copy.testIntegrity();
 
         assertEquals(index.getVersion(), copy.getVersion(), 0.0);
-        assertEquals(0.0, copy.getBranchVersion(), 0.0);
+        assertEquals(0.0, copy.getBaseVersion(), 0.0);
         assertEquals(index.getFilesCount(), copy.getFilesCount());
 
         for (int i = 0; i < index.getFilesCount(); i++) {
             assertEquals(index.getFileInfo(i), copy.getFileInfo(i));
         }
 
-//        assertEquals(10, index.page.getInt("unrelatedProperty"));
-//        assertEquals(101, copy.page.getInt("unrelatedProperty"));
+        assertEquals(10, index.getPage().getInt("unrelatedProperty").get().intValue());
+        assertEquals(101, copy.getPage().getInt("unrelatedProperty").get().intValue());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class IndexTest {
     @Test
     public void integrityTest2() throws InvalidDataException {
         Index index = sampleIndex(10);
-        index.page.removeProperty("branch_version");
+        index.getPage().removeProperty("index.base_version");
 
         index.testIntegrity();
     }
@@ -172,12 +172,12 @@ public class IndexTest {
 
     @Test
     public void integrityFailByMissingKey() {
-        String[] keysToTest = {"version", "files_count",
-                "files.3.filename", "files.4.timestamp", "files.7.check_sum"};
+        String[] keysToTest = {"index.version", "index.files_count",
+                "index.files.3.filename", "index.files.4.timestamp", "index.files.7.check_sum"};
 
         for (String key : keysToTest) {
             Index index = sampleIndex(10);
-            index.page.removeProperty(key);
+            index.getPage().removeProperty(key);
 
             try {
                 index.testIntegrity();
@@ -190,21 +190,21 @@ public class IndexTest {
     @Test
     public void integrityFailByInvalidCast() {
         Pair[] values = {
-                Pair.of("version", "hello"),
-                Pair.of("branch_version", "hello"),
-                Pair.of("files_count", "hello"),
-                Pair.of("files.4.timestamp", "hello"),
-                Pair.of("files.2.check_sum", "hello"),
-                Pair.of("files_count", "11"),
-                Pair.of("files_count", "9"),
-                Pair.of("files_count", "-1"),
-                Pair.of("branch_version", "99")
+                Pair.of("index.version", "hello"),
+                Pair.of("index.base_version", "hello"),
+                Pair.of("index.files_count", "hello"),
+                Pair.of("index.files.4.timestamp", "hello"),
+                Pair.of("index.files.2.check_sum", "hello"),
+                Pair.of("index.files_count", "11"),
+//                Pair.of("index.files_count", "9"),
+//                Pair.of("index.files_count", "-1"),
+                Pair.of("index.base_version", "99")
         };
 
 
         for (Pair value : values) {
             Index index = sampleIndex(10);
-            index.page.setProperty((String) value.get1(), (String) value.get2());
+            index.getPage().setProperty((String) value.get1(), (String) value.get2());
 
             try {
                 index.testIntegrity();
@@ -213,11 +213,11 @@ public class IndexTest {
             }
         }
 
-        // Same tests but without branch_version
+        // Same tests but without base_version
         for (Pair value : values) {
             Index index = sampleIndex(10);
-            index.page.removeProperty("branch_version");
-            index.page.setProperty((String) value.get1(), (String) value.get2());
+            index.getPage().removeProperty("index.base_version");
+            index.getPage().setProperty((String) value.get1(), (String) value.get2());
 
             try {
                 index.testIntegrity();

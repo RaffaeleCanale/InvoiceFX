@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import com.wx.invoicefx.ui.components.PagePane?>
+<?import com.wx.invoicefx.ui.views.settings.cards.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+<?import javafx.scene.control.Separator?>
+<Stage title="%stage.settings.title" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+       fx:controller="com.wx.invoicefx.ui.views.settings.SettingsController">
+    <scene>
+        <Scene>
+            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                        prefHeight="700.0" prefWidth="800.0">
+                <left>
+                    <ListView fx:id="tabListView" styleClass="settings-tab" focusTraversable="false"/>
+                </left>
+                <center>
+                    <VBox>
+
+                        <PagePane fx:id="pagePane" VBox.vgrow="ALWAYS">
+                            <padding>
+                                <Insets bottom="50.0" left="50.0" right="50.0" top="50.0"/>
+                            </padding>
+                            <children>
+                                <!--GENERAL-->
+                                <VBox spacing="20">
+                                    <fx:include source="cards/LanguageChooser.fxml" styleClass="setting-card"/>
+                                    <InvoicesDirectoryChooser text="%stage.settings.card.invoices_dir.label"
+                                                              styleClass="setting-card"/>
+                                    <EnableAnimationsToggle text="%stage.settings.card.enable_animations.label"
+                                                            styleClass="setting-card"/>
+                                    <fx:include source="cards/Update.fxml" styleClass="setting-card"/>
+                                </VBox>
+
+                                <!-- CURRENCY -->
+                                <VBox spacing="20">
+                                    <VBox styleClass="setting-card" spacing="20">
+                                        <AutoUpdateCurrencyToggle text="%stage.settings.card.currency_update.label" />
+                                        <Separator orientation="HORIZONTAL" />
+                                        <fx:include fx:id="currencyRate" source="cards/CurrencyRate.fxml" />
+                                    </VBox>
+
+                                    <fx:include source="cards/VatEditor.fxml" styleClass="setting-card"/>
+                                </VBox>
+
+                                <!-- DOCUMENT -->
+                                <VBox spacing="20">
+                                    <TexCompilerSetting text="%stage.settings.card.tex_compiler.label"
+                                                        styleClass="setting-card"/>
+                                    <!--<TemplateChooser text="%stage.settings.card.tex_template.label" styleClass="setting-card" />-->
+                                    <fx:include source="cards/TemplateChooser.fxml" styleClass="setting-card"/>
+                                    <!--<fx:include source="cards/ShowItemCount.fxml" styleClass="setting-card"/>-->
+                                </VBox>
+
+                                <!-- SYNC -->
+                                <VBox spacing="20">
+                                    <EnableSyncToggle text="%stage.settings.card.sync_enabled.label"
+                                                      styleClass="setting-card"/>
+                                    <fx:include source="../../components/google/GoogleProfile.fxml"
+                                                fx:id="googleProfile" styleClass="setting-card"/>
+                                    <ComputerName text="%stage.settings.card.computer_name.label"
+                                                  styleClass="setting-card"/>
+                                    <fx:include source="cards/SyncError.fxml" styleClass="setting-card"/>
+                                </VBox>
+
+                                <!-- ADVANCED -->
+                                <Button text="%stage.settings.advanced.button.advanced" onAction="#showAdvancedView"
+                                        styleClass="custom-button, lock-button"/>
+
+                            </children>
+                        </PagePane>
+
+                        <BorderPane>
+                            <left>
+                                <fx:include source="../../components/google/RemoteStatusPane.fxml" fx:id="remoteStatusPane"/>
+                            </left>
+                            <right>
+                                <Button text="%stage.common.button.close" styleClass="custom-button" onAction="#close"/>
+                            </right>
+                            <padding>
+                                <Insets top="20" left="20" right="20" bottom="20"/>
+                            </padding>
+                        </BorderPane>
+                    </VBox>
+                </center>
+                <bottom>
+
+                </bottom>
+            </BorderPane>
+        </Scene>
+    </scene>
+</Stage>

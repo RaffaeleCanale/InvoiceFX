@@ -1,8 +1,8 @@
 package com.wx.invoicefx.util;
 
+import com.wx.invoicefx.util.view.BindingUtils;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.Test;

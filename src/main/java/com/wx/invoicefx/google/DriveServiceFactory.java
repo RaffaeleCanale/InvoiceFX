@@ -29,33 +29,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * Factory for the {@link Drive} service that handles loading/creating credentials
+ */
 class DriveServiceFactory {
 
     private static final Logger LOG = LogHelper.getLogger(DriveServiceFactory.class);
 
+    private static final List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE_FILE, Oauth2Scopes.USERINFO_PROFILE);
+    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
+    private static FileDataStoreFactory DATA_STORE_FACTORY;
+    private static HttpTransport HTTP_TRANSPORT;
     private static String userId;
     private static java.io.File dataDirectory;
 
-    /**
-     * Global instance of the {@link FileDataStoreFactory}.
-     */
-    private static FileDataStoreFactory DATA_STORE_FACTORY;
-
-    /**
-     * Global instance of the JSON factory.
-     */
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-
-    /**
-     * Global instance of the HTTP transport.
-     */
-    private static HttpTransport HTTP_TRANSPORT;
-
-    /**
-     * Global instance of the scopes required by this quickstart.
-     */
-    private static final List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE_FILE, Oauth2Scopes.USERINFO_PROFILE);
 
     public static void init(java.io.File dataDirectory) throws GeneralSecurityException, IOException {
         init(dataDirectory, "user");
@@ -69,6 +57,54 @@ class DriveServiceFactory {
         DATA_STORE_FACTORY = new FileDataStoreFactory(dataDirectory);
     }
 
+    public static boolean isInit() {
+        return userId != null && dataDirectory != null && HTTP_TRANSPORT != null && DATA_STORE_FACTORY != null;
+    }
+
+    /**
+     * Build and return an authorized Drive client service.
+     *
+     * @return an authorized Drive client service
+     *
+     * @throws IOException
+     */
+    public static Drive getDriveService(boolean authorize) throws IOException {
+        ensureIsInit();
+
+        Credential credential = getCredential(authorize);
+
+        return new Drive.Builder(
+                HTTP_TRANSPORT, JSON_FACTORY, credential)
+                .setApplicationName(App.APPLICATION_NAME)
+                .build();
+    }
+
+    public static boolean removeCredentials() {
+        ensureIsInit();
+
+        boolean changed = false;
+
+        java.io.File[] files = dataDirectory.listFiles();
+        if (files != null) {
+            for (java.io.File file : files) {
+                if (file.delete()) {
+                    changed = true;
+                }
+            }
+        }
+
+        return changed;
+    }
+
+    public static Userinfoplus getUserInfo(boolean authorize) throws IOException {
+        ensureIsInit();
+
+        Oauth2 auth = new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredential(authorize))
+                .setApplicationName(App.APPLICATION_NAME)
+                .build();
+        return auth.userinfo().get().execute();
+    }
+
     /**
      * Creates an authorized Credential object.
      *
@@ -76,10 +112,9 @@ class DriveServiceFactory {
      *
      * @throws IOException
      */
-    public static Credential getCredential(boolean authorizeIfNeeded) throws IOException {
-        ensureIsInit();
-
+    private static Credential getCredential(boolean authorizeIfNeeded) throws IOException {
         // Load client secrets.
+        //noinspection SpellCheckingInspection
         InputStream in =
                 DriveServiceFactory.class.getResourceAsStream("/google/client_secret_926831742589-1s03oj41qb0k4kfcibhhpp29bcrbn3a9.apps.googleusercontent.com.json");
         GoogleClientSecrets clientSecrets =
@@ -102,8 +137,6 @@ class DriveServiceFactory {
             }
         }
 
-        assert credential != null;
-        LOG.info("Credential loaded, expires in " + Format.formatTime(credential.getExpirationTimeMilliseconds()));
         return credential;
     }
 
@@ -120,7 +153,7 @@ class DriveServiceFactory {
         VerificationCodeReceiver receiver = new CustomCodeReceiver();
 
         try {
-            // open in browser
+            // openInvoice in browser
             String redirectUri = receiver.getRedirectUri();
             AuthorizationCodeRequestUrl authorizationUrl =
                     flow.newAuthorizationUrl().setRedirectUri(redirectUri);
@@ -131,52 +164,20 @@ class DriveServiceFactory {
             // store credential and return it
             return flow.createAndStoreCredential(response, userId);
         } finally {
-            receiver.stop();
-        }
-    }
-
-    /**
-     * Build and return an authorized Drive client service.
-     *
-     * @return an authorized Drive client service
-     *
-     * @throws IOException
-     */
-    public static Drive getDriveService(boolean authorize) throws IOException {
-        ensureIsInit();
-
-        Credential credential = getCredential(authorize);
-
-        return new Drive.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(App.APPLICATION_NAME)
-                .build();
-    }
-
-    public static void removeCredentials() {
-        ensureIsInit();
-
-        java.io.File[] files = dataDirectory.listFiles();
-        if (files != null) {
-            for (java.io.File file : files) {
-                file.delete();
+            try {
+                receiver.stop();
+            } catch (IOException e) {
+                /* no-op */
             }
         }
     }
 
-    public static Userinfoplus getUserInfo(boolean authorize) throws IOException {
-        ensureIsInit();
 
-        Oauth2 auth = new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredential(authorize))
-                .setApplicationName(App.APPLICATION_NAME)
-                .build();
-        return auth.userinfo().get().execute();
-    }
 
 
 
     private static void ensureIsInit() {
-        if (userId == null || dataDirectory == null || HTTP_TRANSPORT == null || DATA_STORE_FACTORY == null) {
+        if (!isInit()) {
             throw new IllegalStateException("Must init first");
         }
     }

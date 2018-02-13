@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+<?import javafx.scene.control.ScrollPane?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<Stage title="TODO" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+       fx:controller="com.wx.invoicefx.ui.views.viewer.InvoiceViewerController" width="1600" height="900">
+    <scene>
+        <Scene>
+            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="800.0">
+                <center>
+                    <ScrollPane fitToWidth="true" fitToHeight="true" BorderPane.alignment="CENTER">
+                        <GridPane fx:id="outerPane" styleClass="invoice-viewer">
+                            <ImageView fx:id="imageView" />
+                            <padding>
+                                <Insets top="10" right="10" bottom="10" left="10" />
+                            </padding>
+                        </GridPane>
+                    </ScrollPane>
+                </center>
+
+                <bottom>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="CLOSE" styleClass="custom-button" onAction="#onClose" />
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10" />
+                        </padding>
+                    </HBox>
+                </bottom>
+            </BorderPane>
+        </Scene>
+    </scene>
+</Stage>

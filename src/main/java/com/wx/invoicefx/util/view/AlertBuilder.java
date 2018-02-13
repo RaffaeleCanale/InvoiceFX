@@ -5,11 +5,12 @@ import com.wx.fx.Lang;
 import com.wx.fx.gui.window.StageManager;
 import com.wx.invoicefx.config.ExceptionLogger;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -125,6 +126,7 @@ public class AlertBuilder {
     private String title;
     private String header;
     private String content;
+    private Node contentNode;
     private Node expandableContent;
 
     /**
@@ -164,6 +166,18 @@ public class AlertBuilder {
         title = Lang.getOptionalString(key + ".title", params).orElse(null);
         header = Lang.getString(key + ".header", params);
         content = Lang.getOptionalString(key + ".content", params).orElse(null);
+
+        return this;
+    }
+
+    public AlertBuilder setHeader(String header) {
+        this.header = header;
+
+        return this;
+    }
+
+    public AlertBuilder setContent(Node content) {
+        contentNode = content;
 
         return this;
     }
@@ -218,7 +232,7 @@ public class AlertBuilder {
      */
     public AlertBuilder expandableContent(Throwable ex) {
         Label label = new Label("[" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
-        label.setId("error");
+        label.getStyleClass().setAll("text-error");
         return expandableContent(label);
     }
 
@@ -259,6 +273,9 @@ public class AlertBuilder {
         }
 
         Alert alert = new Alert(alertType);
+        alert.getDialogPane().setUserData(alert);
+        alert.getDialogPane().getStyleClass().add("custom-dialog-pane");
+
         alert.setResizable(true);
         alert.getDialogPane().getStylesheets().add(StageManager.getStyleSheet());
         alert.getButtonTypes().setAll(buttons);
@@ -268,6 +285,8 @@ public class AlertBuilder {
 
         if (content != null) {
             alert.setContentText(content);
+        } else if (contentNode != null) {
+            alert.getDialogPane().setContent(contentNode);
         }
         if (expandableContent != null) {
             alert.getDialogPane().setExpandableContent(expandableContent);

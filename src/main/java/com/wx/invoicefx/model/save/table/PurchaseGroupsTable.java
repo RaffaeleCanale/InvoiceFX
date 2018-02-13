@@ -5,24 +5,19 @@ import com.wx.invoicefx.io.interfaces.RecordSerializer;
 import com.wx.invoicefx.io.primary_key.ClusteredIndexWithPK;
 import com.wx.invoicefx.model.entities.client.Client;
 import com.wx.invoicefx.model.entities.invoice.Invoice;
-import com.wx.invoicefx.model.entities.item.Item;
 import com.wx.invoicefx.model.entities.purchase.Purchase;
 import com.wx.invoicefx.model.entities.purchase.PurchaseGroup;
 import com.wx.invoicefx.model.save.table.column.Column;
 import com.wx.invoicefx.model.save.table.column.ColumnInfo;
-import com.wx.invoicefx.model.save.table.serializer.NullableSerializer8;
 import com.wx.properties.property.Property;
-import com.wx.util.pair.Pair;
+import com.wx.util.representables.DelimiterEncoder;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import static com.wx.invoicefx.model.save.table.PurchaseGroupsTable.Cols.*;
-import static com.wx.invoicefx.model.save.table.PurchasesTable.Cols.*;
-import static com.wx.invoicefx.model.save.table.RecordsHelper.*;
+import static com.wx.invoicefx.model.save.table.RecordsHelper.getSerializer;
+import static com.wx.invoicefx.model.save.table.RecordsHelper.set;
 import static com.wx.invoicefx.model.save.table.column.ColumnInfo.*;
 
 /**
@@ -31,6 +26,7 @@ import static com.wx.invoicefx.model.save.table.column.ColumnInfo.*;
  */
 public class PurchaseGroupsTable extends ClusteredIndexWithPK {
 
+    public static final String PARTITION_FILE_PREFIX = "purchase_groups";
 
     private static final RecordSerializer PURCHASE_GROUPS_SERIALIZER = getSerializer(Cols.values(), false);
     private static final int DEFAULT_PARTITION_SIZE = 1024;
@@ -41,7 +37,8 @@ public class PurchaseGroupsTable extends ClusteredIndexWithPK {
         GROUP_INDEX(intColumn(NOT_NULL, POS_INT)),
         CLIENTS_COUNT(intColumn(NOT_NULL)),
         PURCHASES_COUNT(intColumn(NOT_NULL)),
-        FIRST_CLIENT_ID(longColumn(NOT_NULL));
+        FIRST_CLIENT_ID(longColumn(NOT_NULL)),
+        STOP_WORDS(stringColumn(NOT_NULL));
 
         private final ColumnInfo column;
 
@@ -60,6 +57,7 @@ public class PurchaseGroupsTable extends ClusteredIndexWithPK {
         final List<Client> clients = purchaseGroup.getClients();
         final List<Purchase> purchases = purchaseGroup.getPurchases();
 
+        String stopWords = DelimiterEncoder.autoEncode(purchaseGroup.getStopWords());
 
         set(record, ID, purchaseGroup.getId());
         set(record, INVOICE_ID, invoice.getId());
@@ -67,30 +65,13 @@ public class PurchaseGroupsTable extends ClusteredIndexWithPK {
         set(record, CLIENTS_COUNT, clients.size());
         set(record, PURCHASES_COUNT, purchases.size());
         set(record, FIRST_CLIENT_ID, clients.isEmpty() ? 0 : clients.get(0).getId());
+        set(record, STOP_WORDS, stopWords);
 
         return record;
     }
 
-//    public static Pair<PurchaseGroup, Integer> getPurchaseGroupModel(Client client, Item item, Object[] record) {
-//        PurchaseGroup group = new PurchaseGroup();
-//
-//        group.setId(getLong(record, ID));
-//
-//
-//
-//        Purchase purchase = new Purchase(client, item);
-//        purchase.setItemCount(getInteger(record, ITEM_COUNT));
-//        purchase.setFromDate(getDate(record, FROM_DATE));
-//        purchase.setToDate(getDate(record, TO_DATE));
-//        purchase.setDateEnabled(getDateEnabled(record, DATE_ENABLED));
-//        int index = getInteger(record, PURCHASE_INDEX);
-//
-//        return Pair.of(purchase, index);
-//    }
-
-
     public PurchaseGroupsTable(File dataDirectory, Property<Long> maxIdProperty) {
-        super(new DirectoryStorage(PURCHASE_GROUPS_SERIALIZER, dataDirectory, "purchase_groups"), DEFAULT_PARTITION_SIZE, INVOICE_ID.ordinal(), ID.ordinal(), maxIdProperty);
+        super(new DirectoryStorage(PURCHASE_GROUPS_SERIALIZER, dataDirectory, PARTITION_FILE_PREFIX), DEFAULT_PARTITION_SIZE, INVOICE_ID.ordinal(), ID.ordinal(), maxIdProperty);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.wx.invoicefx.model;
 
-import com.wx.invoicefx.config.ConfigProperties;
+import com.wx.fx.Lang;
+import com.wx.invoicefx.AppResources;
 import com.wx.invoicefx.util.string.DateConverter;
 import javafx.beans.binding.NumberExpression;
 import javafx.beans.binding.StringBinding;
@@ -9,9 +10,11 @@ import javafx.util.StringConverter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
 
-import static com.wx.invoicefx.config.preferences.SharedProperty.*;
+import static com.wx.invoicefx.config.preferences.shared.SharedProperty.*;
 
 /**
  * Created on 10/07/2015
@@ -27,7 +30,7 @@ public class InvoiceFormats {
      * @return A string converter for dates
      */
     public static StringConverter<LocalDate> dateConverter() {
-        return new DateConverter(ConfigProperties.sharedPreferences().getString(DATE_PATTERN));
+        return new DateConverter(AppResources.sharedPreferences().getString(DATE_PATTERN));
     }
 
     /**
@@ -36,7 +39,7 @@ public class InvoiceFormats {
      * @return A formatter for an invoice ID
      */
     public static DecimalFormat idFormat() {
-        return new DecimalFormat(ConfigProperties.sharedPreferences().getString(ID_FORMAT));
+        return new DecimalFormat(AppResources.sharedPreferences().getString(ID_FORMAT));
     }
 
     /**
@@ -47,7 +50,7 @@ public class InvoiceFormats {
      * @return A formatted string binding of the price
      */
     public static StringBinding formattedPrice(NumberExpression price) {
-        String format = ConfigProperties.sharedPreferences().getString(MONEY_FORMAT);
+        String format = AppResources.sharedPreferences().getString(MONEY_FORMAT);
         return price.asString(format);
     }
 
@@ -57,7 +60,7 @@ public class InvoiceFormats {
      * @return A formatter for money
      */
     public static NumberFormat moneyFormat() {
-        return getNumberFormat(ConfigProperties.sharedPreferences().getString(MONEY_DECIMAL_FORMAT));
+        return getNumberFormat(AppResources.sharedPreferences().getString(MONEY_DECIMAL_FORMAT));
     }
 
     /**
@@ -66,7 +69,7 @@ public class InvoiceFormats {
      * @return A formatter for VAT
      */
     public static NumberFormat vatFormat() {
-        return getNumberFormat(ConfigProperties.sharedPreferences().getString(VAT_DECIMAL_FORMAT));
+        return getNumberFormat(AppResources.sharedPreferences().getString(VAT_DECIMAL_FORMAT));
     }
 
     /**
@@ -81,5 +84,10 @@ public class InvoiceFormats {
         symbols.setDecimalSeparator('.');
 
         return new DecimalFormat(pattern, symbols);
+    }
+
+    public static String formatDateTime(Date dateTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat(Lang.getString("other.date_format"));
+        return sdf.format(dateTime);
     }
 }

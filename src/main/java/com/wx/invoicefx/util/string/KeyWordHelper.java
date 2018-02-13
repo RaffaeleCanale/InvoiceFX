@@ -86,4 +86,6 @@ public class KeyWordHelper {
     public static String validatePath(String path) {
         return path.endsWith(File.separator) ? path : path + File.separator;
     }
+
+    private KeyWordHelper() {}
 }

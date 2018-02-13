@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+<?import org.pdfsam.ui.RingProgressIndicator?>
+<Stage title="%stage.repository_chooser.title" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+       fx:controller="com.wx.invoicefx.ui.views.sync.DataSetChooserController">
+    <scene>
+        <Scene>
+            <BorderPane prefHeight="660" prefWidth="920">
+                <top>
+                    <VBox spacing="10" styleClass="custom-pane">
+                        <Label fx:id="header" styleClass="text-title"/>
+                        <Label fx:id="subHeader" styleClass=""/>
+                    </VBox>
+                </top>
+
+                <center>
+                    <StackPane>
+                        <HBox fx:id="choicePane" spacing="20" BorderPane.alignment="CENTER" alignment="CENTER">
+                            <padding>
+                                <Insets top="20" right="10" bottom="10" left="10"/>
+                            </padding>
+                        </HBox>
+                        <RingProgressIndicator fx:id="progressIndicator" visible="false"/>
+                    </StackPane>
+                </center>
+
+                <bottom>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="%stage.common.button.cancel" cancelButton="true" styleClass="custom-button"
+                                onAction="#onClose"/>
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                    </HBox>
+                </bottom>
+            </BorderPane>
+        </Scene>
+    </scene>
+</Stage>

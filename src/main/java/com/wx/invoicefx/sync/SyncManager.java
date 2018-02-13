@@ -1,251 +1,286 @@
 package com.wx.invoicefx.sync;
 
-import com.wx.invoicefx.sync.index.FileInfo;
-import com.wx.invoicefx.sync.index.Index;
-import com.wx.invoicefx.sync.repo.Local;
-import com.wx.invoicefx.sync.repo.Remote;
-import com.wx.invoicefx.util.InvalidDataException;
+import com.wx.fx.gui.window.StageManager;
+import com.wx.invoicefx.config.ExceptionLogger;
+import com.wx.invoicefx.dataset.DataSet;
+import com.wx.invoicefx.google.DriveManager;
+import com.wx.invoicefx.ui.views.Stages;
+import com.wx.util.concurrent.Callback;
+import com.wx.util.log.LogHelper;
+import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Optional;
+import java.util.logging.Logger;
+
+import static com.wx.invoicefx.sync.SyncManager.State.*;
+import static com.wx.invoicefx.ui.views.sync.DataSetChooserController.DialogType.SOLVE_CONFLICT;
 
 /**
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)
- * @version 0.1 - created on 14.05.17.
+ * @version 0.1 - created on 18.06.17.
  */
-public class SyncManager {
+public abstract class SyncManager {
 
-
-    public enum Status {
-        NEED_PULL,
-        NEED_PUSH,
-        VERSION_CONFLICT,
-        IS_UP_TO_DATE,
-        REMOTE_UNREACHABLE
+    public enum State {
+        OFF,
+        PENDING,
+        UP_TO_DATE,
+        PULL,
+        PUSH,
+        PROCESSING_CONFLICT,
+        PROCESSING_OTHER,
+        CONFLICTED,
+        FAILED
     }
 
-
-    private final Local local;
-    private final Remote remote;
+    private final static Logger LOG = LogHelper.getLogger(SyncManager.class);
 
 
-    public SyncManager(Local local, Remote remote) throws IOException {
+    private final ObjectProperty<StateContainer> currentState = new SimpleObjectProperty<>(new StateContainer(OFF));
+    private final DataSet local;
+    private DataSet remote;
+
+    protected SyncManager(DataSet local) {
         this.local = local;
-        this.remote = remote;
-
-        if (local.getIndex().isEmpty()) {
-            local.createIndex();
-        }
-
-//        if (remote == null) {
-//            currentState = State.NO_REMOTE;
-//        } else if (remote.isReachable()) {
-//            currentState = State.REMOTE_CONNECTED;
-//        } else {
-//            currentState = State.REMOTE_DISCONNECTED;
-//        }
-
-//        if (remote.isReachable() && !remote.getIndex().isEmpty()) {
-//            if (local.getIndex().getBranchVersion() > remote.getIndex().getVersion()) {
-//                throw new InvalidDataException();
-//            }
-//        }
     }
 
-    public Status getStatus() throws InvalidDataException {
-        if (!remote.isReachable()) {
-            return Status.REMOTE_UNREACHABLE;
-        }
+    protected abstract DataSet initRemote() throws IOException;
 
-        Index localIndex = local.getIndex();
-        Index remoteIndex = remote.getIndex();
-
-        localIndex.testIntegrity();
-        remoteIndex.testIntegrity();
-
-        if (remoteIndex.isEmpty() && localIndex.isEmpty()) return Status.IS_UP_TO_DATE;
-        if (remoteIndex.isEmpty() && !localIndex.isEmpty()) return Status.NEED_PUSH;
-        if (!remoteIndex.isEmpty() && localIndex.isEmpty()) return Status.NEED_PULL;
-
-        ensureVersionsAreValid();
-
-        if (!local.hasUncommittedChanges() && localIndex.getBranchVersion() == remoteIndex.getVersion()) return Status.IS_UP_TO_DATE;
-        if (local.hasUncommittedChanges() && localIndex.getBranchVersion() == remoteIndex.getVersion()) return Status.NEED_PUSH;
-        if (!local.hasUncommittedChanges() && localIndex.getBranchVersion() < remoteIndex.getVersion()) return Status.NEED_PULL;
-
-        return Status.VERSION_CONFLICT;
+    public ObjectProperty<StateContainer> currentStateProperty() {
+        return currentState;
     }
 
-    private void ensureVersionsAreValid() throws InvalidDataException {
-        if (!remote.getIndex().isEmpty() && local.getIndex().getBranchVersion() > remote.getIndex().getVersion()) {
-            throw new InvalidDataException("TODO"); // TODO: 15.05.17 Error message
-        }
+    public boolean isEnabled() {
+        return currentState.get().getState() != OFF;
     }
 
-
-    public int pull() throws IOException, InvalidDataException {
-        if (!remote.isReachable()) {
-            throw new IOException("Remote is unreachable");
-        } else if (remote.getIndex().isEmpty()) {
-            return 0;
-        }
-
-        ensureVersionsAreValid();
-
-        Index localIndex = local.getIndex();
-        Index remoteIndex = remote.getIndex();
-
-
-        Diff diff = computeDiff(remoteIndex, localIndex);
-        int changesCount = diff.changesCount();
-
-//        if (changesCount == 0) {
-//            return 0;
-//        }
-
-        for (String filename : diff.filesToCopy) {
-            File destination = local.getFile(filename);
-
-            remote.downloadFile(filename, destination);
-        }
-
-        for (String filename : diff.filesToUpdate) {
-            File destination = local.getFile(filename);
-
-            remote.downloadFile(filename, destination);
-        }
-
-        for (String filename : diff.filesToRemove) {
-            local.getFile(filename).delete();
-        }
-
-        remoteIndex.copyTo(localIndex);
-        localIndex.setBranchVersion(remoteIndex.getVersion());
-
-        localIndex.save();
-
-        return changesCount;
+    public void disableSync() {
+        setCurrentState(OFF);
+        remote = null;
     }
 
-    public int push() throws IOException, InvalidDataException {
-        return push(false);
-    }
-
-    public int pushForce() throws IOException, InvalidDataException {
-        return push(true);
-    }
-
-    private int push(boolean force) throws IOException, InvalidDataException {
-        if (!remote.isReachable()) {
-            throw new IOException("Remote is unreachable");
-        } else if (local.getIndex().isEmpty()) {
-            return 0;
+    public boolean enableSync() {
+        if (!DriveManager.isUserRegistered()) {
+            return false;
         }
 
-        ensureVersionsAreValid();
-
-        Index localIndex = local.getIndex();
-        Index remoteIndex = remote.getIndex();
-
-        if (!remoteIndex.isEmpty() && remoteIndex.getVersion() > localIndex.getBranchVersion()) {
-            if (force) {
-                if (localIndex.getVersion() <= remoteIndex.getVersion()) {
-                    localIndex.setVersion(remoteIndex.getVersion());
-                    localIndex.incrementVersion();
-                }
-
-                localIndex.setBranchVersion(remoteIndex.getVersion());
-            } else {
-                throw new IllegalArgumentException("Must pull first");
+        try {
+            setCurrentState(PENDING);
+            if (remote == null) {
+                remote = initRemote();
             }
+
+            if (remote.isCorrupted()) {
+                ExceptionLogger.logException(remote.getException(), "Remote failed");
+                setCurrentState(FAILED, remote.getException());
+                return false;
+            }
+
+            return true;
+        } catch (IOException e) {
+            ExceptionLogger.logException(e, "Remote failed");
+            setCurrentState(FAILED, e);
+            return false;
         }
-
-
-        Diff diff = computeDiff(localIndex, remoteIndex);
-
-        for (String filename : diff.filesToCopy) {
-            File target = local.getFile(filename);
-
-            remote.uploadFile(filename, target);
-        }
-
-        for (String filename : diff.filesToUpdate) {
-            File target = local.getFile(filename);
-
-            remote.uploadFile(filename, target);
-        }
-
-        for (String filename : diff.filesToRemove) {
-            remote.removeFile(filename);
-        }
-
-        localIndex.copyTo(remoteIndex);
-        localIndex.setBranchVersion(localIndex.getVersion());
-
-        localIndex.save();
-        remoteIndex.save();
-
-        return diff.changesCount();
     }
 
-    private static Diff computeDiff(Index head, Index target) {
-        Diff diff = new Diff();
-
-        if (head.isEmpty() && target.isEmpty()) {
-            return diff;
-        } else if (head.isEmpty()) {
-            diff.filesToRemove.addAll(target.getAllFilenames());
-            return diff;
-
-        } else if (target.isEmpty()) {
-            diff.filesToCopy.addAll(head.getAllFilenames());
-
-            return diff;
-        }
-
-        int filesCount = head.getFilesCount();
-
-        for (int i = 0; i < filesCount; i++) {
-            FileInfo headFile = head.getFileInfo(i);
-            FileInfo targetFile = target.getFileInfo(headFile.getFilename());
-
-            if (targetFile == null) {
-                diff.filesToCopy.add(headFile.getFilename());
-
-            } else if (Arrays.equals(headFile.getCheckSum(), targetFile.getCheckSum())) {
-                diff.ignoredFiles.add(headFile.getFilename());
-
-            } else {
-                diff.filesToUpdate.add(headFile.getFilename());
-            }
-        }
-
-        int targetFilesCount = target.getFilesCount();
-        for (int i = 0; i < targetFilesCount; i++) {
-            String targetFilename = target.getFileInfo(i).getFilename();
-            if (!diff.filesToCopy.contains(targetFilename) &&
-                    !diff.filesToUpdate.contains(targetFilename) &&
-                    !diff.ignoredFiles.contains(targetFilename)) {
-
-                diff.filesToRemove.add(targetFilename);
-            }
-        }
-
-        return diff;
+    public Optional<DataSet> getRemote() {
+        return Optional.ofNullable(remote);
     }
 
+    public synchronized void synchronizeWithRemote(Callback<?> callback) {
+        LOG.info("Synchronizing with remote");
 
-    private static class Diff {
-        private final Set<String> filesToRemove = new HashSet<>();
-        private final Set<String> filesToUpdate = new HashSet<>();
-        private final Set<String> filesToCopy = new HashSet<>();
-        private final Set<String> ignoredFiles = new HashSet<>();
+        State currentState = this.currentState.get().getState();
+        if (currentState == OFF ||
+                currentState == FAILED ||
+                currentState == PUSH ||
+                currentState == PULL ||
+                currentState == PROCESSING_CONFLICT ||
+                currentState == PROCESSING_OTHER) {
+            LOG.fine("Synchronize aborted because of state: " + currentState);
+            callback.failure(null);
+            return;
 
-        public int changesCount() {
-            return filesToCopy.size() + filesToRemove.size() + filesToUpdate.size();
+        }
+        setCurrentState(PROCESSING_OTHER);
+
+        try {
+            PushPullSync pushPullSync = new PushPullSync(local, remote);
+
+
+            switch (pushPullSync.getStatus()) {
+                case IS_UP_TO_DATE:
+                    LOG.finer("Sync up-to-date");
+                    setCurrentState(UP_TO_DATE);
+                    callback.success(null);
+                    return;
+
+                case NEED_PULL:
+                    setCurrentState(PULL, pushPullSync);
+                    LOG.finer("Sync PULL");
+                    pushPullSync.pull();
+
+                    setCurrentState(UP_TO_DATE);
+                    callback.success(null);
+                    return;
+
+                case NEED_PUSH:
+                    setCurrentState(PUSH, pushPullSync);
+                    LOG.finer("Sync PUSH");
+                    pushPullSync.push();
+
+                    setCurrentState(UP_TO_DATE);
+                    callback.success(null);
+                    return;
+
+                case LOCAL_UNREACHABLE:
+                    throw new IOException("Local unreachable");
+                case REMOTE_UNREACHABLE:
+                    throw new IOException("Remote unreachable");
+
+                case VERSION_CONFLICT:
+                    if (pushPullSync.getChangesCount() == 0) {
+                        if (local.getIndex().getVersion() > remote.getIndex().getVersion()) {
+                            LOG.finer("Sync CONFLICT - push force");
+                            pushPullSync.pushForce();
+                        } else {
+                            LOG.finer("Sync CONFLICT - pull force");
+                            pushPullSync.pullForce();
+                        }
+
+                        setCurrentState(UP_TO_DATE);
+                        callback.success(null);
+                        return;
+                    }
+
+                    LOG.fine("Sync CONFLICT - requires user intervention");
+                    solveConflict(callback);
+                    return;
+
+                default:
+                    throw new AssertionError();
+            }
+        } catch (IOException e) {
+            fail(callback, e);
+        }
+    }
+
+    public void resetRemote(Callback<?> callback) {
+        LOG.info("Resetting remote");
+
+
+        State currentState = this.currentState.get().getState();
+        if (currentState != FAILED) {
+            LOG.fine("Synchronize aborted because of state: " + currentState);
+            callback.failure(null);
+            return;
+        }
+
+        if (remote == null) {
+            callback.failure(null);
+            return;
+        }
+
+        try {
+            remote.clear();
+        } catch (IOException e) {
+            callback.failure(e);
+            return;
+        }
+
+        try {
+            PushPullSync sync = new PushPullSync(local, remote);
+            setCurrentState(PUSH, sync);
+            sync.pushForce();
+            setCurrentState(UP_TO_DATE, sync);
+        } catch (IOException e) {
+            fail(callback, e);
+        }
+    }
+
+    private Void fail(Callback<?> callback, Throwable e) {
+        setCurrentState(FAILED, e);
+
+        return callback.failure(e);
+    }
+
+    private void solveConflict(Callback<?> callback) {
+        setCurrentState(PROCESSING_CONFLICT);
+
+        Callback<Object> resolveCallback = new Callback<Object>() {
+            @Override
+            public Void success(Object o) {
+                setCurrentState(UP_TO_DATE);
+                return callback.success(null);
+            }
+
+            @Override
+            public Void failure(Throwable ex) {
+                setCurrentState(FAILED, ex);
+                return callback.failure(ex);
+            }
+
+            @Override
+            public Void cancelled() {
+                setCurrentState(CONFLICTED);
+                return callback.cancelled();
+            }
+        };
+
+        Platform.runLater(() -> StageManager.show(Stages.DATA_SET_CHOOSER, SOLVE_CONFLICT, resolveCallback));
+    }
+
+    private void setCurrentState(State state) {
+        currentState.set(new StateContainer(state));
+    }
+
+    private void setCurrentState(State state, Throwable e) {
+        currentState.set(new StateContainer(state, e));
+    }
+
+    private void setCurrentState(State state, PushPullSync syncManager) {
+        currentState.set(new StateContainer(state, syncManager.progressProperty()));
+    }
+
+    public static class StateContainer {
+        private final State state;
+        private final DoubleProperty progress;
+        private final Throwable exception;
+
+        public StateContainer(State state) {
+            this.state = state;
+            this.progress = null;
+            this.exception = null;
+        }
+
+        public StateContainer(State state, DoubleProperty progress) {
+            this.state = state;
+            this.progress = progress;
+            this.exception = null;
+
+        }
+
+        public StateContainer(State state, Throwable exception) {
+            this.state = state;
+            this.progress = null;
+            this.exception = exception;
+        }
+
+        public State getState() {
+            return state;
+        }
+
+        public DoubleProperty progressProperty() {
+            return progress;
+        }
+
+        public Throwable getException() {
+            return exception;
         }
     }
 }

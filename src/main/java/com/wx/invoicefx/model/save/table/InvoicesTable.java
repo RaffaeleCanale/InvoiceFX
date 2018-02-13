@@ -22,6 +22,8 @@ import static com.wx.invoicefx.model.save.table.column.ColumnInfo.*;
  */
 public class InvoicesTable extends ClusteredIndexWithPK {
 
+    public static final String PARTITION_FILE_PREFIX = "invoices";
+
     private static final RecordSerializer INVOICE_SERIALIZER = getSerializer(Cols.values(), true);
     private static final int DEFAULT_PARTITION_SIZE = 1024;
 
@@ -44,21 +46,13 @@ public class InvoicesTable extends ClusteredIndexWithPK {
         }
     }
 
-//    public enum Cols {
-//        ID,
-//        ADDRESS,
-//        DATE,
-//        PDF_FILE,
-//        GROUPS_COUNT
-//    }
-
     public static Object[] getInvoiceRecord(Invoice invoice) {
         final Object[] record = new Object[Cols.values().length];
 
         set(record, ID, invoice.getId());
         set(record, ADDRESS, invoice.getAddress());
         set(record, DATE, invoice.getDate());
-        set(record, PDF_FILE, invoice.getPdfFilepath());
+        set(record, PDF_FILE, invoice.getPdfFilename());
         set(record, GROUPS_COUNT, invoice.getPurchaseGroups().size());
 
         return record;
@@ -70,13 +64,17 @@ public class InvoicesTable extends ClusteredIndexWithPK {
         invoice.setId(getLong(record, ID));
         invoice.setAddress(getString(record, ADDRESS));
         invoice.setDate(getDate(record, DATE));
-        invoice.setPdfFilepath(getString(record, PDF_FILE));
+        invoice.setPdfFilename(getString(record, PDF_FILE));
         invoice.setPurchaseGroups(purchaseGroups);
 
         return invoice;
     }
 
     public InvoicesTable(File dataDirectory, Property<Long> maxIdProperty) {
-        super(new DirectoryStorage(INVOICE_SERIALIZER, dataDirectory, "invoices"), DEFAULT_PARTITION_SIZE, DATE.ordinal(), ID.ordinal(), maxIdProperty);
+        super(new DirectoryStorage(INVOICE_SERIALIZER, dataDirectory, PARTITION_FILE_PREFIX), DEFAULT_PARTITION_SIZE, DATE.ordinal(), ID.ordinal(), maxIdProperty);
+    }
+
+    public Property<Long> getMaxIdProperty() {
+        return maxIdProperty;
     }
 }

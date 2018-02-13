@@ -14,6 +14,15 @@ public class PurchaseGroup {
     private long id;
     private List<Client> clients = new ArrayList<>();
     private List<Purchase> purchases = new ArrayList<>();
+    private List<String> stopWords = new ArrayList<>();
+
+    public List<String> getStopWords() {
+        return stopWords;
+    }
+
+    public void setStopWords(List<String> stopWords) {
+        this.stopWords = stopWords;
+    }
 
     public double getSum() {
         return purchases.stream()

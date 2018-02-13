@@ -15,13 +15,28 @@ public class DoubleArrayConverter {
 
     private static final TypeCaster<String, List<Double>> CASTER = new ListRepr<>(new DoubleRepr(), "/");
 
-    public static Double[] convert(String value) {
+    public static Double[] convertBoxed(String value) {
         List<Double> list = CASTER.castOut(value);
         return list.toArray(new Double[list.size()]);
     }
 
-    public static String convert(Double[] value) {
+    public static double[] convert(String value) {
+        List<Double> list = CASTER.castOut(value);
+
+        double[] array = new double[list.size()];
+        int i = 0;
+        for (Double v : list) {
+            array[i] = v;
+            i++;
+        }
+
+        return array;
+    }
+
+    public static String convertBoxed(Double[] value) {
         return CASTER.castIn(Arrays.asList(value));
     }
+
+    private DoubleArrayConverter() {}
 
 }

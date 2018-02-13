@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.wx.invoicefx.ui.components.NumberTextField?>
+<?import com.wx.invoicefx.ui.components.settings.ExpandPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<ExpandPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.wx.invoicefx.ui.views.settings.cards.VatEditorController"
+            text="%stage.settings.card.vat_editor.label"
+            fx:id="expandPane">
+
+    <expandableContent>
+        <VBox spacing="10.0" prefHeight="80.0" alignment="CENTER_LEFT">
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Label text="%stage.settings.card.vat_editor.category1" />
+                <NumberTextField fx:id="vatField1" prefWidth="75" styleClass="custom-text-field"/>
+            </HBox>
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Label text="%stage.settings.card.vat_editor.category2" />
+                <NumberTextField fx:id="vatField2" prefWidth="75" styleClass="custom-text-field"/>
+            </HBox>
+
+            <padding>
+                <Insets top="15" right="5" left="5" bottom="5" />
+            </padding>
+        </VBox>
+    </expandableContent>
+
+
+
+</ExpandPane>

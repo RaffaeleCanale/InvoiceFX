@@ -62,6 +62,21 @@ public abstract class ColumnInfo {
     }
 
     @SafeVarargs
+    public static ColumnInfo booleanColumn(Predicate<Object>... predicates) {
+        return new ColumnInfo(predicates) {
+            @Override
+            public void serialize(DataOutput output, Object value) throws IOException {
+                output.writeBoolean((boolean) value);
+            }
+
+            @Override
+            public Object deserialize(DataInput input) throws IOException {
+                return input.readBoolean();
+            }
+        };
+    }
+
+    @SafeVarargs
     public static ColumnInfo doubleColumn(Predicate<Object>... predicates) {
         return new ColumnInfo(predicates) {
             @Override
@@ -130,66 +145,5 @@ public abstract class ColumnInfo {
 
         return true;
     }
-
-
-//    public static ColumnInfo stringColumn(boolean nullable) {
-//        return new DefaultColumn(nullable) {
-//            @Override
-//            void serialize0(DataOutput output, Object value) throws IOException {
-//                output.writeUTF((String) value);
-//            }
-//
-//            @Override
-//            Object deserialize0(DataInput input) throws IOException {
-//                return input.readUTF();
-//            }
-//        };
-//    }
-//
-//    public abstract void serialize(DataOutput output, Object value) throws IOException;
-//
-//    public abstract Object deserialize(DataInput input, boolean isNull) throws IOException;
-//
-//    public abstract boolean isNullable();
-//
-//
-//
-//    private static abstract class DefaultColumn extends ColumnInfo {
-//
-//        private final boolean nullable;
-//
-//        public DefaultColumn(boolean nullable) {
-//            this.nullable = nullable;
-//        }
-//
-//        @Override
-//        public void serialize(DataOutput output, Object value) throws IOException {
-//            if (value == null) {
-//                if (nullable) return;
-//                else throw new IllegalArgumentException("Value for this column cannot be null");
-//            }
-//
-//            serialize0(output, value);
-//        }
-//
-//        abstract void serialize0(DataOutput output, Object value) throws IOException;
-//
-//        @Override
-//        public Object deserialize(DataInput input, boolean isNull) throws IOException {
-//            if (isNull) {
-//                if (nullable) return null;
-//                else throw new IOException("Value for this column cannot be null");
-//            }
-//
-//            return deserialize0(input);
-//        }
-//
-//        abstract Object deserialize0(DataInput input) throws IOException;
-//
-//        @Override
-//        public boolean isNullable() {
-//            return nullable;
-//        }
-//    }
 
 }

@@ -8,13 +8,11 @@ import com.wx.invoicefx.model.entities.purchase.PurchaseGroup;
 import com.wx.invoicefx.model.save.table.column.Column;
 import com.wx.invoicefx.model.save.table.column.ColumnInfo;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.File;
-import java.io.IOException;
 
 import static com.wx.invoicefx.model.save.table.ClientGroupsRelationTable.Cols.*;
-import static com.wx.invoicefx.model.save.table.RecordsHelper.*;
+import static com.wx.invoicefx.model.save.table.RecordsHelper.getSerializer;
+import static com.wx.invoicefx.model.save.table.RecordsHelper.set;
 import static com.wx.invoicefx.model.save.table.column.ColumnInfo.*;
 
 /**
@@ -22,6 +20,8 @@ import static com.wx.invoicefx.model.save.table.column.ColumnInfo.*;
  * @version 0.1 - created on 16.05.17.
  */
 public class ClientGroupsRelationTable extends ClusteredIndex {
+
+    public static final String PARTITION_FILE_PREFIX = "client_group_relation";
 
     private static final RecordSerializer CLIENT_GROUP_RELATION_SERIALIZER = getSerializer(Cols.values(), false);
     private static final int DEFAULT_PARTITION_SIZE = 1024;
@@ -53,19 +53,8 @@ public class ClientGroupsRelationTable extends ClusteredIndex {
         return record;
     }
 
-//    public static Pair<Purchase, Integer> getClientPurchaseRelationModel(Client client, Item item, Object[] record) {
-//        Purchase purchase = new Purchase(client, item);
-//        purchase.setItemCount(getInteger(record, ITEM_COUNT));
-//        purchase.setFromDate(getDate(record, FROM_DATE));
-//        purchase.setToDate(getDate(record, TO_DATE));
-//        purchase.setDateEnabled(getDateEnabled(record, DATE_ENABLED));
-//        int index = getInteger(record, PURCHASE_INDEX);
-//
-//        return Pair.of(purchase, index);
-//    }
-
     public ClientGroupsRelationTable(File dataDirectory) {
-        super(new DirectoryStorage(CLIENT_GROUP_RELATION_SERIALIZER, dataDirectory, "client_group_relation"), DEFAULT_PARTITION_SIZE, GROUP_ID.ordinal());
+        super(new DirectoryStorage(CLIENT_GROUP_RELATION_SERIALIZER, dataDirectory, PARTITION_FILE_PREFIX), DEFAULT_PARTITION_SIZE, GROUP_ID.ordinal());
     }
 
 }

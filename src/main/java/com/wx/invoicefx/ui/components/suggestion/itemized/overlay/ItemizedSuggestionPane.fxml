@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.geometry.Insets?>
+<?import com.wx.invoicefx.ui.components.suggestion.textfield.SuggestionTextField?>
+<StackPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.wx.invoicefx.ui.components.suggestion.itemized.overlay.ItemizedSuggestionPaneController"
+           alignment="CENTER_LEFT">
+    <children>
+        <SuggestionTextField fx:id="textField" prefWidth="600" styleClass="custom-text-field"/>
+        <HBox fx:id="clientOverBox" alignment="CENTER_LEFT" maxHeight="15" spacing="5">
+            <padding>
+                <Insets left="5.0" right="2.0" />
+            </padding>
+            <children>
+
+            </children>
+        </HBox>
+    </children>
+</StackPane>

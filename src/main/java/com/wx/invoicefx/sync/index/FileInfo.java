@@ -17,38 +17,44 @@ public class FileInfo {
         index.removeProperty(Index.IndexProperties.FILES.key(i, "filename"));
         index.removeProperty(Index.IndexProperties.FILES.key(i, "timestamp"));
         index.removeProperty(Index.IndexProperties.FILES.key(i, "check_sum"));
+        index.removeProperty(Index.IndexProperties.FILES.key(i, "size"));
     }
 
     private final String filename;
     private final long timestamp;
     private final byte[] checkSum;
+    private final long fileSize;
 
     public FileInfo(File file) throws IOException {
         this.filename = file.getName();
         this.timestamp = file.lastModified();
         this.checkSum = FileUtil.checkSum(file);
+        this.fileSize = file.length();
     }
 
-    FileInfo(String filename, long timestamp, byte[] checkSum) {
+    FileInfo(String filename, long timestamp, byte[] checkSum, long fileSize) {
         this.filename = filename;
         this.timestamp = timestamp;
         this.checkSum = checkSum;
+        this.fileSize = fileSize;
     }
 
     FileInfo(ResourcePage index, int i) {
-        this.filename = index.getString(Index.IndexProperties.FILES.key(i, "filename")).get();
-        this.timestamp = index.getLong(Index.IndexProperties.FILES.key(i, "timestamp")).get();
-        this.checkSum = index.getBytes(Index.IndexProperties.FILES.key(i, "check_sum")).get();
+        this.filename = index.getString(Index.IndexProperties.FILES.key(i, "filename")).orElse("");
+        this.timestamp = index.getLong(Index.IndexProperties.FILES.key(i, "timestamp")).orElse(0L);
+        this.checkSum = index.getBytes(Index.IndexProperties.FILES.key(i, "check_sum")).orElse(new byte[0]);
+        this.fileSize = index.getLong(Index.IndexProperties.FILES.key(i, "size")).orElse(0L);
     }
 
     public boolean matches(File file) {
-        return file.getName().equals(filename) && timestamp == file.lastModified();
+        return file.getName().equals(filename) && timestamp == file.lastModified() && fileSize == file.length();
     }
 
     void setTo(ResourcePage index, int i) {
         index.setProperty(Index.IndexProperties.FILES.key(i, "filename"), filename);
         index.setProperty(Index.IndexProperties.FILES.key(i, "timestamp"), timestamp);
         index.setProperty(Index.IndexProperties.FILES.key(i, "check_sum"), checkSum);
+        index.setProperty(Index.IndexProperties.FILES.key(i, "size"), fileSize);
     }
 
     public String getFilename() {
@@ -61,6 +67,10 @@ public class FileInfo {
 
     public byte[] getCheckSum() {
         return checkSum;
+    }
+
+    public long getFileSize() {
+        return fileSize;
     }
 
     @Override
@@ -82,5 +92,15 @@ public class FileInfo {
         result = 31 * result + (int) (timestamp ^ (timestamp >>> 32));
         result = 31 * result + Arrays.hashCode(checkSum);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "FileInfo{" +
+                "filename='" + filename + '\'' +
+                ", timestamp=" + timestamp +
+                ", checkSum=" + Arrays.toString(checkSum) +
+                ", fileSize=" + fileSize +
+                '}';
     }
 }

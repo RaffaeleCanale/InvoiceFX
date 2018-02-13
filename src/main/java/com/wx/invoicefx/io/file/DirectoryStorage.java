@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  */
 public class DirectoryStorage implements PartitionedStorage {
 
-    private static final String PARTITION_FILE_EXTENSION = ".part";
+    public static final String PARTITION_FILE_EXTENSION = ".part";
 
     private final RecordSerializer serializer;
     private final File directory;

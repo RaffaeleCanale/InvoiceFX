@@ -1,0 +1,36 @@
+{
+    "files": [
+        {
+            "path": "InvoiceFX.jar",
+            "stat": {
+                "size": 44202977,
+                "checksum": "4ed6f0890f90c32572740f05e63f7064",
+                "timestamp": 1515237245000
+            },
+            "version_base": 0.1,
+            "author": "canale-ThinkPad-X1-Yoga",
+            "version": 0.1
+        },
+        {
+            "path": "UpdateIndex.properties",
+            "stat": {
+                "size": 517,
+                "checksum": "cdf6120894f112be1d06b42ffef31a37",
+                "timestamp": 1515237246000
+            },
+            "version_base": 0.1,
+            "author": "canale-ThinkPad-X1-Yoga",
+            "version": 0.1
+        }
+    ],
+    "remote": {
+        "rootId": "0B6LgrYnciPdhfjB3ZjEyZG9WZWdRZnNZM2tKdW1QX2tVYVJQYmNBZmZQTE1KbUdPcFlqWW8",
+        "type": "GDRIVE",
+        "directory": "InvoiceFX",
+        "user": "Raffaele Canale"
+    },
+    "info": {"options": {"ignore": [
+        "legacy/.*",
+        "Config/.*"
+    ]}}
+}

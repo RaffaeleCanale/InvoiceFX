@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.wx.invoicefx.ui.views.settings.cards.SyncErrorController"
+            fx:id="contentPane">
+
+    <top>
+        <Label text="%stage.settings.card.syncError.label"/>
+    </top>
+    <center>
+        <VBox spacing="10">
+            <Label fx:id="exceptionLabel" styleClass="text-important-1"/>
+            <padding>
+                <Insets top="20" right="10" bottom="20" left="10"/>
+            </padding>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox spacing="10">
+            <Button text="%stage.settings.card.syncError.retry" onAction="#retry" styleClass="custom-button"/>
+            <Button text="%stage.settings.card.syncError.reset" onAction="#reset" styleClass="warning-button"/>
+        </HBox>
+    </bottom>
+
+
+</BorderPane>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.wx.invoicefx.ui.components.settings.ExpandPane?>
+<?import javafx.scene.control.ListView?>
+<ExpandPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.wx.invoicefx.ui.views.settings.cards.LanguageChooserController"
+            text="%stage.settings.card.language.label"
+            fx:id="expandPane">
+
+    <expandableContent>
+        <ListView fx:id="languagesListView" styleClass="custom-list-view" focusTraversable="false" />
+    </expandableContent>
+
+
+
+</ExpandPane>

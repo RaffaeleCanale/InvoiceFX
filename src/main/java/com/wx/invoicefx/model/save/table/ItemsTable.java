@@ -5,13 +5,11 @@ import com.wx.invoicefx.io.interfaces.RecordSerializer;
 import com.wx.invoicefx.io.primary_key.IdClusteredIndex;
 import com.wx.invoicefx.model.entities.DateEnabled;
 import com.wx.invoicefx.model.entities.item.Item;
+import com.wx.invoicefx.model.entities.item.Vat;
 import com.wx.invoicefx.model.save.table.column.Column;
 import com.wx.invoicefx.model.save.table.column.ColumnInfo;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.File;
-import java.io.IOException;
 
 import static com.wx.invoicefx.model.save.table.ItemsTable.Cols.*;
 import static com.wx.invoicefx.model.save.table.RecordsHelper.*;
@@ -26,11 +24,15 @@ public class ItemsTable extends IdClusteredIndex {
     private static final RecordSerializer ITEM_SERIALIZER = getSerializer(Cols.values(), false);
     private static final int DEFAULT_PARTITION_SIZE = 1024;
 
+    public static final String PARTITION_FILE_PREFIX = "items";
+
     public enum Cols implements Column {
         ID(ID_COLUMN),
         NAME(stringColumn(NOT_NULL)),
         PRICE(doubleColumn(NOT_NULL)),
         VAT(doubleColumn(NOT_NULL)),
+        VAT_CATEGORY(byteColumn(NOT_NULL)),
+        IS_ACTIVE(booleanColumn(NOT_NULL)),
         DEFAULT_DATE_ENABLED(byteColumn(NOT_NULL, enumRange(DateEnabled.class)));
 
         private final ColumnInfo column;
@@ -51,7 +53,9 @@ public class ItemsTable extends IdClusteredIndex {
         set(record, ID, item.getId());
         set(record, NAME, item.getName());
         set(record, PRICE, item.getPrice());
-        set(record, VAT, item.getVat());
+        set(record, VAT, item.getVat().getValue());
+        set(record, VAT_CATEGORY, (byte) item.getVat().getCategory());
+        set(record, IS_ACTIVE, item.isActive());
         set(record, DEFAULT_DATE_ENABLED, item.getDefaultDateEnabled());
 
         return record;
@@ -62,13 +66,14 @@ public class ItemsTable extends IdClusteredIndex {
         item.setId(getLong(record, ID));
         item.setName(getString(record, NAME));
         item.setPrice(getDouble(record, PRICE));
-        item.setVat(getDouble(record, VAT));
+        item.setVat(new Vat(getDouble(record, VAT), (int) getByte(record, VAT_CATEGORY)));
+        item.setActive(getBoolean(record, IS_ACTIVE));
         item.setDefaultDateEnabled(getDateEnabled(record, DEFAULT_DATE_ENABLED));
 
         return item;
     }
 
     public ItemsTable(File dataDirectory) {
-        super(new DirectoryStorage(ITEM_SERIALIZER, dataDirectory, "items"), DEFAULT_PARTITION_SIZE, ID.ordinal());
+        super(new DirectoryStorage(ITEM_SERIALIZER, dataDirectory, PARTITION_FILE_PREFIX), DEFAULT_PARTITION_SIZE, ID.ordinal());
     }
 }

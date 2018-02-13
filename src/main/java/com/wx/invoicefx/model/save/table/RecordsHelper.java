@@ -110,7 +110,7 @@ public class RecordsHelper {
             for (int i = 0; i < cols.length; i++) {
                 ColumnInfo col = cols[i].getInfo();
 
-                record[i] = isNull[i] ? null :  col.deserialize(input);
+                record[i] = isNull[i] ? null : col.deserialize(input);
             }
 
             return record;
@@ -158,16 +158,12 @@ public class RecordsHelper {
             for (int i = 0; i < cols.length; i++) {
                 ColumnInfo col = cols[i].getInfo();
 
-                record[i] = isNull[i] ? null :  col.deserialize(input);
+                record[i] = isNull[i] ? null : col.deserialize(input);
             }
 
             return record;
         }
     }
-
-
-
-
 
 
     public static Object get(Object[] record, Enum<?> col) {
@@ -228,29 +224,15 @@ public class RecordsHelper {
         record[col.ordinal()] = value;
     }
 
+    public static void set(Object[] record, Enum<?> col, boolean value) {
+        record[col.ordinal()] = value;
+    }
+
     public static void set(Object[] record, Enum<?> col, LocalDate value) {
-        record[col.ordinal()] = value.toEpochDay();
+        record[col.ordinal()] = value == null ? 0L : value.toEpochDay();
     }
 
     public static void set(Object[] record, Enum<?> col, DateEnabled value) {
         record[col.ordinal()] = (byte) value.ordinal();
     }
-
-
-//    public static Long idOrNull(long id) {
-//        return id > 0 ? id : null;
-//    }
-
-
-    public static byte checkEnumRange(byte value, Class<? extends Enum<?>> cls) throws IOException {
-        int nbConstants = cls.getEnumConstants().length;
-
-        if (value < 0 || value >= nbConstants) {
-            throw new IOException("Corrupted data, invalid ordinal: " + value);
-        }
-
-        return value;
-    }
-
-
 }

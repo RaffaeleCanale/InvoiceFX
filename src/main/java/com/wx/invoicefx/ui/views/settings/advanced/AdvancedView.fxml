@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.wx.invoicefx.ui.views.settings.advanced.table.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<BorderPane prefHeight="600.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.wx.invoicefx.ui.views.settings.advanced.AdvancedViewController">
+    <center>
+        <TabPane  tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <Tab text="%stage.settings.advanced.tab.shared_preferences" >
+                <UserPreferencesTable fx:id="sharedPreferencesTable" />
+            </Tab>
+            <Tab text="%stage.settings.advanced.tab.local_preferences" >
+                <UserPreferencesTable fx:id="localPreferencesTable" />
+            </Tab>
+            <Tab text="%stage.settings.advanced.tab.local_index" >
+                <IndexTable fx:id="localIndexTable" />
+            </Tab>
+            <Tab text="%stage.settings.advanced.tab.remote_index" fx:id="remoteIndexTab" >
+                <IndexTable fx:id="remoteIndexTable" />
+            </Tab>
+            <Tab text="%stage.settings.advanced.tab.drive_properties" >
+                <PreferencesTable fx:id="drivePropertiesTable" />
+            </Tab>
+            <Tab text="%stage.settings.advanced.tab.drive_files" >
+                <DriveFilesTable fx:id="driveFilesTable" />
+            </Tab>
+        </TabPane>
+    </center>
+    <bottom>
+        <FlowPane>
+            <Button text="%stage.settings.advanced.button.close" onAction="#onClose" styleClass="custom-button"/>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+        </FlowPane>
+    </bottom>
+</BorderPane>

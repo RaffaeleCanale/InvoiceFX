@@ -7,23 +7,20 @@ import com.wx.invoicefx.model.entities.client.Client;
 import com.wx.invoicefx.model.save.table.column.Column;
 import com.wx.invoicefx.model.save.table.column.ColumnInfo;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.File;
-import java.io.IOException;
 
 import static com.wx.invoicefx.model.save.table.ClientsTable.Cols.ID;
 import static com.wx.invoicefx.model.save.table.ClientsTable.Cols.NAME;
 import static com.wx.invoicefx.model.save.table.RecordsHelper.*;
-import static com.wx.invoicefx.model.save.table.column.ColumnInfo.ID_COLUMN;
-import static com.wx.invoicefx.model.save.table.column.ColumnInfo.NOT_NULL;
-import static com.wx.invoicefx.model.save.table.column.ColumnInfo.stringColumn;
+import static com.wx.invoicefx.model.save.table.column.ColumnInfo.*;
 
 /**
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)
  * @version 0.1 - created on 16.05.17.
  */
 public class ClientsTable extends IdClusteredIndex {
+
+    public static final String PARTITION_FILE_PREFIX = "clients";
 
     private static final RecordSerializer CLIENT_SERIALIZER = getSerializer(Cols.values(), false);
     private static final int DEFAULT_PARTITION_SIZE = 1024;
@@ -63,6 +60,6 @@ public class ClientsTable extends IdClusteredIndex {
     }
 
     public ClientsTable(File dataDirectory) {
-        super(new DirectoryStorage(CLIENT_SERIALIZER, dataDirectory, "clients"), DEFAULT_PARTITION_SIZE, ID.ordinal());
+        super(new DirectoryStorage(CLIENT_SERIALIZER, dataDirectory, PARTITION_FILE_PREFIX), DEFAULT_PARTITION_SIZE, ID.ordinal());
     }
 }

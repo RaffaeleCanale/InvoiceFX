@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+<?import javafx.scene.shape.Rectangle?>
+<Stage title="%stage.backup.title" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+       fx:controller="com.wx.invoicefx.ui.views.backup.BackupController">
+    <scene>
+        <Scene>
+            <BorderPane prefHeight="550" prefWidth="900">
+                <center>
+                    <VBox spacing="20">
+                        <Label text="%stage.backup.label.header"/>
+                        <ListView fx:id="listView" styleClass="custom-list-view-2"/>
+                        <padding>
+                            <Insets right="50"/>
+                        </padding>
+                    </VBox>
+
+
+                </center>
+
+                <right>
+                    <AnchorPane maxHeight="500" minHeight="500">
+                        <clip>
+                            <Rectangle height="500" width="320" />
+                        </clip>
+                        <fx:include source="../sync/DataSetBox.fxml" fx:id="dataSetBox"/>
+                    </AnchorPane>
+                </right>
+
+                <bottom>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="%stage.common.button.close" cancelButton="true" styleClass="custom-button"
+                                onAction="#onClose"/>
+                        <padding>
+                            <Insets top="20"/>
+                        </padding>
+                    </HBox>
+                </bottom>
+
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+            </BorderPane>
+        </Scene>
+    </scene>
+</Stage>

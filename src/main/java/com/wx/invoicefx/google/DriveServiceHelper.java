@@ -1,17 +1,18 @@
 package com.wx.invoicefx.google;
 
-import com.google.api.client.http.FileContent;
+import com.google.api.client.http.AbstractInputStreamContent;
+import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import com.wx.io.Accessor;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.List;
 
 /**
+ * Simple wrapper around {@link Drive} service that facilitates common operations
+ *
  * @author Raffaele Canale (<a href="mailto:raffaelecanale@gmail.com?subject=InvoiceFX">raffaelecanale@gmail.com</a>)
  * @version 0.1 - created on 11.05.17.
  */
@@ -48,67 +49,33 @@ class DriveServiceHelper {
         return service.files().get(id).executeMediaAsInputStream();
     }
 
-    public void downloadFile(String id, java.io.File destination) throws IOException {
-        try (Accessor accessor = new Accessor()
-                .setIn(downloadFile(id))
-                .setOut(destination, false)) {
-            accessor.pourInOut();
-        }
+    public File insertFile(String parentId, String filename, InputStream in) throws IOException {
+        return insertFile(parentId, filename, new InputStreamContent(null, in));
     }
 
-    public File insertFile(java.io.File fileContent) throws IOException {
-        return insertFile(null, fileContent);
-    }
-
-    public File insertFile(String parentId, java.io.File fileContent) throws IOException {
-        // File's metadata.
+    private File insertFile(String parentId, String filename, AbstractInputStreamContent mediaContent) throws IOException {
         File body = new File();
-        body.setName(fileContent.getName());
+        body.setName(filename);
 
-        // Set the parent folder.
         if (parentId != null && parentId.length() > 0) {
             body.setParents(Collections.singletonList(parentId));
         }
 
-        // File's content.
-        FileContent mediaContent = new FileContent(null, fileContent);
         return service.files().create(body, mediaContent).execute();
     }
 
-    public File updateFile(java.io.File fileContent, String id) throws IOException {
-        // First retrieve the file from the API.
-        File file = service.files().get(id).execute();
-        file.setName(fileContent.getName());
+    public File updateFile(String id, InputStream in) throws IOException {
+        return updateFile(id, new InputStreamContent(null, in));
+    }
 
-        // File's new content.
-        FileContent mediaContent = new FileContent(null, fileContent);
-
-        // Send the request to the API.
-        return service.files().update(id, file, mediaContent).execute();
+    private File updateFile(String id, AbstractInputStreamContent mediaContent) throws IOException {
+        return service.files().update(id, new File(), mediaContent).execute();
     }
 
 
 
     public void removeFile(String id) throws IOException {
         service.files().delete(id).execute();
-    }
-
-
-    public void printFiles() throws IOException {
-        FileList result = service.files().list()
-                .setPageSize(10)
-//                .setMaxResults(10)
-                .execute();
-
-        List<File> files = result.getFiles();
-        if (files == null || files.size() == 0) {
-            System.out.println("No files found.");
-        } else {
-            System.out.println("Files:");
-            for (File file : files) {
-                System.out.printf("%s (%s)\n", file.getName(), file.getId());
-            }
-        }
     }
 
 }

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.*?>
+
+
+<?import javafx.stage.Stage?>
+<?import javafx.scene.Scene?>
+<?import com.wx.invoicefx.ui.components.NumberTextField?>
+<?import com.wx.invoicefx.ui.components.suggestion.textfield.SuggestionTextArea?>
+<Stage title="%stage.overview.title" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+       fx:controller="com.wx.invoicefx.ui.views.overview.OverviewController">
+    <scene>
+        <Scene>
+            <BorderPane>
+                <top>
+                    <MenuBar BorderPane.alignment="CENTER" styleClass="custom-menu-bar">
+                        <Menu text="%stage.overview.menu.file">
+                            <MenuItem onAction="#loadEmptyInvoice" text="%stage.overview.menu.file.new">
+                                <accelerator>
+                                    <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP"
+                                                        shortcut="UP"/>
+                                </accelerator>
+                            </MenuItem>
+                            <SeparatorMenuItem/>
+
+                            <MenuItem onAction="#openInvoicesArchive"
+                                      text="%stage.overview.menu.file.archives">
+                                <accelerator>
+                                    <KeyCodeCombination alt="UP" code="F" control="DOWN" meta="UP" shift="UP"
+                                                        shortcut="UP"/>
+                                </accelerator>
+                            </MenuItem>
+
+                            <MenuItem onAction="#editItems"
+                                      text="%stage.overview.menu.file.edit_items"/>
+
+                            <MenuItem onAction="#openBackups" text="%stage.overview.menu.file.backup"/>
+
+                            <SeparatorMenuItem/>
+                            <MenuItem onAction="#settings"
+                                      text="%stage.overview.menu.file.settings">
+                                <!--<accelerator>-->
+                                <!--<KeyCodeCombination alt="DOWN" code="S" control="DOWN" meta="UP" shift="UP"-->
+                                <!--shortcut="UP"/>-->
+                                <!--</accelerator>-->
+                            </MenuItem>
+                            <SeparatorMenuItem/>
+                            <MenuItem onAction="#quit" text="%stage.overview.menu.file.quit">
+                                <accelerator>
+                                    <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP"
+                                                        shortcut="UP"/>
+                                </accelerator>
+                            </MenuItem>
+                        </Menu>
+                    </MenuBar>
+                </top>
+
+
+                <center>
+                    <VBox alignment="TOP_CENTER" spacing="10.0" BorderPane.alignment="CENTER" prefWidth="700">
+                        <padding>
+                            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                        </padding>
+                        <HBox spacing="10.0" VBox.vgrow="NEVER">
+                            <Label minWidth="-Infinity" text="%stage.overview.label.address"/>
+                            <SuggestionTextArea fx:id="addressTextArea" prefHeight="100.0" styleClass="custom-text-field-2"
+                                                promptText="%stage.overview.prompt.address"
+                                                HBox.hgrow="ALWAYS"/>
+                            <VBox spacing="10.0" HBox.hgrow="NEVER">
+                                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                    <Label minWidth="-Infinity" text="%stage.overview.label.date"/>
+                                    <DatePicker minWidth="-Infinity" fx:id="datePicker" prefWidth="120.0"
+                                                styleClass="custom-date-picker"/>
+                                </HBox>
+                                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                    <Label minWidth="-Infinity" text="%stage.overview.label.id"/>
+                                    <NumberTextField minWidth="-Infinity" fx:id="idTextField" prefWidth="120.0"
+                                                     styleClass="custom-text-field"/>
+                                </HBox>
+                            </VBox>
+                        </HBox>
+                        <VBox styleClass="warning-pane" spacing="10.0" fx:id="vatWarningPane" visible="false" managed="false">
+                            <Label text="%stage.overview.vat_warning.warning" styleClass="text-bold, warning-label"/>
+                            <Label text="%stage.overview.vat_warning.description"/>
+                            <FlowPane alignment="BASELINE_RIGHT">
+                                <Button text="%stage.overview.vat_warning.action" onAction="#updateItemsVats" styleClass="custom-button"/>
+                            </FlowPane>
+                            <padding>
+                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                            </padding>
+                        </VBox>
+                        <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" styleClass="custom-scroll-pane"
+                                    VBox.vgrow="ALWAYS"
+                                    prefHeight="500">
+                            <VBox>
+                                <VBox fx:id="itemsPane" spacing="10.0">
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </padding>
+                                </VBox>
+                                <FlowPane>
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </padding>
+                                    <FlowPane fx:id="buttonsPane" hgap="10" vgap="10"/>
+                                </FlowPane>
+                            </VBox>
+                        </ScrollPane>
+                        <HBox>
+                            <fx:include source="../../components/google/RemoteStatusPane.fxml"
+                                        fx:id="remoteStatusPane"/>
+                            <FlowPane HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT">
+                                <Button fx:id="createButton" onAction="#createInvoice" styleClass="custom-button"
+                                        text="%stage.overview.button.create"/>
+                            </FlowPane>
+                        </HBox>
+                    </VBox>
+                </center>
+            </BorderPane>
+        </Scene>
+    </scene>
+</Stage>

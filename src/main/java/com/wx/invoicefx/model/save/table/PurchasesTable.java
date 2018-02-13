@@ -23,6 +23,8 @@ import static com.wx.invoicefx.model.save.table.column.ColumnInfo.*;
  */
 public class PurchasesTable extends ClusteredIndex {
 
+    public static final String PARTITION_FILE_PREFIX = "purchases";
+
     private static final RecordSerializer PURCHASE_SERIALIZER = getSerializer(Cols.values(), false);
     private static final int DEFAULT_PARTITION_SIZE = 1024;
 
@@ -46,11 +48,6 @@ public class PurchasesTable extends ClusteredIndex {
             return column;
         }
     }
-
-//    public static long getClientId(Object[] record, int i) {
-//        int index = Cols.values().length + i;
-//        return (long) record[index];
-//    }
 
     public static Object[] getPurchaseRecord(PurchaseGroup purchaseGroup, Purchase purchase, int purchaseIndex) {
         final Object[] record = new Object[Cols.values().length];
@@ -80,7 +77,7 @@ public class PurchasesTable extends ClusteredIndex {
     }
 
     public PurchasesTable(File dataDirectory) {
-        super(new DirectoryStorage(PURCHASE_SERIALIZER, dataDirectory, "purchases"), DEFAULT_PARTITION_SIZE, GROUP_ID.ordinal());
+        super(new DirectoryStorage(PURCHASE_SERIALIZER, dataDirectory, PARTITION_FILE_PREFIX), DEFAULT_PARTITION_SIZE, GROUP_ID.ordinal());
     }
 
 }

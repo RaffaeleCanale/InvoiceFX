@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.wx.invoicefx.util.UpperBoundBinarySearch.search;
+import static com.wx.invoicefx.util.collections.UpperBoundBinarySearch.search;
 import static java.util.Comparator.naturalOrder;
 import static org.junit.Assert.assertEquals;
 

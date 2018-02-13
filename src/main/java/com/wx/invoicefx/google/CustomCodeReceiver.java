@@ -16,8 +16,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-//import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-
 /**
  * This receiver has been extracted from the Google API and slightly adapted
  * in order to retrieve the activation url

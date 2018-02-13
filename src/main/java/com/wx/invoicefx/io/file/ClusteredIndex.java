@@ -1,7 +1,7 @@
 package com.wx.invoicefx.io.file;
 
 import com.wx.invoicefx.io.interfaces.PartitionedStorage;
-import com.wx.invoicefx.util.UpperBoundBinarySearch;
+import com.wx.invoicefx.util.collections.UpperBoundBinarySearch;
 import com.wx.util.future.Future;
 import com.wx.util.future.IoIterator;
 import com.wx.util.iterator.FilteredIterator;
@@ -30,6 +30,10 @@ public class ClusteredIndex {
         this.storage = storage;
         this.maxPartitionSize = maxPartitionSize;
         this.sortKey = sortKey;
+    }
+
+    public void clearBuffer() {
+        partitionsBuffer.clear();
     }
 
     public int getSortKey() {
@@ -64,10 +68,6 @@ public class ClusteredIndex {
         return new ReversedIterator(storage.getPartitionsCount());
     }
 
-//    public Stream<Object[]> streamm() {
-//        return StreamSupport.stream(spliterator(), false);
-//    }
-
     public IoIterator<Object[]> queryIndex(long value) throws IOException {
         int partitionIndex = searchPartitionFor(value);
         if (partitionIndex < 0) {
@@ -98,23 +98,13 @@ public class ClusteredIndex {
     }
 
     public IoIterator<Object[]> query(Predicate<Object[]> query) throws IOException {
-
-        FilteredIterator<Future<Object[]>> filteredIterator = new FilteredIterator<>(iterator().iterator(), future -> {
-            if (future.isException()) return true;
-
-            return query.test(future.getValue());
-        });
+        FilteredIterator<Future<Object[]>> filteredIterator = new FilteredIterator<>(iterator().iterator(), future -> future.isException() || query.test(future.getValue()));
 
         return IoIterator.reversed(filteredIterator);
+    }
 
-//        while (it.hasNext()) {
-//            Object[] next = it.next();
-//            if (query.test(next)) {
-//                return Optional.of(next);
-//            }
-//        }
-//
-//        return Optional.empty();
+    public IoIterator<Object[]> queryColumn(Enum<?> col, Object value) throws IOException {
+        return queryColumn(col.ordinal(), value);
     }
 
     public IoIterator<Object[]> queryColumn(int col, Object value) throws IOException {
@@ -140,6 +130,28 @@ public class ClusteredIndex {
         return false;
     }
 
+    public boolean update(Enum<?> idCol, Object id, Object[] newRow) throws IOException {
+        return update(idCol.ordinal(), id, newRow);
+    }
+
+    public boolean update(int idCol, Object id, Object[] newRow) throws IOException {
+        return update((row) -> Objects.equals(row[idCol], id), newRow);
+    }
+
+    public boolean update(Predicate<Object[]> query, Object[] newRow) throws IOException {
+        ReversedIterator it = (ReversedIterator) iterator();
+
+        while (it.hasNext()) {
+            Object[] next = it.next();
+            if (query.test(next)) {
+                it.update(newRow);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void insertWithIndexUnique(Object[] row) throws IOException {
         insertWithIndex(row, true);
     }
@@ -157,8 +169,6 @@ public class ClusteredIndex {
     public PartitionedStorage getStorage() {
         return storage;
     }
-
-    protected void onRemoved(Object[] removed) {}
 
     private void insertWithIndex(Object[] row, boolean ensureUnique) throws IOException {
         if (row[sortKey] == null) {
@@ -187,13 +197,12 @@ public class ClusteredIndex {
         List<Object[]> partition = getPartition(partitionIndex);
         if (partition.size() < maxPartitionSize) {
             partition.add(0, row);
-            storage.getPartition(partitionIndex).write(partition);
+
 
         } else {
             partition.add(0, row);
             Object[] replaceRow = partition.remove(partition.size() - 1);
 
-            storage.getPartition(partitionIndex).write(partition);
             insertAtBeginning(partitionIndex + 1, replaceRow);
         }
     }
@@ -226,13 +235,11 @@ public class ClusteredIndex {
         } else {
             if (partition.size() < maxPartitionSize) {
                 partition.add(insertIndex, row);
-                storage.getPartition(partitionIndex).write(partition);
 
             } else {
                 partition.add(insertIndex, row);
                 Object[] replaceRow = partition.remove(partition.size() - 1);
 
-                storage.getPartition(partitionIndex).write(partition);
                 insertAtBeginning(partitionIndex + 1, replaceRow);
             }
         }
@@ -341,8 +348,15 @@ public class ClusteredIndex {
                 throw new IllegalStateException("Must call next first");
             }
 
-            Object[] removed = getPartition(previousPartition).remove(previousIndex);
-            onRemoved(removed);
+            getPartition(previousPartition).remove(previousIndex);
+        }
+        
+        public void update(Object[] newRow) throws IOException {
+            if (previousIndex < 0) {
+                throw new IllegalStateException("Must call next first");
+            }
+
+            getPartition(previousPartition).set(previousIndex, newRow);
         }
 
         private void nextPartition() throws IOException {

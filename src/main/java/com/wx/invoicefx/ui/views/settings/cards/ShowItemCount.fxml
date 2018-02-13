@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.wx.invoicefx.ui.components.NumberTextField?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Rectangle2D?>
+<?import com.wx.invoicefx.ui.components.ToggleSwitch?>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.wx.invoicefx.ui.views.settings.cards.ShowItemCountController"
+      spacing="10">
+
+
+    <BorderPane>
+        <left>
+            <Label text="HELLO WORLD"/>
+        </left>
+        <right>
+            <ToggleSwitch/>
+        </right>
+    </BorderPane>
+
+    <HBox spacing="10.0" alignment="CENTER_RIGHT">
+        <Label text="See example"/>
+        <Label styleClass="down-arrow"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <ImageView>
+            <Image url="/assets/item_count_fr.png"/>
+        </ImageView>
+
+        <Label text="->"/>
+
+        <VBox>
+            <Label text="Some client name"/>
+            <Label text="2 TODO ITEM            Sfr.     90.0"/>
+            <Label text="Vom 21/06/2017"/>
+            <Label text="Bis 22/06/2017"/>
+        </VBox>
+
+    </HBox>
+
+
+</VBox>

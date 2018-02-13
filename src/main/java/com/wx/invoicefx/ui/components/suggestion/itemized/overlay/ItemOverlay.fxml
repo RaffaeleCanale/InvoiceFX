@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+
+
+<HBox spacing="5.0" styleClass="autocomplete-item" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.wx.invoicefx.ui.components.suggestion.itemized.overlay.ItemOverlayController" fx:id="contentPane"
+      prefHeight="10" alignment="CENTER_LEFT">
+    <children>
+        <Label fx:id="itemNameLabel" text="Raffaele Canale" />
+        <Label styleClass="autocomplete-item-close" text="x" fx:id="closeLabel"
+               onMouseClicked="#removeItem" onMouseEntered="#onMouseEntered" onMouseExited="#onMouseExited">
+            <cursor>
+                <Cursor fx:constant="HAND" />
+            </cursor>
+        </Label>
+    </children>
+    <padding>
+        <Insets bottom="2.0" left="5.0" right="2.0" top="2.0" />
+    </padding>
+</HBox>

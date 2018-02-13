@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<HBox xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.wx.invoicefx.ui.views.archives.InvoiceListCellController"
+      spacing="10"
+      alignment="TOP_LEFT">
+
+    <VBox>
+        <Label fx:id="idLabel"/>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+    </VBox>
+
+    <FlowPane HBox.hgrow="ALWAYS" fx:id="clientsPane" alignment="TOP_LEFT" styleClass="text-bold">
+
+    </FlowPane>
+    <VBox spacing="10.0">
+        <Label fx:id="dateLabel"/>
+        <Label fx:id="sumLabel" styleClass="text-disabled-2"/>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+    </VBox>
+
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+</HBox>

@@ -3,6 +3,7 @@ package com.wx.invoicefx.io.primary_key;
 import com.wx.invoicefx.io.file.ClusteredIndex;
 import com.wx.invoicefx.io.interfaces.PartitionedStorage;
 import com.wx.properties.property.Property;
+import com.wx.util.future.IoIterator;
 
 import java.io.IOException;
 
@@ -12,7 +13,7 @@ import java.io.IOException;
  */
 public class ClusteredIndexWithPK extends ClusteredIndex {
 
-    private final Property<Long> maxIdProperty;
+    protected  final Property<Long> maxIdProperty;
     private final int idKey;
 
     public ClusteredIndexWithPK(PartitionedStorage storage, int maxPartitionSize, int sortKey, int idKey, Property<Long> maxIdProperty) {
@@ -20,10 +21,17 @@ public class ClusteredIndexWithPK extends ClusteredIndex {
 
         this.maxIdProperty = maxIdProperty;
         this.idKey = idKey;
+    }
 
-        if (!maxIdProperty.exists()) {
-            maxIdProperty.set(0L);
+    public void recoverMaxId() throws IOException {
+        IoIterator<Object[]> it = iterator();
+
+        long maxId = 0;
+        while (it.hasNext()) {
+            maxId = Math.max(maxId, (long) it.next()[idKey]);
         }
+
+        maxIdProperty.set(maxId);
     }
 
     public long assignUniqueIdAndInsert(Object[] record) throws IOException {
@@ -47,7 +55,6 @@ public class ClusteredIndexWithPK extends ClusteredIndex {
     @Override
     public void insertWithIndex(Object[] row) throws IOException {
         long id = (long) row[idKey];
-//        System.out.println(id + " .. " + maxIdProperty.get());
 
         if (id > maxIdProperty.get()) {
 
@@ -65,8 +72,4 @@ public class ClusteredIndexWithPK extends ClusteredIndex {
         }
     }
 
-//    @Override
-//    protected void onRemoved(Object[] removed) {
-//        super.onRemoved(removed);
-//    }
 }

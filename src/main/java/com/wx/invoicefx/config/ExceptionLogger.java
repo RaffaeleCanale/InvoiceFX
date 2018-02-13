@@ -1,6 +1,5 @@
 package com.wx.invoicefx.config;
 
-import com.wx.io.AccessorUtil;
 import com.wx.io.TextAccessor;
 import com.wx.util.Format;
 import com.wx.util.log.LogHelper;
@@ -35,13 +34,23 @@ public class ExceptionLogger {
      *
      * @param e Exception to log
      */
-    public static void logException(Exception e) {
-        LOG.warning("[" + e.getClass().getSimpleName() + "] " + e.getMessage());
+    public static void logException(Throwable e) {
+        logException(e, null);
+    }
+
+    public static void logException(Throwable e, String message) {
+        String content = "[" + e.getClass().getSimpleName() + "] " + e.getMessage();
+        if (message != null) {
+            content = message + "\nCaused by: " + content;
+        }
+
+        LOG.warning(content);
+
         try {
             File file = Places.getFile(LOG_FILE);
 
             PrintWriter writer = new PrintWriter(new FileOutputStream(file, true));
-            writer.write("\n\n" + Format.formatDate(new Date().getTime()) + "\n");
+            writer.write("\n\n" + Format.formatDate(new Date().getTime()) + "\n" + content + "\n");
             e.printStackTrace(writer);
             writer.close();
         } catch (IOException ex) {

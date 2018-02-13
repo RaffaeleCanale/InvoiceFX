@@ -1,5 +1,11 @@
 #!/bin/bash
 
-convert icon.png -resize 64x64 icon_64.png
-convert icon.png -resize 128x128 icon_128.png
-convert icon.png -resize 256x256 icon.ico
+filename=$(basename "$1")
+extension="${filename##*.}"
+filename="${filename%.*}"
+
+convert "$1" -resize 16x16 "$filename"_16.png
+convert "$1" -resize 32x32 "$filename"_32.png
+convert "$1" -resize 64x64 "$filename"_64.png
+convert "$1" -resize 128x128 "$filename"_128.png
+convert "$1" -resize 256x256 "$filename".ico

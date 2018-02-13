@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.pdfsam.ui.RingProgressIndicator?>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.wx.invoicefx.ui.views.sync.DataSetBoxController"
+      fx:id="contentPane"
+      spacing="20"
+      prefHeight="480" prefWidth="300"
+      maxHeight="480" minHeight="480"
+      styleClass="setting-card, larger-padding">
+
+
+    <FlowPane alignment="CENTER">
+        <Label fx:id="titleLabel"/>
+        <!--<padding>-->
+        <!--<Insets bottom="20" />-->
+        <!--</padding>-->
+    </FlowPane>
+
+    <BorderPane>
+        <left>
+            <Label fx:id="invoicesCountLabel" BorderPane.alignment="CENTER_LEFT" styleClass="sync-repo-subtitle"/>
+        </left>
+        <right>
+            <Button text="%stage.common.button.open" onAction="#onOpen" styleClass="right-button" fx:id="openButton"/>
+        </right>
+    </BorderPane>
+
+    <VBox spacing="5">
+        <Label text="%stage.repository_chooser.box.label.version" styleClass="repository-box-label"/>
+        <StackPane alignment="CENTER_LEFT">
+            <Label fx:id="versionLabel" styleClass="repository-box-value"/>
+            <ChoiceBox fx:id="versionsChoiceBox" styleClass="custom-choice-box" prefWidth="200" visible="false"/>
+        </StackPane>
+    </VBox>
+
+    <VBox spacing="5">
+        <Label text="%stage.repository_chooser.box.label.last_modified" styleClass="repository-box-label"/>
+        <Label fx:id="dateLabel" styleClass="repository-box-value"/>
+    </VBox>
+
+    <VBox spacing="5">
+        <Label text="%stage.repository_chooser.box.label.last_author" styleClass="repository-box-label"/>
+        <Label fx:id="authorLabel" styleClass="repository-box-value"/>
+    </VBox>
+
+
+    <FlowPane alignment="CENTER">
+        <Button fx:id="chooseButton" text="%stage.repository_chooser.box.button.choose"
+                styleClass="custom-button, lock-button"/>
+        <padding>
+            <Insets top="50"/>
+        </padding>
+    </FlowPane>
+
+
+</VBox>

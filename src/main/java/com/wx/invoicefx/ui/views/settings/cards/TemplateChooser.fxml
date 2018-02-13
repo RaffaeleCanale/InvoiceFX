@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.wx.invoicefx.ui.components.settings.ExpandPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<ExpandPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.wx.invoicefx.ui.views.settings.cards.TemplateChooserController"
+            text="%stage.settings.card.tex_template.label"
+            fx:id="expandPane">
+
+    <expandableContent>
+        <VBox spacing="0.0" prefHeight="80.0">
+            <fx:define>
+                <ToggleGroup fx:id="toggleGroup"/>
+            </fx:define>
+
+
+            <BorderPane onMouseClicked="#selectDefault" styleClass="custom-cell">
+                <left>
+                    <RadioButton text="%stage.settings.card.tex_template.default" toggleGroup="$toggleGroup" fx:id="defaultRadioButton" mouseTransparent="true" BorderPane.alignment="CENTER_LEFT" focusTraversable="false"/>
+                </left>
+            </BorderPane>
+
+            <HBox alignment="CENTER">
+                    <BorderPane onMouseClicked="#selectCustom" styleClass="custom-cell" HBox.hgrow="ALWAYS">
+                        <left>
+                            <RadioButton text="%stage.settings.card.tex_template.custom" toggleGroup="$toggleGroup" fx:id="customRadioButton" mouseTransparent="true" BorderPane.alignment="CENTER_LEFT" focusTraversable="false"/>
+                        </left>
+                    </BorderPane>
+                    <Button text="change" styleClass="right-button" prefHeight="35" onAction="#changeCustom" />
+            </HBox>
+
+
+        </VBox>
+    </expandableContent>
+
+
+
+</ExpandPane>

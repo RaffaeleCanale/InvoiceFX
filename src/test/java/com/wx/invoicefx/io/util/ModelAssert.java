@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 public class ModelAssert {
 
     public static void assertInvoicesEquals(List<Invoice> expectedInvoices, List<Invoice> actualInvoices) {
-        assertEquals("Lists do not have the same number of invoices", expectedInvoices.size(), actualInvoices.size());
+        assertEquals("Lists do not have the same number of openInvoicesArchive", expectedInvoices.size(), actualInvoices.size());
 
         List<Set<Invoice>> expectedInvoicesByDate = groupByDate(expectedInvoices);
         List<Set<Invoice>> actualInvoicesByDate = groupByDate(actualInvoices);
@@ -56,7 +56,7 @@ public class ModelAssert {
 
     private static Map<Long, Invoice> toMap(Set<Invoice> invoices) {
         return invoices.stream().collect(Collectors.toMap(Invoice::getId, Function.identity(), (BinaryOperator<Invoice>) (a, b) -> {
-            throw new AssertionError("Multiple invoices with the same ID");
+            throw new AssertionError("Multiple openInvoicesArchive with the same ID");
         }));
     }
 
